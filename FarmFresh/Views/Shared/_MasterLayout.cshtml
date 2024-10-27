@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="google" value="notranslate" />
+    <title>@ViewBag.Title - FBChamp</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    @*  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="description" content="Course Management System">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body class="bg-gradient-primary" id="page-top">
+    @RenderBody()
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.min.js"></script>
+    @await RenderSectionAsync("Scripts", false)
+</body>
+</html>

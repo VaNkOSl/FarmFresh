@@ -1,0 +1,11 @@
+﻿@model string
+@{
+    if(!String.IsNullOrEmpty(Model))
+    {
+        <img style="height: 65px; width: 40px;" src="data:image/jpeg;base64,@Model" alt="photo">
+    }
+    else
+    {
+        <img style="height: 65px; width: 40px;" src="~/images/no_photo.jpg">
+    }
+}
