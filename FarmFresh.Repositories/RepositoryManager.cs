@@ -3,7 +3,7 @@ using FarmFresh.Repositories.Contacts;
 
 namespace FarmFresh.Repositories;
 
-public class RepositoryManager : IRepositoryManager
+public sealed class RepositoryManager : IRepositoryManager
 {
     private readonly FarmFreshDbContext _data;
     private Lazy<IUserRepository> _userRepository;

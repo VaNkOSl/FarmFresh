@@ -15,7 +15,7 @@ using System.Security.Claims;
 
 namespace FarmFresh.Services;
 
-public class AccountService : IAccountService
+public sealed class AccountService : IAccountService
 {
     private readonly IRepositoryManager _repositoryManager;
     private readonly IMapper _mapper;

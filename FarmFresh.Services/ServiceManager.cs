@@ -5,7 +5,7 @@ using LoggerService.Contacts;
 
 namespace FarmFresh.Services;
 
-public class ServiceManager : IServiceManager
+public sealed class ServiceManager : IServiceManager
 {
     private readonly Lazy<IAccountService> _accountService;
 
