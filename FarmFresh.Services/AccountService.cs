@@ -39,6 +39,7 @@ public sealed class AccountService : IAccountService
 
         if (user is null)
         {
+            _loggerManager.LogWarning($"User with ID {userId} was not found.");
             throw new IdParametersBadRequestException();
         }
 
@@ -55,7 +56,7 @@ public sealed class AccountService : IAccountService
 
         if (user == null)
         {
-            _loggerManager.LogError("Somenthing went wrock in Login method");
+            _loggerManager.LogError("Login attempt failed. User not found.");
             throw new UserNotFounException();
         }
 
@@ -63,10 +64,12 @@ public sealed class AccountService : IAccountService
 
         if(verificationResult is PasswordVerificationResult.Failed)
         {
+            _loggerManager.LogWarning($"Password verification failed for user {model.UserNameOrEmail}.");
             return false;
         }
 
         await SignInUserAsync(user);
+        _loggerManager.LogInfo($"User {model.UserNameOrEmail} successfully logged in.");
 
         return true;
     }
@@ -74,6 +77,7 @@ public sealed class AccountService : IAccountService
     public async Task Logout()
     {
         await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        _loggerManager.LogInfo("User successfully logged out.");
     }
 
     public async Task<bool> Register(RegisterViewModel model)
@@ -82,6 +86,7 @@ public sealed class AccountService : IAccountService
 
         if (await existingUsers.AnyAsync(u => u.Email == model.Email || u.UserName == model.UserName))
         {
+            _loggerManager.LogWarning($"Registration failed. User with email {model.Email} or username {model.UserName} already exists.");
             return false; 
         }
 
@@ -92,6 +97,7 @@ public sealed class AccountService : IAccountService
         await _repositoryManager.UserRepository.CreateUserAsync(user);
         await _repositoryManager.SaveAsync();
 
+        _loggerManager.LogInfo($"New user registered successfully with username {model.UserName}.");
         return true;
     }
 
