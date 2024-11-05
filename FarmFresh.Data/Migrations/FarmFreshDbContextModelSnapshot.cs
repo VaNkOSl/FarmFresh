@@ -117,7 +117,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.Farmer", b =>
@@ -162,7 +162,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Farmer");
+                    b.ToTable("Farmers");
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.Order", b =>
@@ -219,7 +219,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.OrderProduct", b =>
@@ -247,7 +247,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderProduct");
+                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.Product", b =>
@@ -289,6 +289,10 @@ namespace FarmFresh.Data.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<byte[]>("Photo")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -305,7 +309,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasIndex("FarmerId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.ProductPhoto", b =>
@@ -334,7 +338,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductPhoto");
+                    b.ToTable("ProductPhotos");
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.Review", b =>
@@ -365,7 +369,7 @@ namespace FarmFresh.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Review");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>

@@ -36,6 +36,9 @@ public class Product : Entity_1<Guid>
     public bool IsAvailable { get; set; }
 
     [Required]
+    public byte[] Photo { get; set; } = new byte[0];
+
+    [Required]
     public Seasons SuitableSeason {  get; set; }
 
     [Required]
