@@ -12,9 +12,12 @@ public static class EntityValidationConstants
 
         public const int UserUserNameMinLength = 5;
         public const int UserUserNameMaxLength = 15;
+
+        public const int PersonPhotoWidth = 300;
+        public const int PersonPhotoHeight = 500;
     }
 
-    public static class Farmer
+    public static class Farmers
     {
         public const int FarmerDescriptionMinLength = 0;
         public const int FarmerDescriptionMaxLength = 200;

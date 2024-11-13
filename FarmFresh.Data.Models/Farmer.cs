@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static FarmFresh.Commons.EntityValidationConstants.Farmer;
+using static FarmFresh.Commons.EntityValidationConstants.Farmers;
 
 namespace FarmFresh.Data.Models;
 
