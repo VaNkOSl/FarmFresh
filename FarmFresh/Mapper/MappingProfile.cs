@@ -25,7 +25,19 @@ public class MappingProfile : Profile
 
         CreateMap<ApplicationUser, ProfileViewModel>();
 
-        CreateMap<FarmerDto, Farmer>()
-            .ForMember(dest => dest.User, opt => opt.Ignore());
+        CreateMap<FarmerCreateUpdateForm, Farmer>()
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => true))
+            .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoFile != null ? ConvertToByteArray(src.PhotoFile) : new byte[0]))
+            .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.BirthDate));
+    }
+
+    private byte[] ConvertToByteArray(IFormFile file)
+    {
+        using(var memoryStream =  new MemoryStream())
+        {
+            file.CopyTo(memoryStream);
+            return memoryStream.ToArray();
+        }
     }
 }

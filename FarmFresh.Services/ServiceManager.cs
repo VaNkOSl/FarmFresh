@@ -7,11 +7,12 @@ namespace FarmFresh.Services;
 
 public sealed class ServiceManager : IServiceManager
 {
-    private readonly Lazy<IAccountService> _accountService;
+    private readonly Lazy<IFarmerService> _farmerService;
 
     public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager loggerManager)
     {
+        _farmerService = new Lazy<IFarmerService>(() => new FarmerService(repositoryManager, loggerManager, mapper));
     }
 
-    public IAccountService AccountService => _accountService.Value;
+    public IFarmerService FarmerService => _farmerService.Value;
 }

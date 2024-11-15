@@ -2,5 +2,5 @@
 
 public interface IServiceManager
 {
-   // IAccountService AccountService { get; }
+    IFarmerService FarmerService { get; }
 }
