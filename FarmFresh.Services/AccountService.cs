@@ -22,6 +22,7 @@ public sealed class AccountService : IAccountService
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+
     public AccountService(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager loggerManager,
                           IPasswordHasher<ApplicationUser> passwordHasher , IHttpContextAccessor httpContextAccessor)
     {
@@ -37,6 +38,9 @@ public sealed class AccountService : IAccountService
         var users = _repositoryManager.UserRepository
              .FindUsersByConditionAsync(u => u.UserName == userName 
                                         || u.Email == email, trackChanges);
+
+        Console.WriteLine();
+
 
         return await users.AnyAsync();
     }
