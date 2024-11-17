@@ -25,7 +25,7 @@ public class AccountController : BaseController
     {
         if (ModelState.IsValid)
         {
-            if (await _accountService.Login(model))
+            if (await _accountService.Login(model, trackChanges: false))
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -45,7 +45,7 @@ public class AccountController : BaseController
     {
         if (ModelState.IsValid)
         {
-            if (await _accountService.Register(model))
+            if (await _accountService.Register(model, trackChanges: true))
             {
                 return RedirectToAction("Index", "Home");
             }

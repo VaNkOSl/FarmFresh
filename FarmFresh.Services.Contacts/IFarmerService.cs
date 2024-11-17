@@ -4,11 +4,7 @@ namespace FarmFresh.Services.Contacts;
 
 public interface IFarmerService
 {
-    Task CreateFarmerAsync(FarmerCreateUpdateForm model, string userId);
+    Task CreateFarmerAsync(FarmerCreateUpdateForm model, string userId, bool tracktrackChanges);
 
-    Task<bool> FarmerWithProvidedUserIdAlreadyExistsAsync(string userId);
-
-    Task<bool> FarmerEgnAlreadyExistsAsync(string egn);
-
-    Task<bool> FarmerPhoneNumberAlreadyExists(string phoneNumber);
+    Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool tracktrackChanges);
 }

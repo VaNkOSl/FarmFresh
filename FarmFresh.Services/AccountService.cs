@@ -4,7 +4,6 @@ using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.User;
 using LoggerService.Contacts;
-using LoggerService.Exceptions.BadRequest;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -33,6 +32,15 @@ public sealed class AccountService : IAccountService
         _httpContextAccessor = httpContextAccessor;
     }
 
+    public async Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges)
+    {
+        var users = _repositoryManager.UserRepository
+             .FindUsersByConditionAsync(u => u.UserName == userName 
+                                        || u.Email == email, trackChanges);
+
+        return await users.AnyAsync();
+    }
+
     public async Task<ProfileViewModel> GetUserProfileAsync(string userId)
     {
         var user = await _repositoryManager.UserRepository.GetUserByIdAsync(Guid.Parse(userId));
@@ -40,7 +48,7 @@ public sealed class AccountService : IAccountService
         if (user is null)
         {
             _loggerManager.LogWarning($"User with ID {userId} was not found.");
-            throw new IdParametersBadRequestException();
+            throw new UserIdNotFound();
         }
 
         var userProfile = _mapper.Map<ProfileViewModel>(user);
@@ -48,13 +56,15 @@ public sealed class AccountService : IAccountService
         return userProfile;
     }
 
-    public async Task<bool> Login(LoginViewModel model)
+    public async Task<bool> Login(LoginViewModel model, bool trackChanges)
     {
-        var allUsers = await _repositoryManager.UserRepository.GetAllUsersAsync();
+        var users = _repositoryManager.UserRepository
+                             .FindUsersByConditionAsync(u => u.UserName == model.UserNameOrEmail
+                                                        || u.Email == model.UserNameOrEmail, trackChanges);
 
-        var user = await allUsers.FirstOrDefaultAsync(u => u.UserName == model.UserNameOrEmail || u.Email == model.UserNameOrEmail);
+        var user = await users.FirstOrDefaultAsync();
 
-        if (user == null)
+        if (user is null)
         {
             _loggerManager.LogError("Login attempt failed. User not found.");
             throw new UserNotFounException();
@@ -80,14 +90,12 @@ public sealed class AccountService : IAccountService
         _loggerManager.LogInfo("User successfully logged out.");
     }
 
-    public async Task<bool> Register(RegisterViewModel model)
+    public async Task<bool> Register(RegisterViewModel model, bool trackChanges)
     {
-        var existingUsers = await _repositoryManager.UserRepository.GetAllUsersAsync();
-
-        if (await existingUsers.AnyAsync(u => u.Email == model.Email || u.UserName == model.UserName))
+        if (await DoesUserExistAsync(model.UserName, model.Email, trackChanges))
         {
-            _loggerManager.LogWarning($"Registration failed. User with email {model.Email} or username {model.UserName} already exists.");
-            return false; 
+            _loggerManager.LogWarning($"Registration failed. User with username {model.UserName} or email {model.Email} already exists.");
+            return false;
         }
 
         var user = _mapper.Map<ApplicationUser>(model);

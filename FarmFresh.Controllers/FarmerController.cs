@@ -31,7 +31,7 @@ public class FarmerController : BaseController
             return View(model);
         }
 
-        await _serviceManager.FarmerService.CreateFarmerAsync(model, userId);
+        await _serviceManager.FarmerService.CreateFarmerAsync(model, userId, tracktrackChanges: true);
         TempData[SuccessMessage] = SuccessfullyBecomeAFarmer;
 
         return RedirectToAction(nameof(HomeController.Index), "Home");

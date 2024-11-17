@@ -1,18 +1,17 @@
-﻿namespace FarmFresh.Repositories.Contacts;
+﻿using System.Linq.Expressions;
+
+namespace FarmFresh.Repositories.Contacts;
 
 public interface IRepositoryBase<T>
 {
-    IQueryable<T> All<T>() where T : class;
+    IQueryable<T> FindAll(bool tracktrackChanges);
 
-    IQueryable<T> AllReadOnly<T>() where T : class;
+    IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges);
+    Task CreateAsync(T entity);
 
-    Task AddAsync<T>(T entity) where T : class;
+    void Update(T entity);
 
-    Task<T?> GetByIdAsync<T>(Guid id) where T : class;
+    void Delete(T entity);
 
-    Task DeleteAsync<T>(Guid id) where T : class;
-
-    Task UpdateAsync<T>(T entity) where T : class;
-
-    Task DeleteRange<T>(IEnumerable<T> entities) where T : class;
+    Task<T?> GetByIdAsync(Guid id);
 }

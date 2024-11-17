@@ -1,16 +1,16 @@
-﻿namespace FarmFresh.Data.Models.Repositories;
+﻿using System.Linq.Expressions;
+
+namespace FarmFresh.Data.Models.Repositories;
 
 public interface IFarmerRepository
 {
-    Task<IQueryable<Farmer>> GetAllFarmersAsync();
-
-    Task<IQueryable<Farmer>> GetAllFarmerReadOnlyAsync();
-
     Task<Farmer> CreateFarmerAsync(Farmer farmer);
 
-    Task<Farmer> GetFarmerByIdAsync(Guid id);
+    Task<Farmer?> GetFarmerByIdAsync(Guid id);
 
-    Task UpdateFarmerAsync(Farmer farmer);
+    void DeleteFarmer(Farmer farmer);
 
-    Task DeleteFarmerAsync(Guid id);
+    void UpdateFarmer(Farmer farmer);
+
+    IQueryable<Farmer> FindFarmersByConditionAsync(Expression<Func<Farmer, bool>> expression, bool trackChanges);
 }

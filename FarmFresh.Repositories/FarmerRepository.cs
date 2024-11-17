@@ -2,7 +2,7 @@
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.DataValidator;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories;
 
@@ -11,26 +11,17 @@ internal sealed class FarmerRepository(FarmFreshDbContext data, IValidateEntity 
 {
     public async Task<Farmer> CreateFarmerAsync(Farmer farmer)
     {
-        await AddAsync(farmer);
-        await data.SaveChangesAsync();
+        await CreateAsync(farmer);
         return farmer;
     }
 
-    public async Task DeleteFarmerAsync(Guid id)
-    {
-        await DeleteAsync<Farmer>(id);
-        await data.SaveChangesAsync();
-    }
+    public void DeleteFarmer(Farmer farmer) => Delete(farmer);
 
-    public async Task<IQueryable<Farmer>> GetAllFarmerReadOnlyAsync() => AllReadOnly<Farmer>().AsNoTracking();
+    public IQueryable<Farmer> FindFarmersByConditionAsync(Expression<Func<Farmer, bool>> expression, bool trackChanges) =>
+             FindByCondition(expression, trackChanges);
 
-    public Task<IQueryable<Farmer>> GetAllFarmersAsync() => Task.FromResult(All<Farmer>());
 
-    public async Task<Farmer> GetFarmerByIdAsync(Guid id) => await GetByIdAsync<Farmer>(id);
+    public async Task<Farmer?> GetFarmerByIdAsync(Guid id) => await GetByIdAsync(id);
 
-    public async Task UpdateFarmerAsync(Farmer farmer)
-    {
-        await UpdateAsync(farmer);
-        await data.SaveChangesAsync();
-    }
+    public void UpdateFarmer(Farmer farmer) => Update(farmer);
 }

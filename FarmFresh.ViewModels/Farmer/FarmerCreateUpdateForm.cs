@@ -1,24 +1,20 @@
 ﻿using FarmFresh.Infrastructure.Validation;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
-using static FarmFresh.Commons.EntityValidationConstants.Farmers;
 
 namespace FarmFresh.ViewModels.Farmer;
 
 public class FarmerCreateUpdateForm
 {
     [Required]
-    [StringLength(FarmerDescriptionMaxLength, MinimumLength = FarmerDescriptionMinLength)]
     [Display(Name = "Please enter information about your farm!")]
     public string FarmDescription { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(FarmerLocationMaxLegth, MinimumLength = FarmerLocationMinLegth)]
     [Display(Name = "Please enter the location of your farm!")]
     public string Location { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(FarmerPhoneNumberMaxLength, MinimumLength = FarmerPhoneNumberMinLength)]
     [Display(Name = "Please enter your valid phone number!")]
     public string PhoneNumber { get; set; } = string.Empty;
 

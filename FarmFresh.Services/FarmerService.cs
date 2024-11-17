@@ -25,7 +25,7 @@ internal sealed class FarmerService : IFarmerService
         _mapper = mapper;
     }
 
-    public async Task CreateFarmerAsync(FarmerCreateUpdateForm model, string userId)
+    public async Task CreateFarmerAsync(FarmerCreateUpdateForm model, string userId, bool trackChanges)
     {
         if(string.IsNullOrWhiteSpace(userId))
         {
@@ -33,22 +33,10 @@ internal sealed class FarmerService : IFarmerService
             throw new UserIdNotFound();
         }
 
-        if(await FarmerEgnAlreadyExistsAsync(model.Egn))
+        if (await DoesFarmerExistAsync(model.Egn, model.PhoneNumber, userId, trackChanges))
         {
-            _loggerManager.LogError($"Farmer with this EGN {model.Egn} already exists.");
-            throw new EgnAlreadyExistsException();
-        }
-
-        if(await FarmerPhoneNumberAlreadyExists(model.PhoneNumber))
-        {
-            _loggerManager.LogError($"Farmer with this phone number {model.PhoneNumber} already exists.");
-            throw new PhoneNumberAlreadyExistsException();
-        }
-
-        if(await FarmerWithProvidedUserIdAlreadyExistsAsync(userId))
-        {
-            _loggerManager.LogError($"Farmer with this userId {userId} already exists.");
-            throw new UserIdAlreadyExistsException();
+            _loggerManager.LogError($"Farmer with this EGN {model.Egn}, phone number {model.PhoneNumber}, or userId {userId} already exists.");
+            throw new FarmerAlreadyExistsException();
         }
 
         try
@@ -62,7 +50,7 @@ internal sealed class FarmerService : IFarmerService
         }
         catch (FormatException ex)
         {
-            _loggerManager.LogError($"Invalid format for userId: {ex.Message}");
+            _loggerManager.LogError($"Invalid format for userId: {ex.Message}, Value: {userId}");
             throw new InvalidUserIdFormatException();
         }
         catch(Exception ex)
@@ -72,24 +60,13 @@ internal sealed class FarmerService : IFarmerService
         }
     }
 
-    public async Task<bool> FarmerEgnAlreadyExistsAsync(string egn)
+    public async Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges)
     {
-        var farmers = await _repositoryManager.FarmerRepository.GetAllFarmerReadOnlyAsync();
+        var farmers = _repositoryManager.FarmerRepository
+                                        .FindFarmersByConditionAsync(f => (f.Egn == egn 
+                                        || f.PhoneNumber == phoneNumber 
+                                        || f.UserId.ToString() == userId), trackChanges);
 
-        return await farmers.AnyAsync(f => f.Egn == egn);
-    }
-
-    public async Task<bool> FarmerPhoneNumberAlreadyExists(string phoneNumber)
-    {
-        var farmers = await _repositoryManager.FarmerRepository.GetAllFarmerReadOnlyAsync();
-
-       return await farmers.AnyAsync(f => f.PhoneNumber == phoneNumber);
-    }
-
-    public async Task<bool> FarmerWithProvidedUserIdAlreadyExistsAsync(string userId)
-    {
-        var farmers = await _repositoryManager.FarmerRepository.GetAllFarmerReadOnlyAsync();
-
-        return await farmers.AnyAsync(f => f.UserId.ToString() == userId);
+        return await farmers.AnyAsync();
     }
 }
