@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "_MasterLayout";
 }
+
 <div id="wrapper">
     <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
         <div class="container-fluid d-flex flex-column p-0">
@@ -59,7 +60,7 @@
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content">
             <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar">
-                <div class="container-fluid">
+                <div class="container-fluid" id="contentId">
                     <ul class="navbar-nav flex-nowrap">
                         <li class="nav-item">
                             <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">

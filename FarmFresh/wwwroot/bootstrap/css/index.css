@@ -1,0 +1,98 @@
+﻿.container.mt-5{
+    font-family: Arial, sans-serif;
+}
+
+.card{
+    position: relative;
+    border: none;
+}
+
+.overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+}
+
+.overlay h1{
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.overlay p{
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+}
+
+.overlay .btn {
+    background-color: rgba(0, 135, 76, 0.8); 
+    color: #000;
+    border: none;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 25px;
+}
+
+.overlay .btn:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #007bff;
+}
+
+#farmImage {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+card-body {
+    padding: 20px;
+}
+
+.card-body .btn {
+    background-color: rgba(0, 135, 76, 0.8);
+    color: #000;
+    border: none;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 25px;
+}
+
+.card-body .btn:hover {
+    background-color: rgba(251, 255, 163, 100);
+    color: #007bff;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #666;
+}
+
+.faq-answer {
+    display: none;
+    transition: all 0.3s ease-in-out;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 3px solid #28a745;
+}
+
+.faq-question {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+}
+
+.faq-question:hover {
+    background-color: #e9ecef;
+}
+
