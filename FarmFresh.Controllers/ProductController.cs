@@ -230,6 +230,22 @@ namespace FarmFresh.Controllers
 
             return RedirectToAction(nameof(PendingApproval));
         }
+        [HttpGet]
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
+        {
+            var totalProducts = await _context.Products.CountAsync();
+            var products = await _context.Products
+                                         .Where(p => p.IsApproved) // Only approved products
+                                         .OrderBy(p => p.Name)
+                                         .Skip((page - 1) * pageSize)
+                                         .Take(pageSize)
+                                         .ToListAsync();
+
+            ViewBag.TotalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
+            ViewBag.CurrentPage = page;
+
+            return View(products);
+        }
 
     }
 }
