@@ -20,8 +20,8 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 
     public void Delete(T entity) => _data.Remove(entity);
 
-    public IQueryable<T> FindAll(bool tracktrackChanges) =>
-        !tracktrackChanges ?
+    public IQueryable<T> FindAll(bool trackChanges) =>
+        !trackChanges ?
         _data.Set<T>()
         .AsNoTracking() :
         _data.Set<T>();
