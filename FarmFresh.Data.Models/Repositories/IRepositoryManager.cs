@@ -8,7 +8,10 @@ public interface IRepositoryManager
     IUserRepository UserRepository { get; }
 
     IFarmerRepository FarmerRepository { get; }
-    Task SaveAsync(Entity entity);
-    Task SaveAsync();
 
+    IFarmerLocationRepository FarmerLocationRepository { get; }
+
+    Task SaveAsync(Entity entity);
+
+    Task SaveAsync();
 }
