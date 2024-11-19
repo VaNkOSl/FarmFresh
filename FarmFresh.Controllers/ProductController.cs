@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using System.Security.Claims;
 
 namespace FarmFresh.Controllers
 {
@@ -245,6 +246,27 @@ namespace FarmFresh.Controllers
             ViewBag.CurrentPage = page;
 
             return View(products);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> AddReview(Guid id, int rating, string content)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null) return NotFound();
+
+            var review = new Review
+            {
+                Rating = rating,
+                Content = content,
+                ProductId = id,
+                UserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), // Assuming user authentication
+                ReviewDate = DateTime.UtcNow
+            };
+
+            _context.Reviews.Add(review);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id });
         }
 
     }

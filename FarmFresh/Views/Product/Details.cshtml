@@ -27,3 +27,39 @@
         <button type="submit" class="btn btn-danger">Delete</button>
     </form>
 </div>
+
+<!-- Reviews Section -->
+<h2 class="mt-4">Reviews</h2>
+
+@if (Model.Reviews.Any())
+{
+    <ul class="list-group">
+        @foreach (var review in Model.Reviews)
+        {
+            <li class="list-group-item">
+                <strong>@review.User.UserName</strong> (@review.ReviewDate.ToShortDateString())
+                <p><strong>Rating:</strong> @review.Rating / 5</p>
+                <p>@review.Content</p>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No reviews yet. Be the first to review this product!</p>
+}
+
+<!-- Add Review Form -->
+<h3 class="mt-4">Add a Review</h3>
+<form asp-action="AddReview" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <div class="form-group">
+        <label for="rating">Rating (1-5):</label>
+        <input type="number" name="rating" id="rating" min="1" max="5" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="content">Review:</label>
+        <textarea name="content" id="content" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
