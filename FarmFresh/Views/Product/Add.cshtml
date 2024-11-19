@@ -1,0 +1,66 @@
+﻿@model FarmFresh.Data.Models.Product
+
+<h1>Add New Product</h1>
+
+<form asp-action="Add" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label>Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Origin</label>
+        <input asp-for="Origin" class="form-control" />
+        <span asp-validation-for="Origin" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Price</label>
+        <input asp-for="Price" type="number" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Stock Quantity</label>
+        <input asp-for="StockQuantity" type="number" class="form-control" />
+        <span asp-validation-for="StockQuantity" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Photos</label>
+        <input type="file" name="uploadedPhotos" multiple class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Suitable Season</label>
+        <select asp-for="SuitableSeason" class="form-control">
+            @foreach (var season in Enum.GetValues(typeof(FarmFresh.Data.Models.Enums.Seasons)))
+            {
+                <option value="@season">@season</option>
+            }
+        </select>
+        <span asp-validation-for="SuitableSeason" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Harvest Date</label>
+        <input asp-for="HarvestDate" type="date" class="form-control" />
+        <span asp-validation-for="HarvestDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Expiration Date</label>
+        <input asp-for="ExpirationDate" type="date" class="form-control" />
+        <span asp-validation-for="ExpirationDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Farmer ID</label>
+        <input asp-for="FarmerId" type="text" class="form-control" />
+        <span asp-validation-for="FarmerId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Category ID</label>
+        <input asp-for="CategoryId" type="text" class="form-control" />
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Product</button>
+</form>
