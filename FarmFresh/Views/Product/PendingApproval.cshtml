@@ -1,0 +1,32 @@
+﻿@model IEnumerable<FarmFresh.Data.Models.Product>
+
+<h1>Pending Approval</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Farmer</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Farmer.FarmDescription</td>
+                <td>@product.Price.ToString("C")</td>
+                <td>
+                    <form asp-action="Approve" asp-route-id="@product.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+                    <form asp-action="Reject" asp-route-id="@product.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

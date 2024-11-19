@@ -193,5 +193,43 @@ namespace FarmFresh.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        // List unapproved products
+        [HttpGet]
+        public async Task<IActionResult> PendingApproval()
+        {
+            var unapprovedProducts = await _context.Products
+                                                   .Where(p => !p.IsApproved)
+                                                   .Include(p => p.Farmer)
+                                                   .ToListAsync();
+            return View(unapprovedProducts);
+        }
+
+        // Approve a product
+        [HttpPost]
+        public async Task<IActionResult> Approve(Guid id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            product.IsApproved = true;
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(PendingApproval));
+        }
+
+        // Reject a product
+        [HttpPost]
+        public async Task<IActionResult> Reject(Guid id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(PendingApproval));
+        }
+
     }
 }
