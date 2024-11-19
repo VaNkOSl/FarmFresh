@@ -31,6 +31,8 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
 
     public virtual DbSet<Review> Reviews { get; set; }
 
+    public virtual DbSet<FarmerLocation> FarmerLocations { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
