@@ -44,4 +44,3 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
         builder.ApplyConfiguration(new CategoryConfiguration());
     }
 }
-
