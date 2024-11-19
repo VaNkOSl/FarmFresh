@@ -268,6 +268,97 @@ namespace FarmFresh.Controllers
 
             return RedirectToAction("Details", new { id });
         }
+        [HttpGet]
+        public async Task<IActionResult> Index(
+    int page = 1,
+    int pageSize = 10,
+    string searchName = null,
+    decimal? minPrice = null,
+    decimal? maxPrice = null,
+    string sortOrder = null)
+        {
+            var query = _context.Products
+                                .Where(p => p.IsApproved) // Only show approved products
+                                .AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                query = query.Where(p => p.Name.Contains(searchName));
+            }
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Apply sorting
+            query = sortOrder switch
+            {
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "rating_desc" => query.OrderByDescending(p => p.Reviews.Average(r => r.Rating)),
+                _ => query.OrderBy(p => p.Name) // Default: Alphabetical
+            };
+
+            // Pagination
+            var totalProducts = await query.CountAsync();
+            var products = await query.Skip((page - 1) * pageSize)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+
+            ViewBag.TotalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
+            ViewBag.CurrentPage = page;
+            ViewBag.SortOrder = sortOrder;
+
+            return View(products);
+        }
+        [HttpPost]
+        public async Task<IActionResult> PlaceOrder(Guid id, int quantity, Order orderInput)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null || product.StockQuantity < quantity)
+            {
+                return BadRequest("Not enough stock available.");
+            }
+
+            // Deduct stock
+            product.StockQuantity -= quantity;
+
+            // Create new order
+            var order = new Order
+            {
+                FirstName = orderInput.FirstName,
+                LastName = orderInput.LastName,
+                Adress = orderInput.Adress,
+                PhoneNumber = orderInput.PhoneNumber,
+                Email = orderInput.Email,
+                DeliveryOption = orderInput.DeliveryOption,
+                CreateOrderdDate = DateTime.UtcNow,
+                UserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), // Assuming user is logged in
+                IsTaken = false,
+                OrderStatus = null // Initial status
+            };
+
+            // Add the order-product relationship
+            var orderProduct = new OrderProduct
+            {
+                OrderId = order.Id,
+                ProductId = id,
+                Quantity = quantity
+            };
+
+            order.OrderProducts.Add(orderProduct);
+
+            // Save to database
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id });
+        }
 
     }
 }

@@ -1,0 +1,45 @@
+﻿@model FarmFresh.Data.Models.Order
+
+<h1>Order Details</h1>
+
+<p><strong>First Name:</strong> @Model.FirstName</p>
+<p><strong>Last Name:</strong> @Model.LastName</p>
+<p><strong>Address:</strong> @Model.Adress</p>
+<p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
+<p><strong>Email:</strong> @Model.Email</p>
+<p><strong>Order Date:</strong> @Model.CreateOrderdDate.ToShortDateString()</p>
+<p><strong>Delivery Option:</strong> @Model.DeliveryOption</p>
+<p><strong>Status:</strong> @Model.OrderStatus</p>
+
+<h3>Ordered Products</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var orderProduct in Model.OrderProducts)
+        {
+            <tr>
+                <td>@orderProduct.Product.Name</td>
+                <td>@orderProduct.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="UpdateOrderStatus" method="post">
+    <input type="hidden" name="orderId" value="@Model.Id" />
+    <div class="form-group">
+        <label for="status">Update Status:</label>
+        <select name="status" id="status" class="form-control">
+            @foreach (var status in Enum.GetValues(typeof(FarmFresh.Data.Models.Enums.OrderStatus)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Update Status</button>
+</form>
