@@ -36,4 +36,8 @@ public class FarmerCreateUpdateForm
 
     [PrivacyAccepted]
     public bool PrivacyAccepted { get; set; }
+
+    public double? Latitude { get; set; }
+
+    public double? Longitude { get; set;}
 }
