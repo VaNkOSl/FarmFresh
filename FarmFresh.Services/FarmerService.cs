@@ -86,7 +86,7 @@ internal sealed class FarmerService : IFarmerService
         }
 
         await _repositoryManager.FarmerLocationRepository.CreateLocationAsync(farmerLocation);
-        await _repositoryManager.SaveAsync();
+        await _repositoryManager.SaveAsync(farmerLocation);
         _loggerManager.LogInfo($"[{nameof(CreateFarmerLocationAsync)}] Successfully created location (ID: {farmerLocation.Id}) for farmer with ID: {farmerId}.");
     }
 
