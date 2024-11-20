@@ -157,19 +157,32 @@ namespace FarmFresh.Controllers
         }
 
         // GET: Product Details
-        public async Task<IActionResult> Details(Guid id)
+        public async Task<IActionResult> Details(Guid id, int page = 1, int pageSize = 5)
         {
             // Fetch the product with related data
             var product = await _context.Products
-                                        .Include(p => p.Farmer)
-                                        .Include(p => p.Category)
-                                        .Include(p => p.ProductPhotos)
-                                        .FirstOrDefaultAsync(p => p.Id == id);
+                .Include(p => p.Farmer)
+                .Include(p => p.Category)
+                .Include(p => p.ProductPhotos)
+                .Include(p => p.Reviews)
+                .ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
                 return NotFound();
             }
+
+            // Paginate reviews
+            var paginatedReviews = product.Reviews
+                .OrderByDescending(r => r.ReviewDate) // Sort reviews by the most recent
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Calculate pagination details
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(product.Reviews.Count() / (double)pageSize);
 
             // Fetch recommended products
             var recommendedProducts = await _context.Products
@@ -179,8 +192,9 @@ namespace FarmFresh.Controllers
                 .Include(p => p.ProductPhotos) // Include photos for recommendations
                 .ToListAsync();
 
-            // Pass recommended products to the view
+            // Pass recommended products and paginated reviews to the view
             ViewBag.RecommendedProducts = recommendedProducts;
+            ViewBag.PaginatedReviews = paginatedReviews;
 
             // Return the product to the view
             return View(product);

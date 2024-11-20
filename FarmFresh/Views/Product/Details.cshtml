@@ -10,10 +10,10 @@
 <!-- Reviews Section -->
 <h2 class="mt-4">Reviews</h2>
 
-@if (Model.Reviews.Any())
+@if (ViewBag.PaginatedReviews != null && ((List<FarmFresh.Data.Models.Review>)ViewBag.PaginatedReviews).Any())
 {
     <ul class="list-group">
-        @foreach (var review in Model.Reviews)
+        @foreach (var review in ViewBag.PaginatedReviews as List<FarmFresh.Data.Models.Review>)
         {
             <li class="list-group-item">
                 <strong>@review.User.UserName</strong> (@review.ReviewDate.ToShortDateString())
@@ -32,8 +32,67 @@
             </li>
         }
     </ul>
+
+    <!-- Pagination Controls -->
+    <div class="pagination mt-3">
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@(ViewBag.CurrentPage - 1)" class="btn btn-primary">Previous</a>
+        }
+
+        Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@(ViewBag.CurrentPage + 1)" class="btn btn-primary">Next</a>
+        }
+    </div>
 }
 else
 {
     <p>No reviews yet. Be the first to review this product!</p>
+}
+
+<!-- Add Review Form -->
+<h3 class="mt-4">Add a Review</h3>
+<form asp-action="AddReview" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <div class="form-group">
+        <label for="rating">Rating (1-5):</label>
+        <input type="number" name="rating" id="rating" min="1" max="5" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="content">Review:</label>
+        <textarea name="content" id="content" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
+
+<!-- Recommended Products Section -->
+<h2 class="mt-4">Recommended Products</h2>
+
+@if (ViewBag.RecommendedProducts != null && ((List<FarmFresh.Data.Models.Product>)ViewBag.RecommendedProducts).Any())
+{
+    <div class="row">
+        @foreach (var recommended in ViewBag.RecommendedProducts as List<FarmFresh.Data.Models.Product>)
+        {
+            <div class="col-md-3">
+                <div class="card mb-3">
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(recommended.ProductPhotos.FirstOrDefault()?.Photo ?? Array.Empty<byte>())"
+                         alt="@recommended.Name"
+                         class="card-img-top"
+                         style="max-height: 150px; object-fit: cover;" />
+                    <div class="card-body">
+                        <h5 class="card-title">@recommended.Name</h5>
+                        <p class="card-text">@recommended.Price.ToString("C")</p>
+                        <a asp-action="Details" asp-route-id="@recommended.Id" class="btn btn-primary">View</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No recommendations available for this product.</p>
 }
