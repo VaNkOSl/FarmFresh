@@ -87,5 +87,45 @@ namespace FarmFresh.Services
             product.ProductPhotos.Add(productPhoto);
             await _context.SaveChangesAsync();
         }
+        public async Task<List<Product>> GetFilteredProductsAsync(
+     string? searchName = null,
+     decimal? minPrice = null,
+     decimal? maxPrice = null,
+     Guid? categoryId = null,
+     int page = 1,
+     int pageSize = 10)
+        {
+            var query = _context.Products.AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                query = query.Where(p => p.Name.Contains(searchName));
+            }
+
+            // Apply price range filter
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Apply category filter
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            // Apply pagination
+            return await query
+                .OrderBy(p => p.Name) // Default sort
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
     }
 }
