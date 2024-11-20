@@ -159,6 +159,7 @@ namespace FarmFresh.Controllers
         // GET: Product Details
         public async Task<IActionResult> Details(Guid id)
         {
+            // Fetch the product with related data
             var product = await _context.Products
                                         .Include(p => p.Farmer)
                                         .Include(p => p.Category)
@@ -170,8 +171,21 @@ namespace FarmFresh.Controllers
                 return NotFound();
             }
 
+            // Fetch recommended products
+            var recommendedProducts = await _context.Products
+                .Where(p => p.CategoryId == product.CategoryId && p.Id != id && p.IsApproved) // Same category, exclude current product
+                .OrderByDescending(p => p.StockQuantity) // Order by stock or other criteria
+                .Take(4) // Limit recommendations to 4
+                .Include(p => p.ProductPhotos) // Include photos for recommendations
+                .ToListAsync();
+
+            // Pass recommended products to the view
+            ViewBag.RecommendedProducts = recommendedProducts;
+
+            // Return the product to the view
             return View(product);
         }
+
 
         // POST: Delete Product
         [HttpPost]
@@ -358,7 +372,9 @@ namespace FarmFresh.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id });
+
         }
 
     }
+
 }

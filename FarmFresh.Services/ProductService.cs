@@ -74,6 +74,15 @@ namespace FarmFresh.Services
 
             return true;
         }
+        public async Task<List<Product>> GetRecommendedProductsAsync(Guid categoryId, Guid excludeProductId, int limit = 4)
+        {
+            return await _context.Products
+                .Where(p => p.CategoryId == categoryId && p.Id != excludeProductId && p.IsApproved)
+                .OrderByDescending(p => p.StockQuantity) // Order products as needed (e.g., by stock quantity)
+                .Take(limit)
+                .ToListAsync();
+        }
+
         public async Task AddProductPhotoAsync(IFormFile file, Product product)
         {
             var fileData = await FileHelper.ReadFileAsync(file);
@@ -126,6 +135,7 @@ namespace FarmFresh.Services
                 .Take(pageSize)
                 .ToListAsync();
         }
+
 
     }
 }
