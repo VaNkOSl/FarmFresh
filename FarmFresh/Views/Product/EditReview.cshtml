@@ -3,14 +3,15 @@
 <h1>Edit Review</h1>
 
 <form asp-action="EditReview" method="post">
-    <input type="hidden" name="reviewId" value="@Model.Id" />
+    <input type="hidden" name="Id" value="@Model.Id" />
     <div class="form-group">
         <label for="rating">Rating (1-5):</label>
-        <input type="number" name="rating" id="rating" min="1" max="5" class="form-control" value="@Model.Rating" required />
+        <input type="number" id="rating" name="Rating" min="1" max="5" value="@Model.Rating" class="form-control" required />
     </div>
     <div class="form-group">
-        <label for="content">Review:</label>
-        <textarea name="content" id="content" class="form-control" required>@Model.Content</textarea>
+        <label for="content">Review Content:</label>
+        <textarea id="content" name="Content" class="form-control" required>@Model.Content</textarea>
     </div>
-    <button type="submit" class="btn btn-primary">Update Review</button>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Details" asp-route-id="@Model.ProductId" class="btn btn-secondary">Cancel</a>
 </form>

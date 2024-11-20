@@ -400,20 +400,31 @@ namespace FarmFresh.Controllers
 
         // POST: Edit Review
         [HttpPost]
-        public async Task<IActionResult> EditReview(Guid reviewId, string content, int rating)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditReview(Guid id, string content, int rating)
         {
-            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);
-            if (review == null) return NotFound();
+            if (id == Guid.Empty || string.IsNullOrWhiteSpace(content) || rating < 1 || rating > 5)
+            {
+                ModelState.AddModelError("", "Invalid data provided.");
+                return View();
+            }
 
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
+            if (review == null)
+            {
+                return NotFound();
+            }
+
+            // Update the review
             review.Content = content;
             review.Rating = rating;
-            review.ReviewDate = DateTime.UtcNow;
 
             _context.Reviews.Update(review);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = review.ProductId });
         }
+
 
         // POST: Delete Review
         [HttpPost]
@@ -426,6 +437,26 @@ namespace FarmFresh.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = review.ProductId });
+        }
+        public async Task<IActionResult> UpdateStock(Guid productId, int quantitySold)
+        {
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null || product.StockQuantity < quantitySold)
+            {
+                return BadRequest("Not enough stock available.");
+            }
+
+            product.StockQuantity -= quantitySold;
+
+            if (product.StockQuantity == 0)
+            {
+                product.IsAvailable = false; // Mark product as unavailable
+            }
+
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+
+            return Ok("Stock updated successfully.");
         }
 
     }
