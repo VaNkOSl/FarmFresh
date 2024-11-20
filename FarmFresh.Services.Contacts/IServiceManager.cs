@@ -4,5 +4,4 @@ public interface IServiceManager
 {
     IFarmerService FarmerService { get; }
 
-    IFarmerLocationService FarmerLocationService { get; }
 }
