@@ -374,6 +374,45 @@ namespace FarmFresh.Controllers
             return RedirectToAction("Details", new { id });
 
         }
+        // GET: Edit Review
+        [HttpGet]
+        public async Task<IActionResult> EditReview(Guid reviewId)
+        {
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);
+            if (review == null) return NotFound();
+
+            return View(review);
+        }
+
+        // POST: Edit Review
+        [HttpPost]
+        public async Task<IActionResult> EditReview(Guid reviewId, string content, int rating)
+        {
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);
+            if (review == null) return NotFound();
+
+            review.Content = content;
+            review.Rating = rating;
+            review.ReviewDate = DateTime.UtcNow;
+
+            _context.Reviews.Update(review);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = review.ProductId });
+        }
+
+        // POST: Delete Review
+        [HttpPost]
+        public async Task<IActionResult> DeleteReview(Guid reviewId)
+        {
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);
+            if (review == null) return NotFound();
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = review.ProductId });
+        }
 
     }
 

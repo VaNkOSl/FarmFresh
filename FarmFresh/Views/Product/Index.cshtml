@@ -7,15 +7,15 @@
     <form method="get" class="form-inline">
         <div class="form-group">
             <label for="searchName">Name:</label>
-            <input type="text" name="searchName" id="searchName" class="form-control ml-2" value="@Context.Request.Query["searchName"]" />
+            <input type="text" name="searchName" id="searchName" class="form-control ml-2" value="@Request.Query["searchName"]" />
         </div>
         <div class="form-group ml-3">
             <label for="minPrice">Min Price:</label>
-            <input type="number" name="minPrice" id="minPrice" class="form-control ml-2" value="@Context.Request.Query["minPrice"]" />
+            <input type="number" name="minPrice" id="minPrice" class="form-control ml-2" value="@Request.Query["minPrice"]" />
         </div>
         <div class="form-group ml-3">
             <label for="maxPrice">Max Price:</label>
-            <input type="number" name="maxPrice" id="maxPrice" class="form-control ml-2" value="@Context.Request.Query["maxPrice"]" />
+            <input type="number" name="maxPrice" id="maxPrice" class="form-control ml-2" value="@Request.Query["maxPrice"]" />
         </div>
         <div class="form-group ml-3">
             <label for="category">Category:</label>
@@ -23,11 +23,20 @@
                 <option value="">All Categories</option>
                 @foreach (var category in ViewBag.Categories as IEnumerable<FarmFresh.Data.Models.Category>)
                 {
-                    var isSelected = Context.Request.Query["category"] == category.Id.ToString();
+                    var isSelected = Request.Query["category"] == category.Id.ToString();
                     <option value="@category.Id" selected="@(isSelected ? "selected" : null)">
                         @category.Name
                     </option>
                 }
+            </select>
+        </div>
+        <div class="form-group ml-3">
+            <label for="sortOrder">Sort By:</label>
+            <select name="sortOrder" id="sortOrder" class="form-control ml-2">
+                <option value="name" @(Request.Query["sortOrder"] == "name" ? "selected" : "")>Name</option>
+                <option value="price_asc" @(Request.Query["sortOrder"] == "price_asc" ? "selected" : "")>Price: Low to High</option>
+                <option value="price_desc" @(Request.Query["sortOrder"] == "price_desc" ? "selected" : "")>Price: High to Low</option>
+                <option value="rating_desc" @(Request.Query["sortOrder"] == "rating_desc" ? "selected" : "")>Highest Rated</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary ml-3">Filter</button>
@@ -52,7 +61,16 @@
                 <td>@product.Name</td>
                 <td>@product.Description</td>
                 <td>@product.Price.ToString("C")</td>
-                <td>@product.StockQuantity</td>
+                <td>
+                    @if (product.StockQuantity > 0)
+                    {
+                        @product.StockQuantity
+                    }
+                    else
+                    {
+                        <span class="text-danger">Out of Stock</span>
+                    }
+                </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-info">Details</a>
                     <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning">Edit</a>
@@ -71,7 +89,10 @@
         @for (int i = 1; i <= ViewBag.TotalPages; i++)
         {
             <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                <a asp-action="Index" asp-route-page="@i" class="page-link">@i</a>
+                <a asp-action="Index" asp-route-page="@i" asp-route-searchName="@Request.Query["searchName"]"
+                   asp-route-minPrice="@Request.Query["minPrice"]" asp-route-maxPrice="@Request.Query["maxPrice"]"
+                   asp-route-category="@Request.Query["category"]" asp-route-sortOrder="@Request.Query["sortOrder"]"
+                   class="page-link">@i</a>
             </li>
         }
     </ul>
