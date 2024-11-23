@@ -298,13 +298,22 @@ namespace FarmFresh.Controllers
         }
         [HttpGet]
         public async Task<IActionResult> Index(
-    int page = 1,
-    int pageSize = 10,
-    string searchName = null,
-    decimal? minPrice = null,
-    decimal? maxPrice = null,
-    string sortOrder = null)
+     int page = 1,
+     int pageSize = 10,
+     string searchName = null,
+     decimal? minPrice = null,
+     decimal? maxPrice = null,
+     string sortOrder = null,
+     string category = null)
         {
+            // Fetch categories for the dropdown
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+
+            // Pass selected category and sortOrder to ViewBag for rendering in the view
+            ViewBag.SelectedCategory = category;
+            ViewBag.SortOrder = sortOrder;
+
+            // Build query
             var query = _context.Products
                                 .Where(p => p.IsApproved) // Only show approved products
                                 .AsQueryable();
@@ -322,6 +331,10 @@ namespace FarmFresh.Controllers
             {
                 query = query.Where(p => p.Price <= maxPrice.Value);
             }
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(p => p.CategoryId.ToString() == category);
+            }
 
             // Apply sorting
             query = sortOrder switch
@@ -338,12 +351,17 @@ namespace FarmFresh.Controllers
                                        .Take(pageSize)
                                        .ToListAsync();
 
+            // Fetch Featured Products and pass them to the ViewBag
+            ViewBag.FeaturedProducts = await GetFeaturedProductsAsync();
+
+            // Pass pagination data to the ViewBag
             ViewBag.TotalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
             ViewBag.CurrentPage = page;
-            ViewBag.SortOrder = sortOrder;
 
+            // Return the view with the products
             return View(products);
         }
+
         [HttpPost]
         public async Task<IActionResult> PlaceOrder(Guid id, int quantity, Order orderInput)
         {
