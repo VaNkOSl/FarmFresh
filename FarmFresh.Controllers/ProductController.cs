@@ -501,6 +501,41 @@ namespace FarmFresh.Controllers
                                  .Include(p => p.ProductPhotos)
                                  .ToListAsync();
         }
+        [HttpPost]
+        public async Task<IActionResult> AddToWishlist(Guid productId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var existingWishlistItem = await _context.Wishlists
+                                                     .FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
+
+            if (existingWishlistItem == null)
+            {
+                var wishlistItem = new Wishlist
+                {
+                    UserId = userId,
+                    ProductId = productId
+                };
+
+                _context.Wishlists.Add(wishlistItem);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> ViewWishlist()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var wishlist = await _context.Wishlists
+                                         .Where(w => w.UserId == userId)
+                                         .Include(w => w.Product)
+                                         .ThenInclude(p => p.ProductPhotos)
+                                         .ToListAsync();
+
+            return View(wishlist);
+        }
 
     }
 

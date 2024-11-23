@@ -96,3 +96,7 @@ else
 {
     <p>No recommendations available for this product.</p>
 }
+<form asp-action="AddToWishlist" method="post">
+    <input type="hidden" name="productId" value="@Model.Id" />
+    <button type="submit" class="btn btn-success">Add to Wishlist</button>
+</form>
