@@ -458,6 +458,22 @@ namespace FarmFresh.Controllers
 
             return Ok("Stock updated successfully.");
         }
+        [HttpGet]
+        public async Task<IActionResult> SearchSuggestions(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return Json(new List<string>());
+            }
+
+            var suggestions = await _context.Products
+                                             .Where(p => p.Name.Contains(term))
+                                             .Select(p => p.Name)
+                                             .Take(10)
+                                             .ToListAsync();
+
+            return Json(suggestions);
+        }
 
     }
 
