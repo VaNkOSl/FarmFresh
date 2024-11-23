@@ -17,7 +17,6 @@ namespace FarmFresh.Controllers
             _context = context;
         }
 
-        // GET: All Products
         public async Task<IActionResult> Index()
         {
             var products = await _context.Products
@@ -28,22 +27,19 @@ namespace FarmFresh.Controllers
             return View(products);
         }
 
-        // GET: Add Product Form
         public IActionResult Add()
         {
             return View();
         }
 
-        // POST: Add Product
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(Product product, List<IFormFile> uploadedPhotos)
         {
             if (ModelState.IsValid)
             {
-                product.Id = Guid.NewGuid(); // Generate a new unique ID for the product
+                product.Id = Guid.NewGuid(); 
 
-                // Handle uploaded photos
                 foreach (var file in uploadedPhotos)
                 {
                     if (file.Length > 0)
@@ -70,7 +66,6 @@ namespace FarmFresh.Controllers
             return View(product);
         }
 
-        // GET: Edit Product Form
         public async Task<IActionResult> Edit(Guid id)
         {
             var product = await _context.Products
@@ -83,7 +78,6 @@ namespace FarmFresh.Controllers
             return View(product);
         }
 
-        // POST: Edit Product
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Product updatedProduct, List<IFormFile> uploadedPhotos)
@@ -106,7 +100,6 @@ namespace FarmFresh.Controllers
                         return NotFound();
                     }
 
-                    // Update product properties
                     existingProduct.Name = updatedProduct.Name;
                     existingProduct.Description = updatedProduct.Description;
                     existingProduct.Origin = updatedProduct.Origin;
@@ -118,7 +111,6 @@ namespace FarmFresh.Controllers
                     existingProduct.FarmerId = updatedProduct.FarmerId;
                     existingProduct.CategoryId = updatedProduct.CategoryId;
 
-                    // Handle new photos
                     foreach (var file in uploadedPhotos)
                     {
                         if (file.Length > 0)
@@ -156,10 +148,8 @@ namespace FarmFresh.Controllers
             return View(updatedProduct);
         }
 
-        // GET: Product Details
         public async Task<IActionResult> Details(Guid id, int page = 1, int pageSize = 5)
         {
-            // Fetch the product with related data
             var product = await _context.Products
                 .Include(p => p.Farmer)
                 .Include(p => p.Category)
@@ -173,18 +163,15 @@ namespace FarmFresh.Controllers
                 return NotFound();
             }
 
-            // Paginate reviews
             var paginatedReviews = product.Reviews
                 .OrderByDescending(r => r.ReviewDate) // Sort reviews by the most recent
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            // Calculate pagination details
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(product.Reviews.Count() / (double)pageSize);
 
-            // Fetch recommended products
             var recommendedProducts = await _context.Products
                 .Where(p => p.CategoryId == product.CategoryId && p.Id != id && p.IsApproved) // Same category, exclude current product
                 .OrderByDescending(p => p.StockQuantity) // Order by stock or other criteria
@@ -192,16 +179,13 @@ namespace FarmFresh.Controllers
                 .Include(p => p.ProductPhotos) // Include photos for recommendations
                 .ToListAsync();
 
-            // Pass recommended products and paginated reviews to the view
             ViewBag.RecommendedProducts = recommendedProducts;
             ViewBag.PaginatedReviews = paginatedReviews;
 
-            // Return the product to the view
             return View(product);
         }
 
 
-        // POST: Delete Product
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
@@ -214,15 +198,12 @@ namespace FarmFresh.Controllers
                 return NotFound();
             }
 
-            // Remove associated photos
             _context.ProductPhotos.RemoveRange(product.ProductPhotos);
 
-            // Remove the product
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        // List unapproved products
         [HttpGet]
         public async Task<IActionResult> PendingApproval()
         {
@@ -233,7 +214,6 @@ namespace FarmFresh.Controllers
             return View(unapprovedProducts);
         }
 
-        // Approve a product
         [HttpPost]
         public async Task<IActionResult> Approve(Guid id)
         {
@@ -247,7 +227,6 @@ namespace FarmFresh.Controllers
             return RedirectToAction(nameof(PendingApproval));
         }
 
-        // Reject a product
         [HttpPost]
         public async Task<IActionResult> Reject(Guid id)
         {
@@ -306,19 +285,15 @@ namespace FarmFresh.Controllers
      string sortOrder = null,
      string category = null)
         {
-            // Fetch categories for the dropdown
             ViewBag.Categories = await _context.Categories.ToListAsync();
 
-            // Pass selected category and sortOrder to ViewBag for rendering in the view
             ViewBag.SelectedCategory = category;
             ViewBag.SortOrder = sortOrder;
 
-            // Build query
             var query = _context.Products
                                 .Where(p => p.IsApproved) // Only show approved products
                                 .AsQueryable();
 
-            // Apply filters
             if (!string.IsNullOrWhiteSpace(searchName))
             {
                 query = query.Where(p => p.Name.Contains(searchName));
@@ -336,7 +311,6 @@ namespace FarmFresh.Controllers
                 query = query.Where(p => p.CategoryId.ToString() == category);
             }
 
-            // Apply sorting
             query = sortOrder switch
             {
                 "price_asc" => query.OrderBy(p => p.Price),
@@ -345,68 +319,79 @@ namespace FarmFresh.Controllers
                 _ => query.OrderBy(p => p.Name) // Default: Alphabetical
             };
 
-            // Pagination
             var totalProducts = await query.CountAsync();
             var products = await query.Skip((page - 1) * pageSize)
                                        .Take(pageSize)
                                        .ToListAsync();
 
-            // Fetch Featured Products and pass them to the ViewBag
             ViewBag.FeaturedProducts = await GetFeaturedProductsAsync();
 
-            // Pass pagination data to the ViewBag
             ViewBag.TotalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
             ViewBag.CurrentPage = page;
 
-            // Return the view with the products
             return View(products);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlaceOrder(Guid id, int quantity, Order orderInput)
-        {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (product == null || product.StockQuantity < quantity)
-            {
-                return BadRequest("Not enough stock available.");
-            }
+public async Task<IActionResult> PlaceOrder(Guid id, int quantity, Order orderInput)
+{
+    var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
-            // Deduct stock
-            product.StockQuantity -= quantity;
+    if (product == null)
+    {
+        return NotFound("Product not found."); 
+    }
 
-            // Create new order
-            var order = new Order
-            {
-                FirstName = orderInput.FirstName,
-                LastName = orderInput.LastName,
-                Adress = orderInput.Adress,
-                PhoneNumber = orderInput.PhoneNumber,
-                Email = orderInput.Email,
-                DeliveryOption = orderInput.DeliveryOption,
-                CreateOrderdDate = DateTime.UtcNow,
-                UserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), // Assuming user is logged in
-                IsTaken = false,
-                OrderStatus = null // Initial status
-            };
+    if (quantity <= 0)
+    {
+        return BadRequest("Quantity must be greater than zero."); // Handle invalid quantity
+    }
 
-            // Add the order-product relationship
-            var orderProduct = new OrderProduct
-            {
-                OrderId = order.Id,
-                ProductId = id,
-                Quantity = quantity
-            };
+    if (product.StockQuantity < quantity)
+    {
+        return BadRequest($"Only {product.StockQuantity} units available for this product."); // Provide specific stock information
+    }
 
-            order.OrderProducts.Add(orderProduct);
+    product.StockQuantity -= quantity;
 
-            // Save to database
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+    var order = new Order
+    {
+        Id = Guid.NewGuid(), 
+        FirstName = orderInput.FirstName,
+        LastName = orderInput.LastName,
+        Adress = orderInput.Adress,
+        PhoneNumber = orderInput.PhoneNumber,
+        Email = orderInput.Email,
+        DeliveryOption = orderInput.DeliveryOption,
+        CreateOrderdDate = DateTime.UtcNow,
+        UserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)), // Assuming user is logged in
+        IsTaken = false,
+        OrderStatus = null // Initial status
+    };
 
-            return RedirectToAction("Details", new { id });
+    var orderProduct = new OrderProduct
+    {
+        OrderId = order.Id,
+        ProductId = id,
+        Quantity = quantity
+    };
 
-        }
-        // GET: Edit Review
+    order.OrderProducts = new List<OrderProduct> { orderProduct };
+
+    try
+    {
+        _context.Products.Update(product);
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateException ex)
+    {
+        return BadRequest($"An error occurred while processing your order: {ex.Message}");
+    }
+
+    return RedirectToAction("Details", new { id });
+}
+
         [HttpGet]
         public async Task<IActionResult> EditReview(Guid reviewId)
         {
@@ -416,7 +401,6 @@ namespace FarmFresh.Controllers
             return View(review);
         }
 
-        // POST: Edit Review
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditReview(Guid id, string content, int rating)

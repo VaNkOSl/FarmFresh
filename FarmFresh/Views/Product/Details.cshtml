@@ -1,4 +1,35 @@
-﻿@using System.Security.Claims
+﻿@model FarmFresh.Data.Models.Product
+
+<h1>@Model.Name</h1>
+
+<p><strong>Description:</strong> @Model.Description</p>
+<p><strong>Origin:</strong> @Model.Origin</p>
+<p><strong>Price:</strong> @Model.Price.ToString("C")</p>
+<p>
+    <strong>Stock Quantity:</strong>
+    @if (Model.StockQuantity > 5)
+    {
+        @Model.StockQuantity
+    }
+    else if (Model.StockQuantity > 0)
+    {
+        <span class="text-warning">Low Stock: @Model.StockQuantity</span>
+    }
+    else
+    {
+        <span class="text-danger">Out of Stock</span>
+    }
+</p>
+<p><strong>Category:</strong> @Model.Category.Name</p>
+
+<h2>Photos</h2>
+<div class="d-flex flex-wrap">
+    @foreach (var photo in Model.ProductPhotos)
+    {
+        <img src="data:image/jpeg;base64,@Convert.ToBase64String(photo.Photo)"
+             alt="Product Photo" style="max-width: 200px; margin: 10px;" />
+    }
+</div>
 
 <div class="mt-3">
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
@@ -7,9 +38,7 @@
     </form>
 </div>
 
-<!-- Reviews Section -->
 <h2 class="mt-4">Reviews</h2>
-
 @if (ViewBag.PaginatedReviews != null && ((List<FarmFresh.Data.Models.Review>)ViewBag.PaginatedReviews).Any())
 {
     <ul class="list-group">
@@ -19,58 +48,16 @@
                 <strong>@review.User.UserName</strong> (@review.ReviewDate.ToShortDateString())
                 <p><strong>Rating:</strong> @review.Rating / 5</p>
                 <p>@review.Content</p>
-
-                @if (review.UserId == Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))) // Check if the current user wrote the review
-                {
-                    <div class="mt-2">
-                        <a asp-action="EditReview" asp-route-reviewId="@review.Id" class="btn btn-warning btn-sm">Edit</a>
-                        <form asp-action="DeleteReview" asp-route-reviewId="@review.Id" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </div>
-                }
             </li>
         }
     </ul>
-
-    <!-- Pagination Controls -->
-    <div class="pagination mt-3">
-        @if (ViewBag.CurrentPage > 1)
-        {
-            <a asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@(ViewBag.CurrentPage - 1)" class="btn btn-primary">Previous</a>
-        }
-
-        Page @ViewBag.CurrentPage of @ViewBag.TotalPages
-
-        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-        {
-            <a asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@(ViewBag.CurrentPage + 1)" class="btn btn-primary">Next</a>
-        }
-    </div>
 }
 else
 {
     <p>No reviews yet. Be the first to review this product!</p>
 }
 
-<!-- Add Review Form -->
-<h3 class="mt-4">Add a Review</h3>
-<form asp-action="AddReview" method="post">
-    <input type="hidden" name="id" value="@Model.Id" />
-    <div class="form-group">
-        <label for="rating">Rating (1-5):</label>
-        <input type="number" name="rating" id="rating" min="1" max="5" class="form-control" required />
-    </div>
-    <div class="form-group">
-        <label for="content">Review:</label>
-        <textarea name="content" id="content" class="form-control" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit Review</button>
-</form>
-
-<!-- Recommended Products Section -->
 <h2 class="mt-4">Recommended Products</h2>
-
 @if (ViewBag.RecommendedProducts != null && ((List<FarmFresh.Data.Models.Product>)ViewBag.RecommendedProducts).Any())
 {
     <div class="row">
@@ -96,7 +83,3 @@ else
 {
     <p>No recommendations available for this product.</p>
 }
-<form asp-action="AddToWishlist" method="post">
-    <input type="hidden" name="productId" value="@Model.Id" />
-    <button type="submit" class="btn btn-success">Add to Wishlist</button>
-</form>
