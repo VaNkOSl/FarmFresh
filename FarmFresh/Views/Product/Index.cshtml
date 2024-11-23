@@ -21,60 +21,49 @@
                 <option value="">All Categories</option>
                 @foreach (var category in (IEnumerable<FarmFresh.Data.Models.Category>)ViewBag.Categories)
                 {
-                    if (ViewContext.HttpContext.Request.Query["category"] == category.Id.ToString())
-                    {
-                        <option value="@category.Id" selected>@category.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@category.Id">@category.Name</option>
-                    }
+                    <option value="@category.Id" @(ViewContext.HttpContext.Request.Query["category"] == category.Id.ToString() ? "selected" : "")>
+                        @category.Name
+                    </option>
                 }
             </select>
         </div>
         <div class="form-group ml-3">
             <label for="sortOrder">Sort By:</label>
             <select name="sortOrder" id="sortOrder" class="form-control ml-2">
-                @if (ViewContext.HttpContext.Request.Query["sortOrder"] == "name")
-                {
-                    <option value="name" selected>Name</option>
-                }
-                else
-                {
-                    <option value="name">Name</option>
-                }
-
-                @if (ViewContext.HttpContext.Request.Query["sortOrder"] == "price_asc")
-                {
-                    <option value="price_asc" selected>Price: Low to High</option>
-                }
-                else
-                {
-                    <option value="price_asc">Price: Low to High</option>
-                }
-
-                @if (ViewContext.HttpContext.Request.Query["sortOrder"] == "price_desc")
-                {
-                    <option value="price_desc" selected>Price: High to Low</option>
-                }
-                else
-                {
-                    <option value="price_desc">Price: High to Low</option>
-                }
-
-                @if (ViewContext.HttpContext.Request.Query["sortOrder"] == "rating_desc")
-                {
-                    <option value="rating_desc" selected>Highest Rated</option>
-                }
-                else
-                {
-                    <option value="rating_desc">Highest Rated</option>
-                }
+                <option value="name" @(ViewContext.HttpContext.Request.Query["sortOrder"] == "name" ? "selected" : "")>Name</option>
+                <option value="price_asc" @(ViewContext.HttpContext.Request.Query["sortOrder"] == "price_asc" ? "selected" : "")>Price: Low to High</option>
+                <option value="price_desc" @(ViewContext.HttpContext.Request.Query["sortOrder"] == "price_desc" ? "selected" : "")>Price: High to Low</option>
+                <option value="rating_desc" @(ViewContext.HttpContext.Request.Query["sortOrder"] == "rating_desc" ? "selected" : "")>Highest Rated</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary ml-3">Filter</button>
     </form>
 </div>
+
+<!-- Featured Products Section -->
+@if (ViewBag.FeaturedProducts != null && ViewBag.FeaturedProducts.Any())
+{
+    <div class="featured-products my-5">
+        <h2>Featured Products</h2>
+        <div class="row">
+            @foreach (var product in (IEnumerable<FarmFresh.Data.Models.Product>)ViewBag.FeaturedProducts)
+            {
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(product.ProductPhotos.FirstOrDefault()?.Photo ?? Array.Empty<byte>())"
+                             alt="@product.Name" class="card-img-top"
+                             style="max-height: 150px; object-fit: cover;" />
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">@product.Price.ToString("C")</p>
+                            <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -94,4 +83,3 @@
         });
     });
 </script>
-

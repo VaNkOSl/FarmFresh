@@ -474,6 +474,15 @@ namespace FarmFresh.Controllers
 
             return Json(suggestions);
         }
+        public async Task<List<Product>> GetFeaturedProductsAsync()
+        {
+            return await _context.Products
+                                 .Where(p => p.IsApproved && p.StockQuantity > 0)
+                                 .OrderByDescending(p => p.Price) // Sort by highest price
+                                 .Take(5) // Limit to 5 products
+                                 .Include(p => p.ProductPhotos)
+                                 .ToListAsync();
+        }
 
     }
 
