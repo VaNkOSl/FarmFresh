@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FarmFresh.Commons\FarmFresh.Commons.csproj" />
+    <ProjectReference Include="..\FarmFresh.Data.Models\FarmFresh.Data.Models.csproj" />
     <ProjectReference Include="..\FarmFresh.Infrastructure\FarmFresh.Infrastructure.csproj" />
   </ItemGroup>
 
