@@ -18,6 +18,12 @@ builder.Services.ConfigureCookieAuthentication();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Administrator")); // Use "Administrator" role for your admin users
+});
+
 
 builder.Logging.ClearProviders();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
