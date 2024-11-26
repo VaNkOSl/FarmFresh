@@ -29,13 +29,13 @@ internal sealed class FarmerService : IFarmerService
     {
         if(string.IsNullOrWhiteSpace(userId))
         {
-            _loggerManager.LogError("Attempted to create farmer, but userId is null or empty!");
+            _loggerManager.LogError($"[{nameof(CreateFarmerAsync)}] Attempted to create farmer, but userId is null or empty!");
             throw new UserIdNotFound();
         }
 
         if (await DoesFarmerExistAsync(model.Egn, model.PhoneNumber, userId, trackChanges))
         {
-            _loggerManager.LogError($"Farmer with this EGN {model.Egn}, phone number {model.PhoneNumber}, or userId {userId} already exists.");
+            _loggerManager.LogError($"[{nameof(CreateFarmerAsync)}] Farmer with this EGN {model.Egn}, phone number {model.PhoneNumber}, or userId {userId} already exists.");
             throw new FarmerAlreadyExistsException();
         }
 
@@ -46,7 +46,21 @@ internal sealed class FarmerService : IFarmerService
 
             await _repositoryManager.FarmerRepository.CreateFarmerAsync(farmer);
             await _repositoryManager.SaveAsync(farmer);
-            _loggerManager.LogInfo($"User with ID {userId} successfully become a farmer!");
+
+            if (model.Latitude.HasValue && model.Longitude.HasValue)
+            {
+                var farmerLocation = new FarmerLocationDto
+                {
+                  Latitude = model.Latitude.Value,
+                  Longitude = model.Longitude.Value,
+                  Title = model.Location,
+                  FarmerId = farmer.Id,
+                };
+
+                await CreateFarmerLocationAsync(farmerLocation, farmer.Id);
+            }
+
+            _loggerManager.LogInfo($"[{nameof(CreateFarmerAsync)}] User with ID {userId} successfully become a farmer!");
         }
         catch (FormatException ex)
         {
@@ -58,6 +72,22 @@ internal sealed class FarmerService : IFarmerService
             _loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
             throw new FarmerSomethingWentWrong();
         }
+    }
+
+    public async Task CreateFarmerLocationAsync(FarmerLocationDto model, Guid farmerId)
+    {
+        var farmerLocation = _mapper.Map<FarmerLocation>(model);
+        farmerLocation.FarmerId = farmerId;
+
+        if(farmerId == Guid.Empty)
+        {
+            _loggerManager.LogError($"[{nameof(CreateFarmerLocationAsync)}] farmerId is invalid (null or empty).");
+            throw new UserIdNotFound();
+        }
+
+        await _repositoryManager.FarmerLocationRepository.CreateLocationAsync(farmerLocation);
+        await _repositoryManager.SaveAsync(farmerLocation);
+        _loggerManager.LogInfo($"[{nameof(CreateFarmerLocationAsync)}] Successfully created location (ID: {farmerLocation.Id}) for farmer with ID: {farmerId}.");
     }
 
     public async Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges)
