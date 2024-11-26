@@ -16,10 +16,7 @@
 
                     <div class="mb-3">
                         <label asp-for="Location" class="form-label">Location</label>
-                        <input asp-for="Location" class="form-control" id="locationInput" autocomplete="off" />
-                        <div id="suggestions" class="list-group mt-1" style="position: absolute; z-index: 1000;"></div>
-                        <input type="hidden" id="Latitude" asp-for="Latitude" />
-                        <input type="hidden" id="Longitude" asp-for="Longitude" />
+                        <input asp-for="Location" class="form-control" />
                         <span asp-validation-for="Location" class="text-danger"></span>
                     </div>
 
@@ -82,7 +79,6 @@
     </div>
 </div>
 
-<script src="/js/Farmer.js"></script>
 @section Scripts
 {
     <partial name="_ValidationScripts" />

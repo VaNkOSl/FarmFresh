@@ -11,7 +11,6 @@ public class CRUDDataValidator : IValidateEntity
     public CRUDDataValidator()
     {
         _validators.Add(new FarmerValidator());
-        _validators.Add(new FarmerLocationValidator());
     }
 
     public Type GetValidatedType() => typeof(CRUDDataValidator);

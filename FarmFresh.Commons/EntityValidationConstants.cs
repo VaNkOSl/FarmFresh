@@ -52,16 +52,4 @@ public static class EntityValidationConstants
         public const int OrderAdressMinLength = 5;
         public const int OrderAdressMaxLength = 150;
     }
-
-    public static class FarmerLocations
-    {
-        public const double LatitudeMinValue = -90.00;
-        public const double LatitudeMaxValue = 90.00;
-
-        public const double LongitudeMinValue = -180.00;
-        public const double LongitudeMaxValue =  180.00;
-
-        public const int TitleMinLength = 3;
-        public const int TitleMaxLength = 150;
-    }
 }

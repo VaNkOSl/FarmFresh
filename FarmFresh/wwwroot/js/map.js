@@ -7,28 +7,16 @@
     const farmersLocations = window.farmersLocations; 
 
     farmersLocations.forEach(location => {
-        if (typeof location.latitude === 'number' && typeof location.longitude === 'number') {
-            const marker = new google.maps.Marker({
-                position: { lat: location.latitude, lng: location.longitude },
+        if (typeof location.lat === 'number' && typeof location.lng === 'number') {
+            new google.maps.Marker({
+                position: { lat: location.lat, lng: location.lng },
                 map: map,
-                title: location.title,
+                title: location.title
             });
-
-            marker.addEventListener('click', () => {
-
-                infoWindow.setContent(`
-                <div>
-                    <h3>${location.title}</h3>
-                    <p>Latitude: ${location.latitude}</p>
-                    <p>Longitude: ${location.longitude}</p>
-                </div>
-            `);
-                infoWindow.open(map, marker);
-            });
-
         } else {
             console.error('Invalid latitude or longitude value:', location);
         }
+    });
 }
 
 function loadGoogleMapsAPI() {

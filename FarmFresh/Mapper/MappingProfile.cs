@@ -30,9 +30,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => true))
             .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoFile != null ? ConvertToByteArray(src.PhotoFile) : new byte[0]))
             .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.BirthDate));
-
-        CreateMap<FarmerLocationDto, FarmerLocation>()
-            .ForMember(dest => dest.FarmerId, opt => opt.Ignore());
     }
 
     private byte[] ConvertToByteArray(IFormFile file)
