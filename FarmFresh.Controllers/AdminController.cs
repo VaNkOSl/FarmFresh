@@ -2,11 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using FarmFresh.Data;
 using FarmFresh.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 namespace FarmFresh.Controllers;
 
+[Authorize(Roles = "Administrator")]
 public class AdminController : Controller
 {
     private readonly FarmFreshDbContext _context;
+
 
     public AdminController(FarmFreshDbContext context)
     {
@@ -117,35 +120,55 @@ public class AdminController : Controller
     }
     public async Task<IActionResult> ManageUsers()
     {
-        var users = await _context.Users.ToListAsync();
+        var users = await _context.Users
+                                  .Select(u => new
+                                  {
+                                      u.Id,
+                                      u.UserName,
+                                      u.Email,
+                                      IsBlocked = u.IsBlocked // Assuming 'IsBlocked' is a property in your User model
+                                  })
+                                  .ToListAsync();
+
         return View(users);
     }
+
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> BlockUser(Guid id)
     {
         var user = await _context.Users.FindAsync(id);
-        if (user == null) return NotFound();
+        if (user == null)
+        {
+            return NotFound();
+        }
 
-        // Block user by setting LockoutEnd to a future date
-        user.LockoutEnd = DateTime.UtcNow.AddYears(100);
+        // Set LockoutEnd to a future date to block the user
+        user.LockoutEnd = DateTime.UtcNow.AddYears(100); // A far future date
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(ManageUsers));
     }
-    [HttpPost]
-    public async Task<IActionResult> UnblockUser(Guid id)
+
+   [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> UnblockUser(Guid id)
+{
+    var user = await _context.Users.FindAsync(id);
+    if (user == null)
     {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null) return NotFound();
-
-        // Unblock user by setting LockoutEnd to null
-        user.LockoutEnd = null;
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction(nameof(ManageUsers));
+        return NotFound();
     }
+
+    // Remove the LockoutEnd date to unblock the user
+    user.LockoutEnd = null;
+    _context.Users.Update(user);
+    await _context.SaveChangesAsync();
+
+    return RedirectToAction(nameof(ManageUsers));
+}
+
     public async Task<IActionResult> ManageCategories()
     {
         var categories = await _context.Categories.ToListAsync();
@@ -219,5 +242,17 @@ public class AdminController : Controller
         ViewBag.ProductId = review.ProductId;
         return View(review);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> ManageAllProducts()
+    {
+        var allProducts = await _context.Products
+            .Include(p => p.Farmer)
+            .Include(p => p.Category)
+            .ToListAsync();
+
+        return View(allProducts);
+    }
+
 
 }
