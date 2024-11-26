@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FarmFresh.Data;
+using FarmFresh.Data.Models;
 namespace FarmFresh.Controllers;
 
 public class AdminController : Controller
@@ -52,4 +53,67 @@ public class AdminController : Controller
 
         return RedirectToAction(nameof(PendingFarmers));
     }
+    public async Task<IActionResult> ManageProducts()
+    {
+        var products = await _context.Products
+                                     .Include(p => p.Farmer)
+                                     .Include(p => p.Category)
+                                     .ToListAsync();
+        return View(products);
+    }
+    public IActionResult AddProduct()
+    {
+        ViewBag.Categories = _context.Categories.ToList();
+        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+        return View();
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddProduct(Product product)
+    {
+        if (ModelState.IsValid)
+        {
+            product.Id = Guid.NewGuid();
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ManageProducts));
+        }
+        ViewBag.Categories = _context.Categories.ToList();
+        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+        return View(product);
+    }
+    public async Task<IActionResult> EditProduct(Guid id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null) return NotFound();
+        ViewBag.Categories = _context.Categories.ToList();
+        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+        return View(product);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProduct(Product product)
+    {
+        if (ModelState.IsValid)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ManageProducts));
+        }
+        ViewBag.Categories = _context.Categories.ToList();
+        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+        return View(product);
+    }
+    [HttpPost]
+    public async Task<IActionResult> DeleteProduct(Guid id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null) return NotFound();
+
+        _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(ManageProducts));
+    }
+
 }
