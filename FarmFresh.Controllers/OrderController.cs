@@ -79,6 +79,7 @@ namespace FarmFresh.Controllers
                     Seasons = o.Product.SuitableSeason,
                     HarvestDate = o.Product.HarvestDate,
                     ExpirationDate = o.Product.ExpirationDate,
+                    Picture=o.Product.Photo
                 });
             return View(OrderDetails);
         }

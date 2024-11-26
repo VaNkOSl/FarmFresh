@@ -36,15 +36,10 @@ else
                     <td>@order.Quantity</td>
                     <td>@(order.Price * order.Quantity) лв.</td> <!-- Calculate total -->
                     <td>
-                        @if (order.Picture != null)
-                        {
-                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(order.Picture)"
-                                 alt="Product Image" width="100" height="100" />
-                        }
-                        else
-                        {
-                            <span>No Image</span>
-                        }
+                        <img src="@(order.Picture != null
+           ? $"data:image/jpeg;base64,{Convert.ToBase64String(order.Picture)}"
+           : "/images/Placeholder.png")"
+                             alt="Product Image" width="100" height="100" />
                     </td>
                     <td><a asp-action="Details" asp-route-id="@order.Id" class="btn btn-primary">View Details</a></td>
                 </tr>

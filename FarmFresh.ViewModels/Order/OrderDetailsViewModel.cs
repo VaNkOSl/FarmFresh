@@ -29,7 +29,7 @@ namespace FarmFresh.ViewModels.Order
         public Seasons Seasons { get; set; }
         public DateTime HarvestDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-
+        public byte[] Picture { get; set; }
 
     }
 }
