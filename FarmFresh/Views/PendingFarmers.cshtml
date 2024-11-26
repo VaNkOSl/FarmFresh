@@ -1,0 +1,46 @@
+﻿@model IEnumerable<FarmFresh.Data.Models.Farmer>
+
+<h1>Pending Farmer Applications</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Farm Description</th>
+            <th>Location</th>
+            <th>Phone Number</th>
+            <th>EGN</th>
+            <th>Date of Birth</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var farmer in Model)
+        {
+            <tr>
+                <td>
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(farmer.Photo)"
+                         alt="Farmer Photo"
+                         style="max-height: 100px;" />
+                </td>
+                <td>@farmer.User.UserName</td>
+                <td>@farmer.User.Email</td>
+                <td>@farmer.FarmDescription</td>
+                <td>@farmer.Location</td>
+                <td>@farmer.PhoneNumber</td>
+                <td>@farmer.Egn</td>
+                <td>@farmer.DateOfBirth.ToShortDateString()</td>
+                <td>
+                    <form asp-action="ApproveFarmer" asp-route-id="@farmer.Id" method="post" style="display:inline;">
+                        <button class="btn btn-success">Approve</button>
+                    </form>
+                    <form asp-action="RejectFarmer" asp-route-id="@farmer.Id" method="post" style="display:inline;">
+                        <button class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
