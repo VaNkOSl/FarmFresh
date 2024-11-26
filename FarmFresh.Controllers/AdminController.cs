@@ -115,5 +115,36 @@ public class AdminController : Controller
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(ManageProducts));
     }
+    public async Task<IActionResult> ManageUsers()
+    {
+        var users = await _context.Users.ToListAsync();
+        return View(users);
+    }
+    [HttpPost]
+    public async Task<IActionResult> BlockUser(Guid id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        // Block user by setting LockoutEnd to a future date
+        user.LockoutEnd = DateTime.UtcNow.AddYears(100);
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(ManageUsers));
+    }
+    [HttpPost]
+    public async Task<IActionResult> UnblockUser(Guid id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        // Unblock user by setting LockoutEnd to null
+        user.LockoutEnd = null;
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(ManageUsers));
+    }
 
 }
