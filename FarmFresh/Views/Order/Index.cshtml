@@ -32,9 +32,9 @@ else
                     <td>@order.OrderId</td>
                     <td>@order.ProductName</td>
                     <td>@order.OrderStatus</td>
-                    <td>@order.Price</td> <!-- Format as currency -->
+                    <td>@order.Price.ToString("C")</td> <!-- Format as currency -->
                     <td>@order.Quantity</td>
-                    <td>@(order.Price * order.Quantity)</td> <!-- Calculate total -->
+                    <td>@(order.Price * order.Quantity) лв.</td> <!-- Calculate total -->
                     <td>
                         @if (order.Picture != null)
                         {
