@@ -1,0 +1,16 @@
+﻿@model FarmFresh.Data.Models.Review
+
+<h1>Add Review</h1>
+
+<form asp-action="AddReview" method="post">
+    <input type="hidden" name="ProductId" value="@ViewBag.ProductId" />
+    <div class="form-group">
+        <label for="Rating">Rating (1-5)</label>
+        <input type="number" name="Rating" class="form-control" min="1" max="5" required />
+    </div>
+    <div class="form-group">
+        <label for="Content">Review Content</label>
+        <textarea name="Content" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>

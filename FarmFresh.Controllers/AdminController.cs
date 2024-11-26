@@ -146,5 +146,78 @@ public class AdminController : Controller
 
         return RedirectToAction(nameof(ManageUsers));
     }
+    public async Task<IActionResult> ManageCategories()
+    {
+        var categories = await _context.Categories.ToListAsync();
+        return View(categories);
+    }
+    public IActionResult AddCategory()
+    {
+        return View();
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddCategory(Category category)
+    {
+        if (ModelState.IsValid)
+        {
+            category.Id = Guid.NewGuid();
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ManageCategories));
+        }
+        return View(category);
+    }
+    public async Task<IActionResult> EditCategory(Guid id)
+    {
+        var category = await _context.Categories.FindAsync(id);
+        if (category == null) return NotFound();
+        return View(category);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditCategory(Category category)
+    {
+        if (ModelState.IsValid)
+        {
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ManageCategories));
+        }
+        return View(category);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteCategory(Guid id)
+    {
+        var category = await _context.Categories.FindAsync(id);
+        if (category == null) return NotFound();
+
+        _context.Categories.Remove(category);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(ManageCategories));
+    }
+
+    public IActionResult AddReview(Guid productId)
+    {
+        ViewBag.ProductId = productId;
+        return View();
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddReview(Review review)
+    {
+        if (ModelState.IsValid)
+        {
+            review.Id = Guid.NewGuid();
+            review.ReviewDate = DateTime.UtcNow;
+            _context.Reviews.Add(review);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "Product", new { id = review.ProductId });
+        }
+        ViewBag.ProductId = review.ProductId;
+        return View(review);
+    }
 
 }
