@@ -154,15 +154,12 @@
     <p class="lead text-muted">Join the sustainable food movement and support your local community!</p>
 </div>
 
- <button id="scrollToTopBtn" class="btn btn-primary">&#8679;</button>  
+ <button id="scrollToTopBtn" class="btn btn-primary">&#8679;</button>
 
-@section Scripts
-{
+@section Scripts{
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        window.farmersLocations = @Html.Raw(Json.Serialize(ViewData["FarmersLocations"]));
-    </script>
+    <script>window.farmersLocations = @Html.Raw(Json.Serialize(ViewData["FarmersLocations"]));</script>
     <script src="/js/animations.js"></script>
-    <script src="/js/map.js"></script> 
+    <script src="/js/map.js"></script>
 }

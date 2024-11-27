@@ -11,7 +11,7 @@
             const marker = new google.maps.Marker({
                 position: { lat: location.latitude, lng: location.longitude },
                 map: map,
-                title: location.title,
+                title: location.title
             });
 
             marker.addEventListener('click', () => {
@@ -29,6 +29,7 @@
         } else {
             console.error('Invalid latitude or longitude value:', location);
         }
+    });
 }
 
 function loadGoogleMapsAPI() {
