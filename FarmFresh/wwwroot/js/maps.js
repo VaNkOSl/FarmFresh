@@ -1,28 +1,29 @@
 ﻿function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 42.7339, lng: 25.4858 }, 
+        center: { lat: 42.7339, lng: 25.4858 },
         zoom: 7
     });
 
-    const farmersLocations = window.farmersLocations; 
+    const infoWindow = new google.maps.InfoWindow();
+
+    const farmersLocations = window.farmersLocations;
 
     farmersLocations.forEach(location => {
         if (typeof location.latitude === 'number' && typeof location.longitude === 'number') {
             const marker = new google.maps.Marker({
                 position: { lat: location.latitude, lng: location.longitude },
                 map: map,
-                title: location.title
+                title: location.title,
             });
 
-            marker.addEventListener('click', () => {
-
+            marker.addListener('click', () => {
                 infoWindow.setContent(`
                 <div>
                     <h3>${location.title}</h3>
                     <p>Latitude: ${location.latitude}</p>
                     <p>Longitude: ${location.longitude}</p>
                 </div>
-            `);
+                `);
                 infoWindow.open(map, marker);
             });
 
