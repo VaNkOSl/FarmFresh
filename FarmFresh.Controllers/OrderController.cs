@@ -100,7 +100,7 @@ namespace FarmFresh.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(Order order)
+        public async Task<IActionResult> Checkout(Order order, Guid OrderProductId)
         {
 
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -120,6 +120,47 @@ namespace FarmFresh.Controllers
 
 
             return View(order);
+        }
+        public IActionResult OrderConfirmation(Guid id)
+        {
+            {
+                var order = _context.Orders
+                    .Where(o => o.Id == id)
+                    .Select(o => new OrderConfirmationViewModel
+                    {
+                        Id = o.Id,
+                        OrderId = o.Id,
+                        Products = o.OrderProducts.ToList(),
+                        Price = o.OrderProducts.Sum(p => p.Price), 
+                        Quantity = o.OrderProducts.Sum(p => p.Quantity),
+                        TotalPrice = o.OrderProducts.Sum(p => p.Price * p.Quantity),
+                        Picture = o.OrderProducts.FirstOrDefault().Product.Photo,   
+                        FirstName = o.FirstName, 
+                        LastName = o.LastName,
+                        Adress = o.Adress,
+                        PhoneNumber = o.PhoneNumber,
+                        Email = o.Email
+                    }).FirstOrDefault();
+
+                if (order == null)
+                {
+                    return NotFound();
+                }
+
+                return View(order);
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OrderConfirmation(Order order)
+        {
+            if (order == null)
+            {
+                return NotFound();
+            }
+            order.OrderStatus = OrderStatus.Completed;
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }
