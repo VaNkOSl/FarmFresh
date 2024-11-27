@@ -1,6 +1,8 @@
 using FarmFresh.Extensions;
+using FarmFresh.Infrastructure.Extensions;
 using LoggerService.Contacts;
 using NLog;
+using static FarmFresh.Commons.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +24,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Administrator")); // Use "Administrator" role for your admin users
+        policy.RequireRole("Administrator")); 
 });
 
 
@@ -42,6 +44,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+if(app.Environment.IsDevelopment())
+{
+    app.SeedAdministrator(DevelopmentAdminEmail);
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -49,6 +56,14 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(config =>
+{
+    config.MapControllerRoute(
+        name: "areas",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+        );
+});
 
 app.MapDefaultControllerRoute();
 app.MapRazorPages();

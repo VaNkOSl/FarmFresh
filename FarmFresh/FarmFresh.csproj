@@ -30,4 +30,9 @@
     <None Include="wwwroot\images\farming-crops.jpg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Controllers\" />
+    <Folder Include="Areas\Admin\Views\" />
+  </ItemGroup>
+
 </Project>
