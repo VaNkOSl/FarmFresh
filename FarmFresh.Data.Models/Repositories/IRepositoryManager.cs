@@ -11,6 +11,8 @@ public interface IRepositoryManager
 
     IFarmerLocationRepository FarmerLocationRepository { get; }
 
+    ICategoryRepository CategoryRepository { get; }
+
     Task SaveAsync(Entity entity);
 
     Task SaveAsync();

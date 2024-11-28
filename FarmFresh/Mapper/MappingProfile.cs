@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
+using FarmFresh.ViewModels.Category;
 using FarmFresh.ViewModels.Farmer;
 using FarmFresh.ViewModels.User;
 
@@ -33,6 +34,8 @@ public class MappingProfile : Profile
 
         CreateMap<FarmerLocationDto, FarmerLocation>()
             .ForMember(dest => dest.FarmerId, opt => opt.Ignore());
+
+        CreateMap<CategoryCreateUpdateForm, Category>();
     }
 
     private byte[] ConvertToByteArray(IFormFile file)

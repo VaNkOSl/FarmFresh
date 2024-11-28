@@ -15,6 +15,7 @@ public sealed class RepositoryManager : IRepositoryManager
     private Lazy<IUserRepository> _userRepository;
     private Lazy<IFarmerRepository> _farmerRepository;
     private Lazy<IFarmerLocationRepository> _farmerLocationRepository;
+    private Lazy<ICategoryRepository> _categoryRepository;
     private IValidateEntity _validateEntityRepo;
 
     public RepositoryManager(FarmFreshDbContext data, IServiceProvider serviceProvider)
@@ -23,6 +24,7 @@ public sealed class RepositoryManager : IRepositoryManager
         _userRepository = new Lazy<IUserRepository>(() => new UserRepository(data));
         _farmerRepository = new Lazy<IFarmerRepository>(() => new FarmerRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _farmerLocationRepository = new Lazy<IFarmerLocationRepository>(() => new FarmerLocationRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
+        _categoryRepository = new Lazy<ICategoryRepository>(() => new CategoryRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _validateEntityRepo = serviceProvider.GetRequiredService<IValidateEntity>();
     }
 
@@ -31,6 +33,8 @@ public sealed class RepositoryManager : IRepositoryManager
     public IFarmerRepository FarmerRepository => _farmerRepository.Value;
 
     public IFarmerLocationRepository FarmerLocationRepository => _farmerLocationRepository.Value;
+
+    public ICategoryRepository CategoryRepository => _categoryRepository.Value;
 
     public async Task SaveAsync(Entity entity)
     {
