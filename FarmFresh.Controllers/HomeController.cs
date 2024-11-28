@@ -3,6 +3,7 @@ using FarmFresh.Repositories.Contacts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using static FarmFresh.Commons.GeneralApplicationConstants;
 
 namespace FarmFresh.Controllers;
 
@@ -19,6 +20,12 @@ public class HomeController : BaseController
 
     public async Task<IActionResult> Index()
     {
+        if (User.IsInRole(AdminRoleName))
+        {
+            return RedirectToAction("DashBoard", "Home", new { area = AdminAreaName });
+        }
+
+
         var farmersLocations = await GetFarmerLocations();
         ViewData["FarmersLocations"] = farmersLocations;
         return View();
