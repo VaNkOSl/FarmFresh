@@ -1,6 +1,7 @@
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
 using LoggerService.Contacts;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using NLog;
 using static FarmFresh.Commons.GeneralApplicationConstants;
 
@@ -21,12 +22,11 @@ builder.Services.ConfigureCookieAuthentication();
 
 builder.Services.AddHttpContextAccessor();
 
+
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Administrator")); 
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole(AdminRoleName));
 });
-
 
 builder.Logging.ClearProviders();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -48,6 +48,8 @@ if(app.Environment.IsDevelopment())
 {
     app.SeedAdministrator(DevelopmentAdminEmail);
 }
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

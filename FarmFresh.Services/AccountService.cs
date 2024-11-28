@@ -17,20 +17,26 @@ namespace FarmFresh.Services;
 public sealed class AccountService : IAccountService
 {
     private readonly IRepositoryManager _repositoryManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
     private readonly ILoggerManager _loggerManager;
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-    public AccountService(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager loggerManager,
-                          IPasswordHasher<ApplicationUser> passwordHasher , IHttpContextAccessor httpContextAccessor)
+    public AccountService(IRepositoryManager repositoryManager,
+                          IMapper mapper,
+                          ILoggerManager loggerManager,
+                          IPasswordHasher<ApplicationUser> passwordHasher, 
+                          IHttpContextAccessor httpContextAccessor,
+                          UserManager<ApplicationUser> userManager)
     {
         _repositoryManager = repositoryManager;
         _mapper = mapper;
         _loggerManager = loggerManager;
         _passwordHasher = passwordHasher;
         _httpContextAccessor = httpContextAccessor;
+        _userManager = userManager;
     }
 
     public async Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges)
@@ -115,14 +121,18 @@ public sealed class AccountService : IAccountService
 
     private async Task SignInUserAsync(ApplicationUser user)
     {
-        var claim = new List<Claim>
-        {
-          new Claim(ClaimTypes.Name, user.UserName!),
-          new Claim(ClaimTypes.Email, user.Email!),
-          new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        };
+        var roles = await _userManager.GetRolesAsync(user);
 
-        var claimsIdentity = new ClaimsIdentity(claim, CookieAuthenticationDefaults.AuthenticationScheme);
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName!),
+        new Claim(ClaimTypes.Email, user.Email!),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    };
+
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
         var authProperties = new AuthenticationProperties
         {
