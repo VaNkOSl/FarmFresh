@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
                       "/nlog.config"));
 
-
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
 builder.Services.ConfigureRepositoryManager();
@@ -20,6 +19,9 @@ builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
+builder.Services.ConfigureServicesCORS();
+
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -30,6 +32,8 @@ builder.Logging.ClearProviders();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 var logger = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(logger);
@@ -46,8 +50,6 @@ if(app.Environment.IsDevelopment())
 {
     app.SeedAdministrator(DevelopmentAdminEmail);
 }
-
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

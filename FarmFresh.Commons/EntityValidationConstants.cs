@@ -29,7 +29,7 @@ public static class EntityValidationConstants
         public const int FarmerPhoneNumberMaxLength = 14;
     }
 
-    public static class Category
+    public static class Categories
     {
         public const int CategoryNameMinLength = 3;
         public const int CategoryNameMaxLength = 50;

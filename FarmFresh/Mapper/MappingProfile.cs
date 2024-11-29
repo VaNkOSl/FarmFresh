@@ -36,6 +36,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.FarmerId, opt => opt.Ignore());
 
         CreateMap<CategoryCreateForm, Category>();
+        CreateMap<Category, CategoryUpdateForm>()
+             .ReverseMap();
         CreateMap<CategoryUpdateForm, Category>()
              .ForMember(dest => dest.Id, opt => opt.Ignore()) 
              .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));

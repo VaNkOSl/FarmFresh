@@ -1,6 +1,6 @@
 ﻿using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Enums;
-using static FarmFresh.Commons.EntityValidationConstants.Category;
+using static FarmFresh.Commons.EntityValidationConstants.Categories;
 
 namespace FarmFresh.Repositories.DataValidator.ValidateEntity;
 

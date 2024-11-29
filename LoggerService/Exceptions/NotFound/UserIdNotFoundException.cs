@@ -1,8 +1,8 @@
 ﻿namespace LoggerService.Exceptions.NotFound;
 
-public class UserIdNotFound : NotFoundException
+public class UserIdNotFoundException : NotFoundException
 {
-    public UserIdNotFound() 
+    public UserIdNotFoundException() 
         : base("User with the provided ID was not found. Please try again later or contact the administrator.")
     {
     }

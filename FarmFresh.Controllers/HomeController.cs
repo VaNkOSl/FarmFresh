@@ -1,4 +1,5 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Repositories.Contacts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +21,10 @@ public class HomeController : BaseController
 
     public async Task<IActionResult> Index()
     {
-        if (User.IsInRole(AdminRoleName))
+        if (User.IsAdmin())
         {
             return RedirectToAction("DashBoard", "Home", new { area = AdminAreaName });
         }
-
 
         var farmersLocations = await GetFarmerLocations();
         ViewData["FarmersLocations"] = farmersLocations;

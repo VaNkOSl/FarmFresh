@@ -30,7 +30,7 @@ internal sealed class FarmerService : IFarmerService
         if(string.IsNullOrWhiteSpace(userId))
         {
             _loggerManager.LogError($"[{nameof(CreateFarmerAsync)}] Attempted to create farmer, but userId is null or empty!");
-            throw new UserIdNotFound();
+            throw new UserIdNotFoundException();
         }
 
         if (await DoesFarmerExistAsync(model.Egn, model.PhoneNumber, userId, trackChanges))
@@ -82,7 +82,7 @@ internal sealed class FarmerService : IFarmerService
         if(farmerId == Guid.Empty)
         {
             _loggerManager.LogError($"[{nameof(CreateFarmerLocationAsync)}] farmerId is invalid (null or empty).");
-            throw new UserIdNotFound();
+            throw new UserIdNotFoundException();
         }
 
         await _repositoryManager.FarmerLocationRepository.CreateLocationAsync(farmerLocation);

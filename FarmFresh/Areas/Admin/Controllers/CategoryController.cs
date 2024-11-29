@@ -7,6 +7,7 @@ using static FarmFresh.Commons.NotificationMessagesConstants;
 namespace FarmFresh.Areas.Admin.Controllers;
 
 [Route("api/admin/category")]
+
 public class CategoryController : AdminBaseController
 {
     private readonly IServiceManager _serviceManager;
@@ -39,12 +40,13 @@ public class CategoryController : AdminBaseController
         return RedirectToAction("DashBoard", "Home", new { area = AdminAreaName });
     }
 
-    [HttpPost("delete")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _serviceManager.CategoryService.DeleteCategory(id);
-        return RedirectToAction("All", "Category", new { area = AdminAreaName });
+        return Ok();
     }
+
 
     [HttpGet("edit/{id}")]
     public async Task<IActionResult> Edit(Guid id)
@@ -53,6 +55,7 @@ public class CategoryController : AdminBaseController
         return View(result);
     }
 
+
     [HttpPost("edit/{id}")]
     public async Task<IActionResult> Edit(CategoryUpdateForm model , Guid id)
     {
@@ -60,6 +63,7 @@ public class CategoryController : AdminBaseController
         {
             await _serviceManager.CategoryService.UpdateCategory(model, id, trackChanges: true);
         }
+
         return RedirectToAction("All", "Category", new { area = AdminAreaName });
     }
 }
