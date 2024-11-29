@@ -26,7 +26,7 @@ public class MappingProfile : Profile
 
         CreateMap<ApplicationUser, ProfileViewModel>();
 
-        CreateMap<FarmerCreateUpdateForm, Farmer>()
+        CreateMap<FarmerCreateForm, Farmer>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
             .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => true))
             .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoFile != null ? ConvertToByteArray(src.PhotoFile) : new byte[0]))
@@ -35,7 +35,10 @@ public class MappingProfile : Profile
         CreateMap<FarmerLocationDto, FarmerLocation>()
             .ForMember(dest => dest.FarmerId, opt => opt.Ignore());
 
-        CreateMap<CategoryCreateUpdateForm, Category>();
+        CreateMap<CategoryCreateForm, Category>();
+        CreateMap<CategoryUpdateForm, Category>()
+             .ForMember(dest => dest.Id, opt => opt.Ignore()) 
+             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
     }
 
     private byte[] ConvertToByteArray(IFormFile file)

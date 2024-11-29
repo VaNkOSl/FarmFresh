@@ -12,7 +12,16 @@
         <div class="mt-4 p-5 bg-light text-center rounded shadow">
             <h2 class="display-4">Welcome, Admin!</h2>
             <p class="lead">Manage your products, users, and attributes with ease.</p>
-            <a asp-area="" asp-controller="Product" asp-action="All" class="btn btn-primary btn-lg mx-2"><i class="fas fa-list"></i> All Products</a>
+            <div class="dropdown d-inline-block">
+                <button class="btn btn-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-list"></i> All
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" asp-area="" asp-controller="Product" asp-action="All">All Products</a></li>
+                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="All">All Categories</a></li>
+                    <li><a class="dropdown-item" asp-area="" asp-controller="Farmer" asp-action="All">All Farmers</a></li>
+                </ul>
+            </div>
             <a asp-area="" asp-controller="Product" asp-action="Add" class="btn btn-success btn-lg mx-2"><i class="fas fa-plus"></i> Add Product</a>
             <a asp-area="Admin" asp-controller="Product" asp-action="Mine" class="btn btn-info btn-lg mx-2"><i class="fas fa-box"></i> My Products</a>
             <div class="btn-group mt-4">
@@ -42,7 +51,7 @@
                                 Add Attributes
                             </button>
                             <div class="dropdown-menu w-100">
-                                <a asp-area="Admin" asp-controller="Product" asp-action="AddCategory" class="dropdown-item">Add Category</a>
+                                <a asp-area="Admin" asp-controller="Category" asp-action="AddCategory" class="dropdown-item">Add Category</a>
                             </div>
                         </div>
                     </div>
