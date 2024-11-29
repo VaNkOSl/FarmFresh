@@ -4,7 +4,7 @@ namespace FarmFresh.Services.Contacts;
 
 public interface IFarmerService
 {
-    Task CreateFarmerAsync(FarmerCreateUpdateForm model, string userId, bool tracktrackChanges);
+    Task CreateFarmerAsync(FarmerCreateForm model, string userId, bool tracktrackChanges);
 
     Task CreateFarmerLocationAsync(FarmerLocationDto model, Guid farmerId);
 

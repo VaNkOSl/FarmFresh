@@ -22,7 +22,7 @@ public class FarmerController : BaseController
        View();
 
     [HttpPost("become")]
-    public async Task<IActionResult> Become(FarmerCreateUpdateForm model)
+    public async Task<IActionResult> Become(FarmerCreateForm model)
     {
         var userId = User.GetId()!;
 

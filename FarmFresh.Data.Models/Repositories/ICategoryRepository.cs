@@ -13,4 +13,6 @@ public interface ICategoryRepository
     void UpdateCategory(Category category);
 
     IQueryable<Category> FindCategoryByConditionAsync(Expression<Func<Category, bool>> expression, bool trackChanges);
+
+    IQueryable<Category> GetAllCategories(bool trackChanges);
 }

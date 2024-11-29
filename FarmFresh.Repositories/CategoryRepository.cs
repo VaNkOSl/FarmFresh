@@ -15,12 +15,15 @@ internal sealed class CategoryRepository(FarmFreshDbContext data, IValidateEntit
         return category;
     }
 
-    public void DeleteCategory(Category category) => DeleteCategory(category);
+    public void DeleteCategory(Category category) => Delete(category);
 
-    public void UpdateCategory(Category category) => UpdateCategory(category);
+    public void UpdateCategory(Category category) => Update(category);
 
     public async Task<Category?> GetCategoryByIdAsync(Guid id) => await GetByIdAsync(id);
 
     public IQueryable<Category> FindCategoryByConditionAsync(Expression<Func<Category, bool>> expression, bool trackChanges) =>
            FindByCondition(expression, trackChanges);
+
+    public IQueryable<Category> GetAllCategories(bool trackChanges) =>
+        FindAll(trackChanges);
 }

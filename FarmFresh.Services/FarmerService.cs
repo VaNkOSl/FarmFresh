@@ -25,7 +25,7 @@ internal sealed class FarmerService : IFarmerService
         _mapper = mapper;
     }
 
-    public async Task CreateFarmerAsync(FarmerCreateUpdateForm model, string userId, bool trackChanges)
+    public async Task CreateFarmerAsync(FarmerCreateForm model, string userId, bool trackChanges)
     {
         if(string.IsNullOrWhiteSpace(userId))
         {

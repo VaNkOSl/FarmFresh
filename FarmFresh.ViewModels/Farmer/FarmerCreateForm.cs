@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FarmFresh.ViewModels.Farmer;
 
-public class FarmerCreateUpdateForm
+public class FarmerCreateForm
 {
     [Required]
     [Display(Name = "Please enter information about your farm!")]

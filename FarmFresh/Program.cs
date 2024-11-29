@@ -1,8 +1,8 @@
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
 using LoggerService.Contacts;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using NLog;
+
 using static FarmFresh.Commons.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +19,7 @@ builder.Services.ConfigureValidator();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
-
 builder.Services.AddHttpContextAccessor();
-
 
 builder.Services.AddAuthorization(options =>
 {
