@@ -74,4 +74,22 @@ public static class ServiceCollectionExtension
 
         return services;
     }
+
+    public static IServiceCollection ConfigureServicesCORS(this IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+        });
+
+        services.AddControllersWithViews();
+
+        return services;
+    }
+
 }

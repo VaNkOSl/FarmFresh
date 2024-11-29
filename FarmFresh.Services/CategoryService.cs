@@ -6,7 +6,9 @@ using FarmFresh.ViewModels.Category;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.BadRequest;
 using LoggerService.Exceptions.InternalError;
+using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using static FarmFresh.Commons.EntityValidationConstants;
 
 namespace FarmFresh.Services;
 
@@ -97,11 +99,19 @@ internal sealed class CategoryService : ICategoryService
 
         if(currentCategory is null)
         {
-
+            _loggerManager.LogError($"[{nameof(GetCategoryForUpdate)}] Category with id {categoryId} was not found! Time: {DateTime.UtcNow}");
+            throw new CategoryIdNotFoundException(categoryId);
         }
 
-        var categoryUpdateForm = _mapper.Map<CategoryUpdateForm>(currentCategory);
-        return categoryUpdateForm;
+        try
+        {
+            var categoryUpdateForm = _mapper.Map<CategoryUpdateForm>(currentCategory);
+            return categoryUpdateForm;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task UpdateCategory(CategoryUpdateForm model, Guid categoryId, bool trackChanges)
