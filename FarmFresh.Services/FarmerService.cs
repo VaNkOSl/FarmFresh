@@ -91,17 +91,9 @@ internal sealed class FarmerService : IFarmerService
         _loggerManager.LogInfo($"[{nameof(CreateFarmerLocationAsync)}] Successfully created location (ID: {farmerLocation.Id}) for farmer with ID: {farmerId}.");
     }
 
-    public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm)
-    {
-        return  _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
-
-        //return new FarmersListViewModel
-        //{
-        //    Farmers = farmers,
-        //    MetaData = metaData,
-        //    SearchTerm = searchTerm
-        //};
-    }
+    public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm) => 
+        _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
+    
 
     public async Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges)
     {
