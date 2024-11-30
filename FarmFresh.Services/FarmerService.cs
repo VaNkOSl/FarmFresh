@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
@@ -90,6 +91,18 @@ internal sealed class FarmerService : IFarmerService
         _loggerManager.LogInfo($"[{nameof(CreateFarmerLocationAsync)}] Successfully created location (ID: {farmerLocation.Id}) for farmer with ID: {farmerId}.");
     }
 
+    public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm)
+    {
+        return  _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
+
+        //return new FarmersListViewModel
+        //{
+        //    Farmers = farmers,
+        //    MetaData = metaData,
+        //    SearchTerm = searchTerm
+        //};
+    }
+
     public async Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges)
     {
         var farmers = _repositoryManager.FarmerRepository
@@ -98,5 +111,16 @@ internal sealed class FarmerService : IFarmerService
                                         || f.UserId.ToString() == userId), trackChanges);
 
         return await farmers.AnyAsync();
+    }
+
+    public async Task<(IEnumerable<FarmersViewModel> farmers, MetaData metaData)> GetAllFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
+    {
+        
+        var farmerWithMetaData = await _repositoryManager.FarmerRepository.GetFarmersAsync(farmerParameters, trackChanges);
+
+        var farmerDTO = _mapper.Map<IEnumerable<FarmersViewModel>>(farmerWithMetaData);
+
+        _loggerManager.LogInfo("Successfully retrieved and mapped farmers. Returning data.");
+        return (farmers: farmerDTO, metaData: farmerWithMetaData.MetaData);
     }
 }
