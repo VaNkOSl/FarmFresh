@@ -1,9 +1,10 @@
-﻿using FarmFresh.Infrastructure.Extensions;
+﻿using FarmFresh.Commons.RequestFeatures;
+using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Farmer;
 using Microsoft.AspNetCore.Mvc;
-using static FarmFresh.Commons.NotificationMessagesConstants;
 using static FarmFresh.Commons.MessagesConstants.Farmers;
+using static FarmFresh.Commons.NotificationMessagesConstants;
 
 namespace FarmFresh.Controllers;
 
@@ -31,10 +32,20 @@ public class FarmerController : BaseController
             return View(model);
         }
 
-        await _serviceManager.FarmerService.CreateFarmerAsync(model, userId, tracktrackChanges: true);
+        await _serviceManager.FarmerService.CreateFarmerAsync(model, userId, trackChanges: true);
         TempData[SuccessMessage] = SuccessfullyBecomeAFarmer;
 
         return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    [HttpGet("allFarmers")]
+    public async Task<IActionResult> AllFarmers([FromQuery] FarmerParameters farmerParameters)
+    {
+        var (farmers, metaData) = await _serviceManager.FarmerService.GetAllFarmersAsync(farmerParameters, trackChanges: false);
+
+        var model = await _serviceManager.FarmerService.CreateFarmersListViewModelAsync(farmers, metaData, farmerParameters.SearchTerm);
+
+        return View(model);
     }
 }
 
