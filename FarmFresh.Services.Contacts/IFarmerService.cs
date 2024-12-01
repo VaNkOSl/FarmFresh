@@ -5,7 +5,7 @@ namespace FarmFresh.Services.Contacts;
 
 public interface IFarmerService
 {
-    Task CreateFarmerAsync(FarmerCreateForm model, string userId, bool trackChanges);
+    Task CreateFarmerAsync(FarmerForCreationDto model, string userId, bool trackChanges);
 
     Task CreateFarmerLocationAsync(FarmerLocationDto model, Guid farmerId);
 
@@ -14,4 +14,12 @@ public interface IFarmerService
     Task<(IEnumerable<FarmersViewModel> farmers, MetaData metaData)> GetAllFarmersAsync(FarmerParameters farmerParameters, bool trackChanges);
 
     Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm);
+
+    Task<bool> DoesFarmerExistsByuserId(string userId, bool trackChanges);
+
+    Task DeleteFarmerAsync(Guid farmerId);
+
+    Task<FarmerForUpdatingDto> GetFarmerForEditAsync(Guid farmerId);
+
+    Task EditFarmerAsync(FarmerForUpdatingDto model, Guid farmerId);
 }

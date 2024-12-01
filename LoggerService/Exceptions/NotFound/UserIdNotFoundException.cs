@@ -2,8 +2,8 @@
 
 public class UserIdNotFoundException : NotFoundException
 {
-    public UserIdNotFoundException() 
-        : base("User with the provided ID was not found. Please try again later or contact the administrator.")
+    public UserIdNotFoundException(Guid userId) 
+        : base($"User with the provided Id {userId} was not found. Please try again later or contact the administrator.")
     {
     }
 }
