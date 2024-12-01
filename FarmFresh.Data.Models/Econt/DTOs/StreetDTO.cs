@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace FarmFresh.Data.Models.EcontNomenclatures
+namespace FarmFresh.Data.Models.Econt.DTOs
 {
-    public class Street
+    public class StreetDTO
     {
         [JsonProperty("id")]
         public int? Id { get; set; }

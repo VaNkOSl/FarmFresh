@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 
-namespace FarmFresh.Data.Models.EcontNomenclatures
+namespace FarmFresh.Data.Models.Econt.DTOs
 {
-    public class Address
+    public class AddressDTO
     {
         [JsonProperty("id")]
         public int? Id { get; set; }
 
         [JsonProperty("city")]
-        public City? City { get; set; }
+        public CityDTO? City { get; set; }
 
         [JsonProperty("fullAddress")]
         public string? FullAddress { get; set; }
@@ -29,7 +29,7 @@ namespace FarmFresh.Data.Models.EcontNomenclatures
         public string? Other { get; set; }
 
         [JsonProperty("location")]
-        public GeoLocation? Location { get; set; }
+        public GeoLocationDTO? Location { get; set; }
 
         [JsonProperty("zip")]
         public string? Zip { get; set; }

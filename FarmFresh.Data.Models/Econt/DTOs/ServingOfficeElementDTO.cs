@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace FarmFresh.Data.Models.EcontNomenclatures
+namespace FarmFresh.Data.Models.Econt.DTOs
 {
-    public class ServingOfficeElement
+    public class ServingOfficeElementDTO
     {
         [JsonProperty("officeCode")]
         public string? OfficeCode { get; set; }

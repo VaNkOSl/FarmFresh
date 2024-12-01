@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
-namespace FarmFresh.Data.Models.EcontNomenclatures
+namespace FarmFresh.Data.Models.Econt.DTOs
 {
-    public class Country
+    public class CountryDTO
     {
         [JsonProperty("id")]
         public int? Id { get; set; }

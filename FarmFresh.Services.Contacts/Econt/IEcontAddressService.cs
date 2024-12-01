@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmFresh.Services.Contacts
+namespace FarmFresh.Services.Contacts.Econt
 {
-    public interface IEcontService
+    public interface IEcontAddressService
     {
-
+        bool ValidateAddress();
     }
 }
