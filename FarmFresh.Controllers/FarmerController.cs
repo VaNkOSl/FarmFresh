@@ -23,7 +23,7 @@ public class FarmerController : BaseController
        View();
 
     [HttpPost("become")]
-    public async Task<IActionResult> Become(FarmerCreateForm model)
+    public async Task<IActionResult> Become(FarmerForCreationDto model)
     {
         var userId = User.GetId()!;
 
@@ -46,6 +46,14 @@ public class FarmerController : BaseController
         var model = await _serviceManager.FarmerService.CreateFarmersListViewModelAsync(farmers, metaData, farmerParameters.SearchTerm);
 
         return View(model);
+    }
+
+    [HttpGet("edit/{id}")]
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        await _serviceManager.FarmerService.GetFarmerForEditAsync(id);
+        return RedirectToAction(nameof(HomeController.Index), "Home");
+
     }
 }
 

@@ -1,6 +1,10 @@
-﻿@model ProfileViewModel
+﻿@using FarmFresh.Services.Contacts
+@using  FarmFresh.Infrastructure.Extensions;
+@inject IServiceManager _serviceManager;
+@model ProfileViewModel
 @{
     ViewData["Title"] = "Profile";
+    bool userExists = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId(), trackChanges: false);
 }
 
 <h3>@ViewData["Title"]</h3>
@@ -8,8 +12,24 @@
 <div class="row">
     <div class="col-md-3">
         <div class="d-flex flex-column align-items-start">
-            <a asp-area="" asp-controller="Profile" asp-action="Edit" class="btn btn-primary mb-3 w-100">Edit profile</a>
-            <a asp-area="" asp-controller="Account" asp-action="ChangePassword" class="btn btn-secondary mb-3 w-100">Change Password</a>
+            <a asp-area="" asp-controller="Profile" asp-action="Edit" class="btn btn-primary mb-3 w-100 d-flex align-items-center">
+                <i class="fas fa-user-edit me-2"></i> Edit Profile
+            </a>
+
+            <a asp-area="" asp-controller="Account" asp-action="ChangePassword" class="btn btn-warning mb-3 w-100 d-flex align-items-center text-white">
+                <i class="fas fa-key me-2"></i> Change Password
+            </a>
+
+            <a asp-area="" asp-controller="Account" asp-action="Delete" class="btn btn-danger mb-3 w-100 d-flex align-items-center">
+                <i class="fas fa-trash-alt me-2"></i> Delete Profile!
+            </a>
+
+            @if (userExists is true)
+            {
+                <a asp-area="" asp-controller="Farmer" asp-action="Profile" class="btn btn-success mb-3 w-100 d-flex align-items-center">
+                    <i class="fas fa-tractor me-2"></i> Manage Farmer Account
+                </a>
+            }
         </div>
     </div>
 

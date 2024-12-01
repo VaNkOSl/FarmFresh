@@ -4,40 +4,40 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FarmFresh.ViewModels.Farmer;
 
-public class FarmerCreateForm
+public abstract record FarmerForManipulationDto
 {
     [Required]
     [Display(Name = "Please enter information about your farm!")]
-    public string FarmDescription { get; set; } = string.Empty;
+    public string FarmDescription { get; init; } = string.Empty;
 
     [Required]
     [Display(Name = "Please enter the location of your farm!")]
-    public string Location { get; set; } = string.Empty;
+    public string Location { get; init; } = string.Empty;
 
     [Required]
     [Display(Name = "Please enter your valid phone number!")]
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string PhoneNumber { get; init; } = string.Empty;
 
-    public byte[] Photo { get; set; } = new byte[0];
+    public byte[] Photo { get; init; } = new byte[0];
 
-    public string? PhotoString { get; set; }
+    public string? PhotoString { get; init; }
 
     [DataType(DataType.Upload)]
-    public IFormFile? PhotoFile { get; set; }
+    public IFormFile? PhotoFile { get; init; }
 
     [Required]
     [Display(Name = "Please enter your valid egn!")]
-    public string Egn { get; set; } = string.Empty;
+    public string Egn { get; init; } = string.Empty;
 
     [Required]
     [DataType(DataType.Date)]
     [Display(Name = "Please enter your date of birth!")]
-    public DateTime BirthDate { get; set; }
+    public DateTime BirthDate { get; init; }
 
     [PrivacyAccepted]
-    public bool PrivacyAccepted { get; set; }
+    public bool PrivacyAccepted { get; init; }
 
-    public double? Latitude { get; set; }
+    public double? Latitude { get; init; }
 
-    public double? Longitude { get; set;}
+    public double? Longitude { get; init; }
 }

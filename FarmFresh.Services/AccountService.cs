@@ -58,7 +58,7 @@ public sealed class AccountService : IAccountService
         if (user is null)
         {
             _loggerManager.LogWarning($"User with ID {userId} was not found.");
-            throw new UserIdNotFoundException();
+            throw new UserIdNotFoundException(Guid.Parse(userId));
         }
 
         var userProfile = _mapper.Map<ProfileViewModel>(user);
