@@ -66,4 +66,6 @@ public class Product : Entity_1<Guid>
     public virtual ICollection<Review> Reviews { get; set; }
 
     public virtual ICollection<ProductPhoto> ProductPhotos { get; set; }
+    public bool IsApproved { get; set; } // Defaults to false (not approved)
+
 }

@@ -14,7 +14,11 @@ namespace FarmFresh.ViewModels.Products
         public int StockQuantity { get; set; }
         public string? Description { get; set; }
         public string CategoryName { get; set; }
+        public Guid CategoryId { get; set; } // Add this for editing
         public string FarmerName { get; set; }
+        public Guid FarmerId { get; set; } // Add this for editing
+        public DateTime HarvestDate { get; set; } // Add this for editing
+        public DateTime ExpirationDate { get; set; } // Add this for editing
         public List<string> Photos { get; set; } = new List<string>();
     }
 

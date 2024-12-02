@@ -10,6 +10,11 @@ using FarmFresh.ViewModels.Products;
 
 namespace FarmFresh.Services
 {
+    using FarmFresh.Data.Models.Repositories;
+    using FarmFresh.Services.Contacts;
+    using FarmFresh.ViewModels;
+    using System.IO;
+
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
@@ -31,14 +36,48 @@ namespace FarmFresh.Services
             return product == null ? null : MapToViewModel(product);
         }
 
+        public async Task<PagedResult<ProductViewModel>> GetPagedProductsAsync(string? filter, int pageIndex, int pageSize)
+        {
+            var products = await _productRepository.GetPagedProductsAsync(pageIndex, pageSize, filter);
+            var totalCount = await _productRepository.GetTotalCountAsync(filter);
+
+            return new PagedResult<ProductViewModel>
+            {
+                Items = products.Select(MapToViewModel),
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+        }
+
         public async Task AddProductAsync(CreateProductViewModel model)
         {
+            // Convert uploaded photo to byte[]
+            if (model.UploadedPhoto != null && model.UploadedPhoto.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await model.UploadedPhoto.CopyToAsync(memoryStream);
+                    model.Photo = memoryStream.ToArray();
+                }
+            }
+
             var product = MapToModel(model);
             await _productRepository.AddProductAsync(product);
         }
 
         public async Task UpdateProductAsync(EditProductViewModel model)
         {
+            // Convert uploaded photo to byte[] (if updated)
+            if (model.UploadedPhoto != null && model.UploadedPhoto.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await model.UploadedPhoto.CopyToAsync(memoryStream);
+                    model.Photo = memoryStream.ToArray();
+                }
+            }
+
             var product = MapToModel(model);
             await _productRepository.UpdateProductAsync(product);
         }
@@ -46,12 +85,6 @@ namespace FarmFresh.Services
         public async Task DeleteProductAsync(Guid productId)
         {
             await _productRepository.DeleteProductAsync(productId);
-        }
-
-        public async Task<IEnumerable<ProductViewModel>> GetPagedProductsAsync(int pageIndex, int pageSize, string filter)
-        {
-            var products = await _productRepository.GetPagedProductsAsync(pageIndex, pageSize, filter);
-            return products.Select(MapToViewModel);
         }
 
         private ProductViewModel MapToViewModel(Product product)
@@ -64,7 +97,11 @@ namespace FarmFresh.Services
                 StockQuantity = product.StockQuantity,
                 Description = product.Description,
                 CategoryName = product.Category.Name,
-                FarmerName = product.Farmer.User.UserName, 
+                CategoryId = product.CategoryId, // Map this
+                FarmerName = product.Farmer.User.UserName,
+                FarmerId = product.FarmerId, // Map this
+                HarvestDate = product.HarvestDate, // Map this
+                ExpirationDate = product.ExpirationDate, // Map this
                 Photos = product.ProductPhotos.Select(p => p.FilePath).ToList()
             };
         }

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmFresh.ViewModels.Products
+namespace FarmFresh.ViewModels.DropDown
 {
-    public class EditProductViewModel : CreateProductViewModel
+    public class FarmerDropdownViewModel
     {
         public Guid Id { get; set; }
+        public string UserName { get; set; } = string.Empty; // Ensure non-nullable
     }
-
 }

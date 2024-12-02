@@ -1,4 +1,4 @@
-﻿@model IEnumerable<FarmFresh.ViewModels.ProductViewModel>
+﻿@model FarmFresh.ViewModels.Products.PagedResult<FarmFresh.ViewModels.Products.ProductViewModel>
 
 <h2>All Products</h2>
 
@@ -18,7 +18,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var product in Model)
+        @foreach (var product in Model.Items)
         {
                 <tr>
                     <td>@product.Name</td>
@@ -36,3 +36,13 @@
         }
     </tbody>
 </table>
+
+<div>
+    @if (Model.TotalPages > 1)
+    {
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+                    <a asp-action="Index" asp-route-pageIndex="@i">@i</a>
+        }
+    }
+</div>

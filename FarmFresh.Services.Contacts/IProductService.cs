@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Services.Contacts
 {
+    using FarmFresh.ViewModels;
+
     public interface IProductService
     {
         Task<IEnumerable<ProductViewModel>> GetAllProductsAsync();
         Task<ProductViewModel?> GetProductByIdAsync(Guid productId);
+        Task<PagedResult<ProductViewModel>> GetPagedProductsAsync(string? filter, int pageIndex, int pageSize);
         Task AddProductAsync(CreateProductViewModel model);
         Task UpdateProductAsync(EditProductViewModel model);
         Task DeleteProductAsync(Guid productId);
-        Task<IEnumerable<ProductViewModel>> GetPagedProductsAsync(int pageIndex, int pageSize, string filter);
     }
 
 

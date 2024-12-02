@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmFresh.ViewModels.Products
+namespace FarmFresh.ViewModels.Category
 {
-    public class EditProductViewModel : CreateProductViewModel
+    public class CategoryViewModel
     {
         public Guid Id { get; set; }
+        public string Name { get; set; }
     }
-
 }

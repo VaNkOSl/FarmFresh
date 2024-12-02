@@ -27,12 +27,17 @@ namespace FarmFresh.ViewModels.Products
 
         public string? Description { get; set; }
 
-        public byte[] Photo { get; set; }
-
+        [Required]
         public DateTime HarvestDate { get; set; }
 
+        [Required]
         public DateTime ExpirationDate { get; set; }
-    }
 
+        public byte[] Photo { get; set; } = new byte[0];
+
+        [Required]
+        [DataType(DataType.Upload)]
+        public IFormFile UploadedPhoto { get; set; }
+    }
 
 }
