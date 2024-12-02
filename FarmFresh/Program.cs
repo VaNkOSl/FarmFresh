@@ -1,4 +1,8 @@
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Extensions;
+using FarmFresh.Repositories;
+using FarmFresh.Services.Contacts;
+using FarmFresh.Services;
 using LoggerService.Contacts;
 using NLog;
 
@@ -16,6 +20,9 @@ builder.Services.ConfigureValidator();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
 
 builder.Services.AddHttpContextAccessor();
 
