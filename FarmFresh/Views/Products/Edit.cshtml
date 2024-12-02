@@ -1,0 +1,42 @@
+﻿@model FarmFresh.ViewModels.EditProductViewModel
+
+<h2>Edit Product</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div>
+        <label asp-for="Name"></label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+    <div>
+        <label asp-for="Price"></label>
+        <input asp-for="Price" />
+        <span asp-validation-for="Price"></span>
+    </div>
+    <div>
+        <label asp-for="StockQuantity"></label>
+        <input asp-for="StockQuantity" />
+        <span asp-validation-for="StockQuantity"></span>
+    </div>
+    <div>
+        <label asp-for="CategoryId"></label>
+        <select asp-for="CategoryId">
+            <!-- Populate categories dynamically -->
+        </select>
+        <span asp-validation-for="CategoryId"></span>
+    </div>
+    <div>
+        <label asp-for="FarmerId"></label>
+        <select asp-for="FarmerId">
+            <!-- Populate farmers dynamically -->
+        </select>
+        <span asp-validation-for="FarmerId"></span>
+    </div>
+    <div>
+        <label asp-for="Photo"></label>
+        <input asp-for="Photo" type="file" />
+        <span asp-validation-for="Photo"></span>
+    </div>
+    <button type="submit">Save Changes</button>
+</form>

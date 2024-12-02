@@ -1,0 +1,38 @@
+﻿@model IEnumerable<FarmFresh.ViewModels.ProductViewModel>
+
+<h2>All Products</h2>
+
+<form method="get">
+    <input type="text" name="filter" placeholder="Search products" />
+    <button type="submit">Filter</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.CategoryName</td>
+                    <td>@product.Price</td>
+                    <td>@product.StockQuantity</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@product.Id">Details</a> |
+                        <a asp-action="Edit" asp-route-id="@product.Id">Edit</a> |
+                        <form asp-action="Delete" asp-route-id="@product.Id" method="post" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>

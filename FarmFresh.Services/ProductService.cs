@@ -25,27 +25,27 @@ namespace FarmFresh.Services
             return products.Select(MapToViewModel);
         }
 
-        public async Task<ProductViewModel> GetProductByIdAsync(int id)
+        public async Task<ProductViewModel?> GetProductByIdAsync(Guid productId)
         {
-            var product = await _productRepository.GetProductByIdAsync(id);
+            var product = await _productRepository.GetProductByIdAsync(productId);
             return product == null ? null : MapToViewModel(product);
         }
 
-        public async Task AddProductAsync(CreateProductViewModel createModel)
+        public async Task AddProductAsync(CreateProductViewModel model)
         {
-            var product = MapToModel(createModel);
+            var product = MapToModel(model);
             await _productRepository.AddProductAsync(product);
         }
 
-        public async Task UpdateProductAsync(EditProductViewModel editModel)
+        public async Task UpdateProductAsync(EditProductViewModel model)
         {
-            var product = MapToModel(editModel);
+            var product = MapToModel(model);
             await _productRepository.UpdateProductAsync(product);
         }
 
-        public async Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(Guid productId)
         {
-            await _productRepository.DeleteProductAsync(id);
+            await _productRepository.DeleteProductAsync(productId);
         }
 
         public async Task<IEnumerable<ProductViewModel>> GetPagedProductsAsync(int pageIndex, int pageSize, string filter)
@@ -61,9 +61,11 @@ namespace FarmFresh.Services
                 Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
-                Quantity = product.Quantity,
+                StockQuantity = product.StockQuantity,
                 Description = product.Description,
-                CategoryName = product.Category?.Name
+                CategoryName = product.Category.Name,
+                FarmerName = product.Farmer.User.UserName, 
+                Photos = product.ProductPhotos.Select(p => p.FilePath).ToList()
             };
         }
 
@@ -73,9 +75,13 @@ namespace FarmFresh.Services
             {
                 Name = viewModel.Name,
                 Price = viewModel.Price,
-                Quantity = viewModel.Quantity,
+                StockQuantity = viewModel.StockQuantity,
                 Description = viewModel.Description,
-                CategoryId = viewModel.CategoryId
+                CategoryId = viewModel.CategoryId,
+                FarmerId = viewModel.FarmerId,
+                Photo = viewModel.Photo,
+                HarvestDate = viewModel.HarvestDate,
+                ExpirationDate = viewModel.ExpirationDate
             };
         }
 
@@ -86,9 +92,13 @@ namespace FarmFresh.Services
                 Id = viewModel.Id,
                 Name = viewModel.Name,
                 Price = viewModel.Price,
-                Quantity = viewModel.Quantity,
+                StockQuantity = viewModel.StockQuantity,
                 Description = viewModel.Description,
-                CategoryId = viewModel.CategoryId
+                CategoryId = viewModel.CategoryId,
+                FarmerId = viewModel.FarmerId,
+                Photo = viewModel.Photo,
+                HarvestDate = viewModel.HarvestDate,
+                ExpirationDate = viewModel.ExpirationDate
             };
         }
     }

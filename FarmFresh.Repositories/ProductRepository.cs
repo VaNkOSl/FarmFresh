@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Repositories
 {
+
     public class ProductRepository : IProductRepository
     {
         private readonly FarmFreshDbContext _context;
@@ -21,12 +22,18 @@ namespace FarmFresh.Repositories
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            return await _context.Products.Include(p => p.Category).ToListAsync();
+            return await _context.Products.Include(p => p.Category)
+                                          .Include(p => p.Farmer)
+                                          .Include(p => p.ProductPhotos)
+                                          .ToListAsync();
         }
 
-        public async Task<Product> GetProductByIdAsync(int id)
+        public async Task<Product?> GetProductByIdAsync(Guid productId)
         {
-            return await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Products.Include(p => p.Category)
+                                          .Include(p => p.Farmer)
+                                          .Include(p => p.ProductPhotos)
+                                          .FirstOrDefaultAsync(p => p.Id == productId);
         }
 
         public async Task AddProductAsync(Product product)
@@ -41,9 +48,9 @@ namespace FarmFresh.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(Guid productId)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.FindAsync(productId);
             if (product != null)
             {
                 _context.Products.Remove(product);
@@ -53,12 +60,13 @@ namespace FarmFresh.Repositories
 
         public async Task<IEnumerable<Product>> GetPagedProductsAsync(int pageIndex, int pageSize, string filter)
         {
-            return await _context.Products
-                .Where(p => string.IsNullOrEmpty(filter) || p.Name.Contains(filter))
-                .Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            return await _context.Products.Where(p => string.IsNullOrEmpty(filter) || p.Name.Contains(filter))
+                                          .OrderBy(p => p.Name)
+                                          .Skip((pageIndex - 1) * pageSize)
+                                          .Take(pageSize)
+                                          .Include(p => p.Category)
+                                          .Include(p => p.Farmer)
+                                          .ToListAsync();
         }
     }
-
 }

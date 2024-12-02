@@ -1,0 +1,15 @@
+﻿@model FarmFresh.ViewModels.ProductViewModel
+
+<h2>Product Details</h2>
+
+<p><strong>Name:</strong> @Model.Name</p>
+<p><strong>Price:</strong> @Model.Price</p>
+<p><strong>Category:</strong> @Model.CategoryName</p>
+<p><strong>Farmer:</strong> @Model.FarmerName</p>
+<p><strong>Description:</strong> @Model.Description</p>
+
+<h3>Photos</h3>
+@foreach (var photo in Model.Photos)
+{
+    <img src="@photo" alt="@Model.Name" width="200" />
+}
