@@ -1,7 +1,6 @@
 ﻿using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.User;
-using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmFresh.Controllers;
@@ -76,6 +75,7 @@ public class AccountController : BaseController
     }
 
     [HttpDelete("delete/{id}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromBody] ProfileViewModel model)
     {
         await _accountService.DeleteUserAsync(model.Id, trackChanges: true);
@@ -92,6 +92,7 @@ public class AccountController : BaseController
     }
 
     [HttpPatch("edit/{id}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, [FromForm] UserForUpdateDto model)
     {
         if (id != model.Id)

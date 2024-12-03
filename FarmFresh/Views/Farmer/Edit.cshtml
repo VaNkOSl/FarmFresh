@@ -9,8 +9,10 @@
     <div class="col-lg-8">
         <div class="card shadow mb-4">
             <div class="card-body">
-                <form asp-action="Edit" asp-controller="Farmer" method="post" enctype="multipart/form-data">
+                <form id="editForm" method="post">
+
                     <input type="hidden" asp-for="PhotoString" />
+                    <input type="hidden" id="FarmerId" name="Id" value="@Model.Id" />
 
                     <div class="mb-3">
                         <label asp-for="FarmDescription" class="form-label">Farm Description</label>
@@ -61,7 +63,7 @@
                     </div>
 
                     <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary" onclick="farmerUpdateProfile()">Submit</button>
                     </div>
                 </form>
             </div>
@@ -69,7 +71,8 @@
     </div>
 </div>
 
-<script src="/js/Farmer.js"></script>
+<script src="/js/farmer/Farmer.js"></script>
+<script src="/js/farmer/farmerUpdateProfile.js"></script>
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />

@@ -211,11 +211,12 @@ internal sealed class FarmerService : IFarmerService
         var farmer = await _repositoryManager
          .FarmerRepository
          .FindFarmersByConditionAsync(f => (f.UserId.ToString() == userId || f.Id.ToString() == userId), trackChanges: false)
+         .Include(u => u.User)
          .FirstOrDefaultAsync();
 
         if (farmer is null)
         {
-            _loggerManager.LogError($"[{nameof(GetFarmerProfileAsync)}] Farmer with ID {farmer.Id} not found.");
+            _loggerManager.LogError($"[{nameof(GetFarmerProfileAsync)}] Farmer with user ID {userId} not found.");
             throw new FarmerIdNotFoundException(farmer.Id);
         }
 
