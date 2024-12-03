@@ -9,22 +9,40 @@ using FarmFresh.ViewModels.Order;
 using Microsoft.AspNetCore.Http;
 
 using System.Text.Json;
+using FarmFresh.Data;
 
 namespace FarmFresh.Controllers
 {
     public class CartController : Controller
     {
         private const string CartSessionKey = "Cart";
-        private readonly ISession session;
+        private FarmFreshDbContext _context;
+        public CartController(FarmFreshDbContext context)
+        {
+            _context= context;
+        }
         public IActionResult Index()
         {
-            var cart = session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+            var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
             return View(cart);
         }
         public IActionResult AddToCart(Guid productId, string ProductName, decimal price)
         {
-            var cart = session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+            var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+
             var existingItem = cart.FirstOrDefault(c => c.ProductId == productId);
+
+            var product = _context.Products.FirstOrDefault(p => p.Id == productId);
+            if (product == null)
+            {
+                return NotFound("Product not found.");
+            }
+            int requestedQuantity = existingItem != null ? existingItem.Quantity + 1 : 1;
+            if (product.StockQuantity < requestedQuantity)
+            {
+                return BadRequest("Not enough stock available.");
+            }
+
             if (existingItem != null)
             {
                 existingItem.Quantity++;
@@ -35,23 +53,25 @@ namespace FarmFresh.Controllers
                 {
                     ProductId = productId,
                     ProductName = ProductName,
-                    Price = price,
-                    Quantity = 1
+                    Quantity = 1,
+                    Price = price
                 });
             }
-            session.Set(CartSessionKey, cart);
-            return RedirectToAction("Index");   
+
+            HttpContext.Session.Set(CartSessionKey, cart);
+
+            return RedirectToAction("Index");
         }
         public IActionResult RemoveFromCart(Guid ProductId)
         {
-            var cart = session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+            var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
             if (cart != null)
             {
                 var item = cart.FirstOrDefault(i => i.ProductId == ProductId);
                 if(item != null)
                 {
                     cart.Remove(item);
-                    session.Set(CartSessionKey, cart);
+                    HttpContext.Session.Set(CartSessionKey, cart);
                 }
             }
             return RedirectToAction("Index");
