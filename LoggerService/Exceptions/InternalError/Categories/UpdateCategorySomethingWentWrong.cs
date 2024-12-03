@@ -1,8 +1,8 @@
-﻿namespace LoggerService.Exceptions.InternalError;
+﻿namespace LoggerService.Exceptions.InternalError.Categories;
 
 public class UpdateCategorySomethingWentWrong : InternalServiceError
 {
-    public UpdateCategorySomethingWentWrong() 
+    public UpdateCategorySomethingWentWrong()
         : base("Something went wrong while updating the category! Please try again later")
     {
     }

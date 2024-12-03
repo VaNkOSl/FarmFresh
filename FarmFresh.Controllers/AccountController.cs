@@ -1,6 +1,7 @@
 ﻿using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.User;
+using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmFresh.Controllers;
@@ -72,6 +73,34 @@ public class AccountController : BaseController
         }
 
         return View(userProfile);
+    }
+
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> Delete([FromBody] ProfileViewModel model)
+    {
+        await _accountService.DeleteUserAsync(model.Id, trackChanges: true);
+        return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    [HttpGet("edit/{id}")]
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        var updateView = await _accountService
+            .GetUserForUpdateAsync(id, trackChanges: false);
+
+        return View(updateView);
+    }
+
+    [HttpPatch("edit/{id}")]
+    public async Task<IActionResult> Edit(Guid id, [FromForm] UserForUpdateDto model)
+    {
+        if (id != model.Id)
+        {
+            return BadRequest("Route ID and model ID do not match.");
+        }
+
+        await _accountService.UpdateUserAsync(model, trackChanges: true);
+        return Ok(new { success = true });
     }
 
     public async Task<IActionResult> Logout()

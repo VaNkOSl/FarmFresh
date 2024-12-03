@@ -1,8 +1,8 @@
-﻿namespace LoggerService.Exceptions.InternalError;
+﻿namespace LoggerService.Exceptions.InternalError.Farmers;
 
 public class UpdateFarmerSomethingWentWrong : InternalServiceError
 {
-    public UpdateFarmerSomethingWentWrong() 
+    public UpdateFarmerSomethingWentWrong()
         : base("An error occurred while updating the farmer. Please try again later.")
     {
     }
