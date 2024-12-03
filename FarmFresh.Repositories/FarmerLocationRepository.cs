@@ -2,6 +2,7 @@
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.DataValidator;
+using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories;
 
@@ -20,4 +21,7 @@ internal sealed class FarmerLocationRepository(FarmFreshDbContext data, IValidat
 
     public IQueryable<FarmerLocation> GetAllLocationsAsync(bool trackChanges) =>
         FindAll(trackChanges);
+
+    public IQueryable<FarmerLocation> FindFarmerLocationsByConditionAsync(Expression<Func<FarmerLocation, bool>> condition, bool trackChanges) =>
+        FindByCondition(condition, trackChanges);
 }

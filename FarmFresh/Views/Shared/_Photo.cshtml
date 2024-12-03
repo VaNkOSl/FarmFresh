@@ -1,11 +1,14 @@
 ﻿@model string
-@{
-    if(!String.IsNullOrEmpty(Model))
+
+<link rel="stylesheet" href="/bootstrap/css/Photo.css"/>
+
+<div class="image-container">
+    @if (!string.IsNullOrEmpty(Model))
     {
-        <img style="height: 65px; width: 40px;" src="data:image/jpeg;base64,@Model" alt="photo">
+        <img class="image-display" src="data:image/jpeg;base64,@Model" alt="Image">
     }
     else
     {
-        <img style="height: 65px; width: 40px;" src="~/images/no_photo.jpg">
+        <img class="image-display" src="~/images/no_photo.jpg" alt="No Image Available">
     }
-}
+</div>

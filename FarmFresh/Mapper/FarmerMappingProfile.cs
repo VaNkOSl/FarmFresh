@@ -33,6 +33,17 @@ public class FarmerMappingProfile : Profile
             .ForMember(dest => dest.PhotoString, opt => opt.MapFrom(src =>
                 src.Photo != null ? Convert.ToBase64String(src.Photo) : string.Empty));
 
+        CreateMap<Farmer, FarmerProfileViewModel>()
+                .ForCtorParam("FullName", opt => opt.MapFrom(src =>
+                    src.User != null ? $"{src.User.FirstName} {src.User.LastName}" : "No Name"))
+                .ForCtorParam("PhoneNumber", opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForCtorParam("Location", opt => opt.MapFrom(src => src.Location))
+                .ForCtorParam("FarmDescription", opt => opt.MapFrom(src => src.FarmDescription))
+                .ForCtorParam("PhotoString", opt => opt.MapFrom(src =>
+                src.Photo != null && src.Photo.Length > 0
+                    ? Convert.ToBase64String(src.Photo)
+                    : null));
+
         CreateMap<(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string searchTerm), FarmersListViewModel>()
           .ForMember(dest => dest.Farmers, opt => opt.MapFrom(src => src.farmers))
           .ForMember(dest => dest.MetaData, opt => opt.MapFrom(src => src.metaData))

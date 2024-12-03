@@ -7,8 +7,6 @@ public interface IFarmerService
 {
     Task CreateFarmerAsync(FarmerForCreationDto model, string userId, bool trackChanges);
 
-    Task CreateFarmerLocationAsync(FarmerLocationDto model, Guid farmerId);
-
     Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges);
 
     Task<(IEnumerable<FarmersViewModel> farmers, MetaData metaData)> GetAllFarmersAsync(FarmerParameters farmerParameters, bool trackChanges);
@@ -17,9 +15,11 @@ public interface IFarmerService
 
     Task<bool> DoesFarmerExistsByuserId(string userId, bool trackChanges);
 
-    Task DeleteFarmerAsync(Guid farmerId);
+    Task DeleteFarmerAsync(Guid farmerId, bool trackChanges);
 
-    Task<FarmerForUpdatingDto> GetFarmerForEditAsync(Guid farmerId);
+    Task<FarmerForUpdatingDto> GetFarmerForEditAsync(Guid farmerId, bool trackChanges);
 
-    Task EditFarmerAsync(FarmerForUpdatingDto model, Guid farmerId);
+    Task EditFarmerAsync(FarmerForUpdatingDto model, Guid farmerId, bool trackChanges);
+
+    Task<FarmerProfileViewModel> GetFarmerProfileAsync(string userId);
 }

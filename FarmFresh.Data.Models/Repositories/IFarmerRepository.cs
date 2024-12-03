@@ -7,8 +7,6 @@ public interface IFarmerRepository
 {
     Task<Farmer> CreateFarmerAsync(Farmer farmer);
 
-    Task<Farmer?> GetFarmerByIdAsync(Guid id);
-
     void DeleteFarmer(Farmer farmer);
 
     void UpdateFarmer(Farmer farmer);

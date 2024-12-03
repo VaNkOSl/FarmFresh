@@ -51,9 +51,33 @@ public class FarmerController : BaseController
     [HttpGet("edit/{id}")]
     public async Task<IActionResult> Edit(Guid id)
     {
-        await _serviceManager.FarmerService.GetFarmerForEditAsync(id);
-        return RedirectToAction(nameof(HomeController.Index), "Home");
+        var editView =  await _serviceManager.FarmerService.GetFarmerForEditAsync(id, trackChanges: false);
+        return View(editView);
+    }
 
+    [HttpPost("edit/{farmerId}")]
+    public async Task<IActionResult> Edit(Guid farmerId, FarmerForUpdatingDto model)
+    {
+        if (ModelState.IsValid)
+        {
+            await _serviceManager.FarmerService.EditFarmerAsync(model, farmerId, trackChanges: true);
+            return RedirectToAction("Profile", "Farmer", new { id = farmerId });
+        }
+        return View(model);
+    }
+
+    [HttpGet("profile/{id}")]
+    public async Task<IActionResult> Profile(Guid id)
+    {
+        var farmerProfile = await _serviceManager.FarmerService.GetFarmerProfileAsync(id.ToString());
+        return View(farmerProfile);
+    }
+
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> Delete([FromBody] FarmerProfileViewModel model)
+    {
+        await _serviceManager.FarmerService.DeleteFarmerAsync(model.Id, trackChanges: true);
+        return RedirectToAction(nameof(HomeController.Index), "Home");
     }
 }
 

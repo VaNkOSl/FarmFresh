@@ -1,0 +1,54 @@
+﻿@model FarmerProfileViewModel
+@{
+    ViewBag.Title = "Farmer Profile";
+}
+
+<h3>@ViewData["Title"]</h3>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="d-flex flex-column align-items-start">
+             <a asp-controller="Farmer" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary mb-3 w-100 d-flex align-items-center">
+                <i class="fas fa-user-edit me-2"></i> Edit Profile
+            </a> 
+
+            <form id="deleteForm" class="d-inline">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="button" class="btn btn-danger mb-3 w-100 d-flex align-items-center"
+                        onclick="deleteProfile()">
+                    <i class="fas fa-trash-alt me-2"></i> Delete Profile!
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <partial name="_Photo" model="@Model.PhotoString" />
+
+            <div class="form-floating mb-4">
+                <input asp-for="FullName" class="form-control" disabled />
+                <label asp-for="FullName" class="form-label">Full Name</label>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="FarmDescription" class="form-control" disabled />
+                <label asp-for="FarmDescription" class="form-label">Description</label>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="Location" class="form-control" disabled />
+                <label asp-for="Location" class="form-label">Location</label>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input asp-for="PhoneNumber" class="form-control" disabled/>
+                <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/farmerDeleteProfile.js"></script>
