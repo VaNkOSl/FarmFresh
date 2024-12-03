@@ -4,8 +4,7 @@ using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),
-                      "/nlog.config"));
+LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
@@ -46,6 +45,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession(); // Enable session handling
 
 app.UseAuthentication();
 app.UseAuthorization();
