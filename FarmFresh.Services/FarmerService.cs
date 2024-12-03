@@ -7,7 +7,7 @@ using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Farmer;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.BadRequest;
-using LoggerService.Exceptions.InternalError;
+using LoggerService.Exceptions.InternalError.Farmers;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
 
