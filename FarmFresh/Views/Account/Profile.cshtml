@@ -4,8 +4,8 @@
 @model ProfileViewModel
 @{
     ViewData["Title"] = "Profile";
-    bool userExists = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId(), trackChanges: false);
-    var userId = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId(), trackChanges: false);
+    bool userExists = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId()!, trackChanges: false);
+    var userId = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId()!, trackChanges: false);
 }
 
 <h3>@ViewData["Title"]</h3>

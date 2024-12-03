@@ -40,4 +40,6 @@ public abstract record FarmerForManipulationDto
     public double? Latitude { get; init; }
 
     public double? Longitude { get; init; }
+
+    public Guid Id { get; init; }
 }
