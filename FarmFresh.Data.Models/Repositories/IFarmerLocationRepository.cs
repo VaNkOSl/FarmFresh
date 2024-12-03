@@ -1,4 +1,6 @@
-﻿namespace FarmFresh.Data.Models.Repositories;
+﻿using System.Linq.Expressions;
+
+namespace FarmFresh.Data.Models.Repositories;
 
 public interface IFarmerLocationRepository
 {
@@ -9,4 +11,6 @@ public interface IFarmerLocationRepository
     void UpdateLocation(FarmerLocation location);
 
     IQueryable<FarmerLocation> GetAllLocationsAsync(bool trackChanges);
+
+    IQueryable<FarmerLocation> FindFarmerLocationsByConditionAsync(Expression<Func<FarmerLocation, bool>> condition, bool trackChanges);
 }

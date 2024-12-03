@@ -1,6 +1,6 @@
 ﻿namespace FarmFresh.ViewModels.Farmer;
 
-public class FarmerLocationDto
+public abstract class FarmerLocationForManipulationDto
 {
     public required double Latitude { get; set; }
 

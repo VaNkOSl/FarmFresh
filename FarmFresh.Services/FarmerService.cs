@@ -3,6 +3,7 @@ using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Farmer;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.BadRequest;
@@ -50,7 +51,7 @@ internal sealed class FarmerService : IFarmerService
 
             if (model.Latitude.HasValue && model.Longitude.HasValue)
             {
-                var farmerLocation = new FarmerLocationDto
+                var farmerLocation = new FarmerCreateLocationDto
                 {
                   Latitude = model.Latitude.Value,
                   Longitude = model.Longitude.Value,
@@ -58,7 +59,12 @@ internal sealed class FarmerService : IFarmerService
                   FarmerId = farmer.Id,
                 };
 
-                await CreateFarmerLocationAsync(farmerLocation, farmer.Id);
+                await FarmerLocationHelper.CreateFarmerLocationAsync(
+                    _repositoryManager, 
+                    _mapper,
+                    _loggerManager,
+                    farmerLocation,
+                    farmer.Id);
             }
 
             _loggerManager.LogInfo($"[{nameof(CreateFarmerAsync)}] User with ID {userId} successfully become a farmer!");
@@ -75,24 +81,8 @@ internal sealed class FarmerService : IFarmerService
         }
     }
 
-    public async Task CreateFarmerLocationAsync(FarmerLocationDto model, Guid farmerId)
-    {
-        var farmerLocation = _mapper.Map<FarmerLocation>(model);
-        farmerLocation.FarmerId = farmerId;
-
-        if(farmerId == Guid.Empty)
-        {
-            _loggerManager.LogError($"[{nameof(CreateFarmerLocationAsync)}] farmerId is invalid (null or empty).");
-            throw new FarmerIdNotFoundException(farmerId);
-        }
-
-        await _repositoryManager.FarmerLocationRepository.CreateLocationAsync(farmerLocation);
-        await _repositoryManager.SaveAsync(farmerLocation);
-        _loggerManager.LogInfo($"[{nameof(CreateFarmerLocationAsync)}] Successfully created location (ID: {farmerLocation.Id}) for farmer with ID: {farmerId}.");
-    }
-
     public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm) => 
-        _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
+         _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
  
     public async Task<(IEnumerable<FarmersViewModel> farmers, MetaData metaData)> GetAllFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
     {
@@ -105,11 +95,12 @@ internal sealed class FarmerService : IFarmerService
         return (farmers: farmerDTO, metaData: farmerWithMetaData.MetaData);
     }
 
-    public async Task DeleteFarmerAsync(Guid farmerId)
+    public async Task DeleteFarmerAsync(Guid farmerId, bool trackChanges)
     {
         var farmerForDeleting = await _repositoryManager
                                       .FarmerRepository
-                                      .GetFarmerByIdAsync(farmerId);
+                                      .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
+                                      .FirstOrDefaultAsync();
 
         if (farmerForDeleting is null)
         {
@@ -119,6 +110,13 @@ internal sealed class FarmerService : IFarmerService
 
         try
         {
+           await FarmerLocationHelper.DeleteFarmerLocationAsync(
+                _repositoryManager,
+                _mapper,
+                _loggerManager,
+                farmerId,
+                trackChanges);
+
             _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
             await _repositoryManager.SaveAsync();
             _loggerManager.LogInfo($"Farmer with Id {farmerId} was successfully deleted.");
@@ -130,11 +128,12 @@ internal sealed class FarmerService : IFarmerService
         }
     }
 
-    public async Task<FarmerForUpdatingDto> GetFarmerForEditAsync(Guid farmerId)
+    public async Task<FarmerForUpdatingDto> GetFarmerForEditAsync(Guid farmerId, bool trackChanges)
     {
         var farmerForEdit = await _repositoryManager
                               .FarmerRepository
-                              .GetFarmerByIdAsync(farmerId);
+                              .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
+                              .FirstOrDefaultAsync();
 
         if (farmerForEdit is null)
         {
@@ -142,24 +141,17 @@ internal sealed class FarmerService : IFarmerService
             throw new FarmerIdNotFoundException(farmerId);
         }
 
-        try
-        {
-            var farmer = _mapper.Map<FarmerForUpdatingDto>(farmerForEdit);
-            return farmer;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        return _mapper.Map<FarmerForUpdatingDto>(farmerForEdit);
     }
 
-    public async Task EditFarmerAsync(FarmerForUpdatingDto model, Guid farmerId)
+    public async Task EditFarmerAsync(FarmerForUpdatingDto model, Guid farmerId, bool trackChanges)
     {
         var existingFarmer = await _repositoryManager
-                                  .FarmerRepository
-                                  .GetFarmerByIdAsync(farmerId);
+                              .FarmerRepository
+                              .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
+                              .FirstOrDefaultAsync();
 
-        if(existingFarmer is null)
+        if (existingFarmer is null)
         {
             _loggerManager.LogError($"[{nameof(EditFarmerAsync)}] Farmer with ID {farmerId} not found.");
             throw new FarmerIdNotFoundException(farmerId);
@@ -168,6 +160,26 @@ internal sealed class FarmerService : IFarmerService
         try
         {
             _mapper.Map(model, existingFarmer);
+
+            if(model.Latitude.HasValue && model.Longitude.HasValue)
+            {
+                var updatedLocation = new FarmerUpdateLocationDto
+                {
+                    Latitude = model.Latitude.Value,
+                    Longitude = model.Longitude.Value,
+                    Title = model.Location,
+                    FarmerId = existingFarmer.Id,
+                };
+
+                await FarmerLocationHelper.UpdateFarmerLocationAsync(
+                    _repositoryManager,
+                    _mapper,
+                    _loggerManager,
+                    updatedLocation,
+                    existingFarmer.Id,
+                    trackChanges);
+            }
+
             _repositoryManager.FarmerRepository.UpdateFarmer(existingFarmer);
             await _repositoryManager.SaveAsync();
             _loggerManager.LogInfo($"[{nameof(EditFarmerAsync)}] Farmer with ID {farmerId} successfully updated.");
@@ -179,22 +191,34 @@ internal sealed class FarmerService : IFarmerService
         }
     }
 
-    public async Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges)
+    public async Task<bool> DoesFarmerExistAsync(string egn, string phoneNumber, string userId, bool trackChanges) =>
+       await _repositoryManager
+             .FarmerRepository
+             .FindFarmersByConditionAsync(f => (f.Egn == egn || 
+             f.PhoneNumber == phoneNumber || 
+             f.UserId.ToString() == userId), trackChanges)
+             .AnyAsync();
+
+
+    public async Task<bool> DoesFarmerExistsByuserId(string userId, bool trackChanges) => 
+        await _repositoryManager
+              .FarmerRepository
+              .FindFarmersByConditionAsync(f => f.UserId.ToString() == userId, trackChanges)
+              .AnyAsync();
+
+    public async Task<FarmerProfileViewModel> GetFarmerProfileAsync(string userId)
     {
-        var farmers = _repositoryManager.FarmerRepository
-                                        .FindFarmersByConditionAsync(f => (f.Egn == egn
-                                        || f.PhoneNumber == phoneNumber
-                                        || f.UserId.ToString() == userId), trackChanges);
+        var farmer = await _repositoryManager
+         .FarmerRepository
+         .FindFarmersByConditionAsync(f => (f.UserId.ToString() == userId || f.Id.ToString() == userId), trackChanges: false)
+         .FirstOrDefaultAsync();
 
-        return await farmers.AnyAsync();
-    }
+        if (farmer is null)
+        {
+            _loggerManager.LogError($"[{nameof(GetFarmerProfileAsync)}] Farmer with ID {farmer.Id} not found.");
+            throw new FarmerIdNotFoundException(farmer.Id);
+        }
 
-    public async Task<bool> DoesFarmerExistsByuserId(string userId, bool trackChanges)
-    {
-        var farmers = _repositoryManager.FarmerRepository
-                                        .FindFarmersByConditionAsync(f => f.UserId.ToString() == userId,
-                                         trackChanges);
-
-        return await farmers.AnyAsync();
+        return _mapper.Map<FarmerProfileViewModel>(farmer);
     }
 }

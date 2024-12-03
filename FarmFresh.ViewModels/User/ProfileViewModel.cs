@@ -4,6 +4,7 @@ public record class ProfileViewModel(
     string FirstName,
     string LastName,
     string Email,
-    string UserName)
+    string UserName,
+    Guid Id)
 {
 }

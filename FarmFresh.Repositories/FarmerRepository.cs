@@ -26,8 +26,6 @@ internal sealed class FarmerRepository(FarmFreshDbContext data, IValidateEntity 
     public IQueryable<Farmer> FindFarmersByConditionAsync(Expression<Func<Farmer, bool>> expression, bool trackChanges) =>
              FindByCondition(expression, trackChanges);
 
-    public async Task<Farmer?> GetFarmerByIdAsync(Guid id) => await GetByIdAsync(id);
-
     public async Task<PagedList<Farmer>> GetFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
     {
         var farmers = await
