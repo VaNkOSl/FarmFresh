@@ -79,18 +79,12 @@ public static class FarmerLocationHelper
 
         if(locationForDelete is null)
         {
-
+            loggerManager.LogError($"[{nameof(DeleteFarmerLocationAsync)}] Location for FarmerId {farmerId} was not found.");
+            throw new FarmerIdNotFoundException(farmerId);
         }
 
-        try
-        {
-            repositoryManager.FarmerLocationRepository.DeleteLocation(locationForDelete!);
-            await repositoryManager.SaveAsync();
-        }
-        catch (Exception)
-        {
-
-            throw;
-        }
+        repositoryManager.FarmerLocationRepository.DeleteLocation(locationForDelete!);
+        await repositoryManager.SaveAsync();
+        loggerManager.LogInfo($"Successfully deleted location for FarmerId {farmerId}.");
     }
 }

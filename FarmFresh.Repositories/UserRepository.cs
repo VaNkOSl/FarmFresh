@@ -21,5 +21,5 @@ internal sealed class UserRepository(FarmFreshDbContext data) :
 
     public void UpdateUser(ApplicationUser user) => Update(user);
 
-    public async Task<ApplicationUser?> GetUserByIdAsync(Guid id) => await GetByIdAsync(id);
+  //  public async Task<ApplicationUser?> GetUserByIdAsync(Guid id) => await GetByIdAsync(id);
 }

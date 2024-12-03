@@ -24,7 +24,10 @@ public class CategoryController : AdminBaseController
     [HttpGet("All")]
     public async Task<IActionResult> All()
     {
-        var result = await _serviceManager.CategoryService.GetAllCategoriesAsync(trackChanges:false);
+        var result = await _serviceManager
+            .CategoryService
+            .GetAllCategoriesAsync(trackChanges:false);
+
         return View(result);
     }
 
@@ -33,7 +36,9 @@ public class CategoryController : AdminBaseController
     {
         if(ModelState.IsValid)
         {
-            await _serviceManager.CategoryService.CreateCategoryAsync(model, trackChanges: true);
+            await _serviceManager
+                .CategoryService
+                .CreateCategoryAsync(model, trackChanges: true);
             TempData[SuccessMessage] = $"Successfully create category with name {model.Name}";
         }
 
@@ -43,7 +48,9 @@ public class CategoryController : AdminBaseController
     [HttpDelete("delete/{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _serviceManager.CategoryService.DeleteCategory(id);
+        await _serviceManager
+            .CategoryService
+            .DeleteCategory(id, trackChanges: true);
         return Ok();
     }
 
@@ -51,7 +58,9 @@ public class CategoryController : AdminBaseController
     [HttpGet("edit/{id}")]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var result = await _serviceManager.CategoryService.GetCategoryForUpdate(id,trackChanges:false);
+        var result = await _serviceManager
+            .CategoryService
+            .GetCategoryForUpdate(id,trackChanges:false);
         return View(result);
     }
 
@@ -61,7 +70,9 @@ public class CategoryController : AdminBaseController
     {
         if(ModelState.IsValid)
         {
-            await _serviceManager.CategoryService.UpdateCategory(model, id, trackChanges: true);
+            await _serviceManager
+                .CategoryService
+                .UpdateCategory(model, id, trackChanges: true);
         }
 
         return RedirectToAction("All", "Category", new { area = AdminAreaName });

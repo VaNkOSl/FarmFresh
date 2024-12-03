@@ -8,7 +8,7 @@ public interface ICategoryService
 
     Task<bool> DoesCategoryExistsByNameAsync(string name, bool trackChanges);
 
-    Task<bool> DeleteCategory(Guid categoryId);
+    Task<bool> DeleteCategory(Guid categoryId, bool trackChanges);
 
     Task UpdateCategory(CategoryUpdateForm model,Guid categoryId, bool trackChanges);
 

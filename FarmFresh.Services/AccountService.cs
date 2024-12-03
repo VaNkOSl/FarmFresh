@@ -39,21 +39,21 @@ public sealed class AccountService : IAccountService
         _userManager = userManager;
     }
 
-    public async Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges)
+    public async Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges) => 
+        await _repositoryManager
+        .UserRepository
+        .FindUsersByConditionAsync(u => u.UserName == userName || 
+        u.Email == email, trackChanges)
+        .AnyAsync();
+
+
+    public async Task<ProfileViewModel> GetUserProfileAsync(string userId, bool trackChanges)
     {
-        var users = _repositoryManager.UserRepository
-             .FindUsersByConditionAsync(u => u.UserName == userName 
-                                        || u.Email == email, trackChanges);
-
-        Console.WriteLine();
-
-
-        return await users.AnyAsync();
-    }
-
-    public async Task<ProfileViewModel> GetUserProfileAsync(string userId)
-    {
-        var user = await _repositoryManager.UserRepository.GetUserByIdAsync(Guid.Parse(userId));
+        var user = await _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.Id.ToString() == userId,
+            trackChanges)
+            .FirstOrDefaultAsync();
 
         if (user is null)
         {
@@ -61,18 +61,17 @@ public sealed class AccountService : IAccountService
             throw new UserIdNotFoundException(Guid.Parse(userId));
         }
 
-        var userProfile = _mapper.Map<ProfileViewModel>(user);
-
-        return userProfile;
+        return _mapper.Map<ProfileViewModel>(user);
     }
 
     public async Task<bool> Login(LoginViewModel model, bool trackChanges)
     {
-        var users = _repositoryManager.UserRepository
-                             .FindUsersByConditionAsync(u => u.UserName == model.UserNameOrEmail
-                                                        || u.Email == model.UserNameOrEmail, trackChanges);
+        var user = await _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.UserName == model.UserNameOrEmail || 
+            u.Email == model.UserNameOrEmail, 
+            trackChanges).FirstOrDefaultAsync();
 
-        var user = await users.FirstOrDefaultAsync();
 
         if (user is null)
         {
