@@ -10,7 +10,7 @@ public interface IAccountService
 
     Task Logout();
 
-    Task<ProfileViewModel> GetUserProfileAsync(string userId);
+    Task<ProfileViewModel> GetUserProfileAsync(string userId, bool trackChanges);
 
     Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges);
 }

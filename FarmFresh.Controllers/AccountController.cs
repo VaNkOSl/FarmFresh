@@ -62,7 +62,8 @@ public class AccountController : BaseController
             id = User.GetId()!;
         }
 
-        var userProfile = await _accountService.GetUserProfileAsync(id);
+        var userProfile = await _accountService
+            .GetUserProfileAsync(id, trackChanges: false);
 
         if (userProfile is null)
         {
