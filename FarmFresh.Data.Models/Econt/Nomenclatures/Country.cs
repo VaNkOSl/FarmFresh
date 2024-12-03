@@ -1,14 +1,15 @@
 ﻿using Newtonsoft.Json;
+using static FarmFresh.Commons.EntityValidationConstants.Country;
 using System.ComponentModel.DataAnnotations;
 
 namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
     public class Country : Entity_1<int?>
     {
-        [MaxLength(2)]
+        [MaxLength(Code2MaxLength)]
         public string? Code2 { get; set; }
 
-        [MaxLength(3)]
+        [MaxLength(Code3MaxLength)]
         public string? Code3 { get; set; }
 
         public string? Name { get; set; }

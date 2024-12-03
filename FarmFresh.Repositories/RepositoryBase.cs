@@ -7,7 +7,7 @@ namespace FarmFresh.Repositories;
 
 public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 {
-    private readonly DbContext _data;
+    protected readonly FarmFreshDbContext _data;
 
     protected RepositoryBase(FarmFreshDbContext data)
     {
@@ -36,5 +36,6 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 
     public void Update(T entity) => _data.Update(entity);
 
+    public async Task<T?> GetByIdAsync(int id) => await DbSet<T>().FindAsync(id);
     public async Task<T?> GetByIdAsync(Guid id) => await DbSet<T>().FindAsync(id);
 }

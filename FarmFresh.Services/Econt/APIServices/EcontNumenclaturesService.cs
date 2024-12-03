@@ -1,18 +1,19 @@
-﻿using FarmFresh.Data.Models.Econt.APIInterractionClasses;
+﻿using AutoMapper;
+using FarmFresh.Data.Models.Econt.APIInterraction;
 using FarmFresh.Data.Models.Econt.DTOs;
-using FarmFresh.Data.Models.Econt.Nomenclatures;
-using FarmFresh.Services.Contacts.Econt;
+using FarmFresh.Services.Contacts.Econt.APIServices;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace FarmFresh.Services.Econt
+namespace FarmFresh.Services.Econt.APIServices
 {
     public class EcontNumenclaturesService : IEcontNumenclaturesService
     {
         private IConfiguration _configuration;
         private HttpClient _httpClient;
+        private IMapper _mapper;
 
         private readonly string credentials;
 
@@ -23,7 +24,7 @@ namespace FarmFresh.Services.Econt
         private readonly string getQuartersEndpoint;
         private readonly string getStreetsEndpoint;
 
-        public EcontNumenclaturesService(IConfiguration configuration, HttpClient httpClient)
+        public EcontNumenclaturesService(IConfiguration configuration, HttpClient httpClient, IMapper mapper)
         {
             _configuration = configuration;
             _httpClient = httpClient;
@@ -36,6 +37,8 @@ namespace FarmFresh.Services.Econt
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
+            _mapper = mapper;
+
             testApiUrl = _configuration["Econt:TestApiUrl"]!;
             getCountriesEndpoint = _configuration["Econt:Endpoints:GetCountries"]!;
             getCititesEndpoint = _configuration["Econt:Endpoints:GetCities"]!;
@@ -44,7 +47,7 @@ namespace FarmFresh.Services.Econt
             getQuartersEndpoint = _configuration["Econt:Endpoints:GetQuarters"]!;
         }
 
-        public async Task<List<CountryDTO>> GetCountries(GetCountriesRequest request)
+        public async Task<List<CountryDTO>> GetCountriesAsync(GetCountriesRequest request)
         {
             var json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -56,31 +59,35 @@ namespace FarmFresh.Services.Econt
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var countriesResponse = JsonConvert.DeserializeObject<GetCountriesResponse>(responseContent);
 
-                if(countriesResponse != null && countriesResponse.Countries != null)
+                if (countriesResponse != null && countriesResponse.Countries != null)
                     return countriesResponse.Countries;
             }
 
             return null!;
         }
 
-        public Task<List<CityDTO>> GetCities()
+        public Task<List<CityDTO>> GetCitiesAsync()
         {
-            throw new NotImplementedException();
+            //WIP
+            return Task.FromResult(new List<CityDTO>());
         }
 
-        public Task<List<OfficeDTO>> GetOffices()
+        public Task<List<OfficeDTO>> GetOfficesAsync()
         {
-            throw new NotImplementedException();
+            //WIP
+            return Task.FromResult(new List<OfficeDTO>());
         }
 
-        public Task<List<StreetDTO>> GetStreets()
+        public Task<List<StreetDTO>> GetStreetsAsync()
         {
-            throw new NotImplementedException();
+            //WIP
+            return Task.FromResult(new List<StreetDTO>());
         }
 
-        public Task<List<QuarterDTO>> GetQuarters()
+        public Task<List<QuarterDTO>> GetQuartersAsync()
         {
-            throw new NotImplementedException();
+            //WIP
+            return Task.FromResult(new List<QuarterDTO>());
         }
     }
 }

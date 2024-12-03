@@ -8,7 +8,6 @@ using LoggerService.Exceptions.BadRequest;
 using LoggerService.Exceptions.InternalError;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
-using static FarmFresh.Commons.EntityValidationConstants;
 
 namespace FarmFresh.Services;
 

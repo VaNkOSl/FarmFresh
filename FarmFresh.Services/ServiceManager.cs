@@ -1,7 +1,14 @@
 ﻿using AutoMapper;
+using FarmFresh.Data.Models.Repositories.Econt;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Contacts.Econt;
+using FarmFresh.Services.Contacts.Econt.APIServices;
+using FarmFresh.Services.Econt;
+using FarmFresh.Services.Econt.APIServices;
 using LoggerService.Contacts;
+using Microsoft.Extensions.Configuration;
+using System.Runtime.CompilerServices;
 
 namespace FarmFresh.Services;
 
@@ -13,11 +20,22 @@ public sealed class ServiceManager : IServiceManager
 
     private readonly Lazy<ICategoryService> _categoryService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager loggerManager)
+    private readonly Lazy<IEcontNumenclaturesService> _econtNumenclaturesService;
+
+    private readonly Lazy<ICountryService> _countryService;
+
+    public ServiceManager(
+        IRepositoryManager repositoryManager,
+        IMapper mapper,
+        ILoggerManager loggerManager,
+        IConfiguration configuration,
+        HttpClient httpClient)
     {
         _farmerService = new Lazy<IFarmerService>(() => new FarmerService(repositoryManager, loggerManager, mapper));
         _adminService = new Lazy<IAdminService>(() => new AdminService(repositoryManager, loggerManager, mapper));
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
+        _econtNumenclaturesService = new Lazy<IEcontNumenclaturesService>(() => new EcontNumenclaturesService(configuration, httpClient, mapper));
+        _countryService = new Lazy<ICountryService>(() => new CountryService(EcontNumenclaturesService, repositoryManager, mapper));
     }
 
     public IFarmerService FarmerService => _farmerService.Value;
@@ -25,4 +43,8 @@ public sealed class ServiceManager : IServiceManager
     public IAdminService AdminService => _adminService.Value;
 
     public ICategoryService CategoryService => _categoryService.Value;
+
+    public IEcontNumenclaturesService EcontNumenclaturesService => _econtNumenclaturesService.Value;
+
+    public ICountryService CountryService => _countryService.Value;
 }

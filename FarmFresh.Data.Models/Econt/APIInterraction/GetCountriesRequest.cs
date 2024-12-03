@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmFresh.Data.Models.Econt.APIInterractionClasses
+namespace FarmFresh.Data.Models.Econt.APIInterraction
 {
     public class GetCountriesRequest
     {
