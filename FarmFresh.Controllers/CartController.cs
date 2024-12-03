@@ -42,6 +42,20 @@ namespace FarmFresh.Controllers
             session.Set(CartSessionKey, cart);
             return RedirectToAction("Index");   
         }
+        public IActionResult RemoveFromCart(Guid ProductId)
+        {
+            var cart = session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+            if (cart != null)
+            {
+                var item = cart.FirstOrDefault(i => i.ProductId == ProductId);
+                if(item != null)
+                {
+                    cart.Remove(item);
+                    session.Set(CartSessionKey, cart);
+                }
+            }
+            return RedirectToAction("Index");
+        }
     }
     public static class SessionExtension
     {
