@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Http;
 
 using System.Text.Json;
 using FarmFresh.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FarmFresh.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         private const string CartSessionKey = "Cart";
