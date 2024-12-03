@@ -21,6 +21,27 @@ namespace FarmFresh.Controllers
             var cart = session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
             return View(cart);
         }
+        public IActionResult AddToCart(Guid productId, string ProductName, decimal price)
+        {
+            var cart = session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+            var existingItem = cart.FirstOrDefault(c => c.ProductId == productId);
+            if (existingItem != null)
+            {
+                existingItem.Quantity++;
+            }
+            else
+            {
+                cart.Add(new CartItemViewModel
+                {
+                    ProductId = productId,
+                    ProductName = ProductName,
+                    Price = price,
+                    Quantity = 1
+                });
+            }
+            session.Set(CartSessionKey, cart);
+            return RedirectToAction("Index");   
+        }
     }
     public static class SessionExtension
     {
