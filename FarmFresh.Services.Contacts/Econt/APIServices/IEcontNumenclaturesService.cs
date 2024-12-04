@@ -11,7 +11,7 @@ namespace FarmFresh.Services.Contacts.Econt.APIServices
     public interface IEcontNumenclaturesService
     {
         Task<List<CountryDTO>> GetCountriesAsync(GetCountriesRequest request);
-        Task<List<CityDTO>> GetCitiesAsync();
+        Task<List<CityDTO>> GetCitiesAsync(GetCitiesRequest request);
         Task<List<OfficeDTO>> GetOfficesAsync();
         Task<List<StreetDTO>> GetStreetsAsync();
         Task<List<QuarterDTO>> GetQuartersAsync();

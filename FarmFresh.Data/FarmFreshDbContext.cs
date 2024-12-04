@@ -40,7 +40,7 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
 
     //public virtual DbSet<Address> Addresses { get; set; }
 
-    //public virtual DbSet<City> Cities { get; set; }
+    public virtual DbSet<City> Cities { get; set; }
 
     public virtual DbSet<Country> Countries { get; set; }
 
@@ -61,7 +61,7 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
         builder.ApplyConfiguration(new CategoryConfiguration());
 
         //builder.ApplyConfiguration(new AddressConfiguration());
-        //builder.ApplyConfiguration(new CityConfiguration());
+        builder.ApplyConfiguration(new CityConfiguration());
         builder.ApplyConfiguration(new CountryConfiguration());
         //builder.ApplyConfiguration(new OfficeConfiguration());
         //builder.ApplyConfiguration(new QuarterConfiguration());

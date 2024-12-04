@@ -19,10 +19,12 @@ namespace FarmFresh.Services.Econt.APIServices
 
         private readonly string testApiUrl;
         private readonly string getCountriesEndpoint;
-        private readonly string getCititesEndpoint;
+        private readonly string getCitiesEndpoint;
         private readonly string getOfficesEndpoint;
         private readonly string getQuartersEndpoint;
         private readonly string getStreetsEndpoint;
+
+        private const string requestBodyFormat = "application/json";
 
         public EcontNumenclaturesService(IConfiguration configuration, HttpClient httpClient, IMapper mapper)
         {
@@ -41,7 +43,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
             testApiUrl = _configuration["Econt:TestApiUrl"]!;
             getCountriesEndpoint = _configuration["Econt:Endpoints:GetCountries"]!;
-            getCititesEndpoint = _configuration["Econt:Endpoints:GetCities"]!;
+            getCitiesEndpoint = _configuration["Econt:Endpoints:GetCities"]!;
             getOfficesEndpoint = _configuration["Econt:Endpoints:GetOffices"]!;
             getStreetsEndpoint = _configuration["Econt:Endpoints:GetStreets"]!;
             getQuartersEndpoint = _configuration["Econt:Endpoints:GetQuarters"]!;
@@ -50,7 +52,7 @@ namespace FarmFresh.Services.Econt.APIServices
         public async Task<List<CountryDTO>> GetCountriesAsync(GetCountriesRequest request)
         {
             var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
 
             var response = await _httpClient.PostAsync(testApiUrl + getCountriesEndpoint, content);
 
@@ -66,10 +68,23 @@ namespace FarmFresh.Services.Econt.APIServices
             return null!;
         }
 
-        public Task<List<CityDTO>> GetCitiesAsync()
+        public async Task<List<CityDTO>> GetCitiesAsync(GetCitiesRequest request)
         {
-            //WIP
-            return Task.FromResult(new List<CityDTO>());
+            var json = JsonConvert.SerializeObject(request);
+            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
+            
+            var response  = await _httpClient.PostAsync(testApiUrl + getCitiesEndpoint, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var citiesResponse = JsonConvert.DeserializeObject<GetCitiesResponse>(responseContent);
+
+                if(citiesResponse != null && citiesResponse.Cities != null)
+                    return citiesResponse.Cities;
+            }
+
+            return null!;
         }
 
         public Task<List<OfficeDTO>> GetOfficesAsync()

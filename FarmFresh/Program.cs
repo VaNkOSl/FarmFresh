@@ -27,6 +27,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
 builder.Services.AddScoped<IEcontNumenclaturesService, EcontNumenclaturesService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<ICityService, CityService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -83,6 +84,9 @@ using(var scope = app.Services.CreateScope())
 {
     var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
     await countryService.UpdateCountriesAsync();
+
+    var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
+    await cityService.UpdateCitiesAsync();
 }
 
 app.Run();

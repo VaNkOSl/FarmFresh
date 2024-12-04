@@ -17,7 +17,7 @@ namespace FarmFresh.Mapper
             CreateMap<City, CityDTO>()
                 .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Country))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
-                .ForMember(dest => dest.ServingOfficeElement, opt => opt.MapFrom(src => src.ServingOfficeElement))
+                .ForMember(dest => dest.ServingOffices, opt => opt.MapFrom(src => src.ServingOffices))
                 .ReverseMap();
 
             CreateMap<Office, OfficeDTO>()

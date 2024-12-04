@@ -19,6 +19,7 @@ public sealed class RepositoryManager : IRepositoryManager
     private readonly Lazy<IFarmerLocationRepository> _farmerLocationRepository;
     private readonly Lazy<ICategoryRepository> _categoryRepository;
     private readonly Lazy<ICountryRepository> _countryRepository;
+    private readonly Lazy<ICityRepository> _cityRepository;
     private readonly IValidateEntity _validateEntityRepo;
 
     public RepositoryManager(FarmFreshDbContext data, IServiceProvider serviceProvider)
@@ -29,6 +30,7 @@ public sealed class RepositoryManager : IRepositoryManager
         _farmerLocationRepository = new Lazy<IFarmerLocationRepository>(() => new FarmerLocationRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _categoryRepository = new Lazy<ICategoryRepository>(() => new CategoryRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _countryRepository = new Lazy<ICountryRepository>(() => new CountryRepository(data));
+        _cityRepository = new Lazy<ICityRepository>(() => new CityRepository(data));
         _validateEntityRepo = serviceProvider.GetRequiredService<IValidateEntity>();
     }
 
@@ -41,6 +43,8 @@ public sealed class RepositoryManager : IRepositoryManager
     public ICategoryRepository CategoryRepository => _categoryRepository.Value;
 
     public ICountryRepository CountryRepository => _countryRepository.Value;
+
+    public ICityRepository CityRepository => _cityRepository.Value;
 
     public async Task SaveAsync(Entity entity)
     {

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Services.Contacts.Econt
 {
-    public interface ICountryService
+    public interface ICityService
     {
-        Task UpdateCountriesAsync();
+        Task UpdateCitiesAsync();
     }
 }

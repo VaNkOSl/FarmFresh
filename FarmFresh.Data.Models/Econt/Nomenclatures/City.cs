@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
     public class City : Entity_1<int?>
     {
-        [ForeignKey(nameof(Country))]
         public int? CountryId { get; set; }
 
         public Country? Country { get; set; }
@@ -49,6 +48,6 @@ namespace FarmFresh.Data.Models.Econt.Nomenclatures
 
         public string? ZoneNameEn { get; set; }
 
-        public ServingOfficeElement? ServingOfficeElement { get; set; }
+        public List<ServingOfficeElement>? ServingOffices { get; set; }
     }
 }

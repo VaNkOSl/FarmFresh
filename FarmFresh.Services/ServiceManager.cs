@@ -23,6 +23,7 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IEcontNumenclaturesService> _econtNumenclaturesService;
 
     private readonly Lazy<ICountryService> _countryService;
+    private readonly Lazy<ICityService> _cityService;
 
     public ServiceManager(
         IRepositoryManager repositoryManager,
@@ -36,6 +37,7 @@ public sealed class ServiceManager : IServiceManager
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
         _econtNumenclaturesService = new Lazy<IEcontNumenclaturesService>(() => new EcontNumenclaturesService(configuration, httpClient, mapper));
         _countryService = new Lazy<ICountryService>(() => new CountryService(EcontNumenclaturesService, repositoryManager, mapper));
+        _cityService = new Lazy<ICityService>(() => new CityService(EcontNumenclaturesService, repositoryManager, mapper));
     }
 
     public IFarmerService FarmerService => _farmerService.Value;
@@ -47,4 +49,6 @@ public sealed class ServiceManager : IServiceManager
     public IEcontNumenclaturesService EcontNumenclaturesService => _econtNumenclaturesService.Value;
 
     public ICountryService CountryService => _countryService.Value;
+
+    public ICityService CityService => _cityService.Value;
 }

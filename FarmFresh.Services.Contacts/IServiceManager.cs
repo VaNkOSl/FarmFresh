@@ -19,4 +19,6 @@ public interface IServiceManager
     //Database Services
 
     ICountryService CountryService { get; }
+
+    ICityService CityService { get; }
 }
