@@ -1,4 +1,4 @@
-﻿using FarmFresh.ViewModels.Category;
+﻿using FarmFresh.ViewModels.Categories;
 
 namespace FarmFresh.Services.Contacts;
 

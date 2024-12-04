@@ -1,5 +1,5 @@
 ﻿using FarmFresh.Services.Contacts;
-using FarmFresh.ViewModels.Category;
+using FarmFresh.ViewModels.Categories;
 using Microsoft.AspNetCore.Mvc;
 using static FarmFresh.Commons.GeneralApplicationConstants;
 using static FarmFresh.Commons.NotificationMessagesConstants;
@@ -21,7 +21,7 @@ public class CategoryController : AdminBaseController
     public IActionResult AddCategory() =>
         View();
 
-    [HttpGet("All")]
+    [HttpGet("all")]
     public async Task<IActionResult> All()
     {
         var result = await _serviceManager
