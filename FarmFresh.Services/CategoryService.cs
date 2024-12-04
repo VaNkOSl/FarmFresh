@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
+using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
-using FarmFresh.ViewModels.Category;
+using FarmFresh.ViewModels.Categories;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.BadRequest;
 using LoggerService.Exceptions.InternalError.Categories;
@@ -28,7 +29,7 @@ internal sealed class CategoryService : ICategoryService
 
     public async Task CreateCategoryAsync(CategoryCreateForm model, bool trackChanges)
     {
-        if (await DoesCategoryExistsByNameAsync(model.Name, trackChanges))
+        if (await _repositoryManager.CategoryRepository.DoesCategoryExistByNameAsync(model.Name, trackChanges))
         {
             _loggerManager.LogError($"[{nameof(CreateCategoryAsync)}] Category creation failed: Name '{model.Name}' already exists.");
             throw new CategoryNameAlreadyExists();
@@ -74,12 +75,6 @@ internal sealed class CategoryService : ICategoryService
             throw new DeleteCategorySomethingWentWrong();
         }
     }
-
-    public async Task<bool> DoesCategoryExistsByNameAsync(string name, bool trackChanges) => 
-        await _repositoryManager
-        .CategoryRepository
-        .FindCategoryByConditionAsync(c => c.Name == name, trackChanges)
-        .AnyAsync();
 
     public async Task<IEnumerable<AllCategoriesDTO>> GetAllCategoriesAsync(bool trackChanges)
     {

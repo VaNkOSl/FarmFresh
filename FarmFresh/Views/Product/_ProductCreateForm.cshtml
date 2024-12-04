@@ -1,0 +1,92 @@
+﻿@model CreateProductDto
+
+<h3 class="text-dark mb-4">Add new Product!</h3>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <form asp-action="Add" asp-controller="Product" method="post" enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Origin" class="form-label"></label>
+                        <input asp-for="Origin" class="form-control" />
+                        <span asp-validation-for="Origin" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Price"></label>
+                        <input asp-for="Price" class="form-control" placeholder="Price..." />
+                        <span asp-validation-for="Price" class="small text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="StockQuantity"></label>
+                        <input asp-for="StockQuantity" class="form-control" placeholder="Stock Quantity..." />
+                        <span asp-validation-for="StockQuantity" class="small text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HarvestDate" class="form-label"></label>
+                        <input asp-for="HarvestDate" type="date" class="form-control" />
+                        <span asp-validation-for="HarvestDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ExpirationDate"></label>
+                        <input asp-for="ExpirationDate" type="date" class="form-control" />
+                        <span asp-validation-for="ExpirationDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhotoFile" class="form-label">Upload a Photo</label>
+                        <input asp-for="PhotoFile" type="file" class="form-control" />
+                        <span asp-validation-for="PhotoFile" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CategoryId"></label>
+                        <select asp-for="CategoryId" class="form-control">
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="SuitableSeason"></label>
+                        <select asp-for="SuitableSeason" class="form-control">
+                            <option value="">Select Season</option>
+                            <option value="0">Winter</option>
+                            <option value="1">Spring</option>
+                            <option value="2">Summer</option>
+                            <option value="3">Autumn</option>
+                        </select>
+                        <span asp-validation-for="SuitableSeason" class="small text-danger"></span>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScripts" />
+}

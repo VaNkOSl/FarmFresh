@@ -1,5 +1,9 @@
-﻿@{
+﻿@using FarmFresh.Services.Contacts;
+@using FarmFresh.Infrastructure.Extensions;
+@inject IServiceManager _serviceManager;
+@{
     Layout = "_MasterLayout";
+    bool userIsAFarmer = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId()!, trackChanges: false);
 }
 
 <div id="wrapper">
@@ -63,9 +67,19 @@
                 <div class="container-fluid" id="contentId">
                     <ul class="navbar-nav flex-nowrap">
                         <li class="nav-item">
-                            <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">
-                             <i class="fas fa-some-icon fa-fw"></i> Become a Farmer
-                        </a>
+                            @if (userIsAFarmer is true)
+                            {
+                                <a asp-action="Add" asp-controller="Product" class="nav-link">
+                                    <i class="fas fa-seedling"></i>
+                                    <span>Add Product!</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">
+                                    <i class="fas fa-user-farmer fa-fw"></i> Become a Farmer
+                                </a>
+                            }
                         </li>
                     </ul>
                     @if (User.Identity!.IsAuthenticated == false)
