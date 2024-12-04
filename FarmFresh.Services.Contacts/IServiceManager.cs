@@ -7,4 +7,6 @@ public interface IServiceManager
     IAdminService AdminService { get; }
 
     ICategoryService CategoryService { get; }
+
+    IProductService ProductService { get; }
 }
