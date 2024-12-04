@@ -14,8 +14,6 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
         _data = data;
     }
 
-    private DbSet<T> DbSet<T>() where T : class => _data.Set<T>();
-
     public async Task CreateAsync(T entity) => await _data.AddAsync(entity);
 
     public void Delete(T entity) => _data.Remove(entity);
@@ -35,6 +33,4 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
         .Where(expression);
 
     public void Update(T entity) => _data.Update(entity);
-
-    public async Task<T?> GetByIdAsync(Guid id) => await DbSet<T>().FindAsync(id);
 }
