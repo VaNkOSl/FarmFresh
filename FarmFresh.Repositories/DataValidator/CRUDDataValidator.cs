@@ -13,6 +13,7 @@ public class CRUDDataValidator : IValidateEntity
         _validators.Add(new FarmerValidator());
         _validators.Add(new FarmerLocationValidator());
         _validators.Add(new CategoryValidator());
+        _validators.Add(new ProductValidator());
     }
 
     public Type GetValidatedType() => typeof(CRUDDataValidator);
