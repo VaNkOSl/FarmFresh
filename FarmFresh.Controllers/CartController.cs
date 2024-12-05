@@ -28,7 +28,7 @@ namespace FarmFresh.Controllers
             var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
             return View(cart);
         }
-        public IActionResult AddToCart(Guid productId, string ProductName, decimal price)
+        public IActionResult AddToCart(Guid productId)
         {
             var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
 
@@ -54,9 +54,9 @@ namespace FarmFresh.Controllers
                 cart.Add(new CartItemViewModel
                 {
                     ProductId = productId,
-                    ProductName = ProductName,
+                    ProductName = product.Name,
                     Quantity = 1,
-                    Price = price
+                    Price = product.Price
                 });
             }
 
@@ -64,6 +64,8 @@ namespace FarmFresh.Controllers
 
             return RedirectToAction("Index");
         }
+        [HttpDeleteAttribute]
+        [ValidateAntiForgeryToken]
         public IActionResult RemoveFromCart(Guid ProductId)
         {
             var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
