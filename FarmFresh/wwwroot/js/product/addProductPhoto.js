@@ -2,13 +2,15 @@
 const fileInput = document.getElementById('images');
 const preview = document.getElementById('preview');
 
+let droppedFiles = [];
+
 dropArea.addEventListener('click', () => {
     fileInput.click();
 });
 
 dropArea.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropArea.style.backgroundColor = "#e9ecef"; 
+    dropArea.style.backgroundColor = "#e9ecef";
 });
 
 dropArea.addEventListener('dragleave', () => {
@@ -26,8 +28,20 @@ fileInput.addEventListener('change', () => {
 
 function handleFiles(files) {
     const fileArray = Array.from(files);
+    droppedFiles = [...droppedFiles, ...fileArray];
 
-    fileArray.forEach((file) => {
+    updateFileInput();
+    displayPreview(fileArray);
+}
+
+function updateFileInput() {
+    const dataTransfer = new DataTransfer();
+    droppedFiles.forEach((file) => dataTransfer.items.add(file));
+    fileInput.files = dataTransfer.files; 
+}
+
+function displayPreview(files) {
+    files.forEach((file) => {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
 
