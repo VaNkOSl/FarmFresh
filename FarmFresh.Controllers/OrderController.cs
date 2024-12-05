@@ -139,7 +139,8 @@ namespace FarmFresh.Controllers
                         LastName = o.LastName,
                         Adress = o.Adress,
                         PhoneNumber = o.PhoneNumber,
-                        Email = o.Email
+                        Email = o.Email,
+                        CartItems= HttpContext.Session.Get<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>()
                     }).FirstOrDefault();
 
                 if (order == null)

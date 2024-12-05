@@ -21,5 +21,7 @@ namespace FarmFresh.ViewModels.Order
 		public string Adress { get; set; }
 		public string PhoneNumber { get; set; }
 		public string Email { get; set; }
+
+		public List<CartItemViewModel> CartItems { get; set; }
 	}
 }
