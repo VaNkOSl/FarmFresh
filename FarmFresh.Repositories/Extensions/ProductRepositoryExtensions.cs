@@ -6,14 +6,6 @@ public static class ProductRepositoryExtensions
 {
     public static IQueryable<Product> FilterProductsByPrice(this IQueryable<Product> products, decimal minPrice, decimal maxPrice) =>
         products.Where(p => (p.Price >= minPrice && p.Price <= maxPrice));
-
-    public static IQueryable<Product> FilterByPriceAscending(this IQueryable<Product> products, string orderByPrice) => 
-        orderByPrice switch
-        {
-            "Ascending" => products.OrderBy(p => p.Price),
-            "Descending" => products.OrderByDescending(p => p.Price),
-            _ => products 
-        };
     
     public static IQueryable<Product> Search(this IQueryable<Product> products, string searchTerm)
     {

@@ -10,7 +10,7 @@ public class ProductsListViewModel
 
     public string? SearchTerm { get; set; }
 
-    public decimal MinPrice { get; set; }
+    public decimal? MinPrice { get; set; }
 
-    public decimal MaxPrice { get; set; }
+    public decimal? MaxPrice { get; set; }
 }
