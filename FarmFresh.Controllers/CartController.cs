@@ -79,6 +79,21 @@ namespace FarmFresh.Controllers
             }
             return RedirectToAction("Index");
         }
+        public IActionResult IncreaseQuantity(Guid ProductId)
+        {
+            var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();
+            if(cart != null)
+            {
+                var item=_context.Products.Where(p=>p.Id==ProductId).FirstOrDefault();
+                var itemInCart = cart.Where(p => p.ProductId == ProductId).FirstOrDefault();
+                if (itemInCart.Quantity < item.StockQuantity) 
+                {
+                    itemInCart.Quantity++;
+                    HttpContext.Session.Set(CartSessionKey, cart);
+                }
+            }
+            return RedirectToAction("Index");
+        }
     }
     public static class SessionExtension
     {

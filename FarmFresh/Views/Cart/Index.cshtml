@@ -23,8 +23,20 @@
                         <td>@(i + 1)</td>
                         <td>@Model[i].ProductName</td>
                         <td>@Model[i].Price.ToString("C")</td>
-                        <td>@Model[i].Quantity</td>
-                        <td>@(Model[i].Price * Model[i].Quantity).ToString("C")</td>
+                        <td>
+                            <a type="button" class="btn btn-secondary btn-danger"
+                                    asp-action="DecreaseQuantity"
+                                    asp-route-productId="@Model[i].ProductId">
+                                -
+                            </a>
+                            <span>@Model[i].Quantity</span>
+                            <a type="button" class="btn btn-secondary btn-success"
+                                    asp-action="IncreaseQuantity"
+                                    asp-route-productId="@Model[i].ProductId">
+                                +
+                            </a>
+                        </td>
+                        <td>@(Model[i].Price * Model[i].Quantity) лв.</td>
                         <td>
                             <a asp-action="RemoveFromCart" asp-route-productId="@Model[i].ProductId" class="btn btn-danger btn-sm">
                                 Remove
