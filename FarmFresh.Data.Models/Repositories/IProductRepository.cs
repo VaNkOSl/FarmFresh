@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using FarmFresh.Commons.RequestFeatures;
+using System.Linq.Expressions;
 
 namespace FarmFresh.Data.Models.Repositories;
 
@@ -13,4 +14,6 @@ public interface IProductRepository
     IQueryable<Product> FindProductByConditionAsync(Expression<Func<Product, bool>> condition, bool trackChanges);
 
     IQueryable<Product> FindAllProducts(bool trackChanges);
+
+    Task<PagedList<Product>> GetProductsAsync(ProductParameters productParameters, bool trackChanges);
 }

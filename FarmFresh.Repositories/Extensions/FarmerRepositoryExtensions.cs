@@ -2,7 +2,7 @@
 
 namespace FarmFresh.Repositories.Extensions;
 
-public static class RepositoryFarmerExtensions
+public static class FarmerRepositoryExtensions
 {
     public static IQueryable<Farmer> Search(this IQueryable<Farmer> farmers, string searchTerm)
     {

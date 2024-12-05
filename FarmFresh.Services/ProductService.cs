@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
+using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
-using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Categories;
+using FarmFresh.ViewModels.Farmer;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
-using LoggerService.Exceptions.NotFound;
 using LoggerService.Exceptions.Product;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,8 +30,8 @@ internal sealed class ProductService : IProductService
 
     public async Task CreateProductAsync(CreateProductDto model, string userId, bool trackChanges)
     {
-        var farmer = await ValidateUserAndFarmerAsync(userId, trackChanges);
-        await ValidateCategoryAsync(model.CategoryId, trackChanges);
+        var farmer = await ProductHelper.ValidateUserAndFarmerAsync(userId, trackChanges, _repositoryManager, _loggerManager);
+        await ProductHelper.ValidateCategoryAsync(model.CategoryId, trackChanges, _repositoryManager, _loggerManager);
 
         try
         {
@@ -38,7 +39,15 @@ internal sealed class ProductService : IProductService
             product.FarmerId = farmer.Id;
 
             await _repositoryManager.ProductRepository.CreateProductAsync(product);
-            await _repositoryManager.SaveAsync(product);
+            await _repositoryManager.SaveAsync();
+
+            if (model.Photos != null && model.Photos.Any())
+            {
+                var uploadDirectory = Path.Combine("wwwroot", "uploads");
+
+                await ProductHelper.UploadProductPhotosAsync(model.Photos, product, uploadDirectory, _repositoryManager, _loggerManager);
+            }
+
             _loggerManager.LogInfo($"[{nameof(CreateProductAsync)}] Product with Id {product.Id} and Name {product.Name} was successfully created by user with Id {userId} at Date: {DateTime.UtcNow}");
         }
         catch (Exception ex)
@@ -60,34 +69,21 @@ internal sealed class ProductService : IProductService
         return new CreateProductDto { Categories = _mapper.Map<IEnumerable<AllCategoriesDTO>>(categories) };
     }
 
-    private async Task<Farmer> ValidateUserAndFarmerAsync(string userId, bool trackChanges)
+    public async Task<ProductsListViewModel> CreateProductsViewModelAsync(IEnumerable<AllProductsDto> allProducts, MetaData metaData, string? searchTerm) =>
+        _mapper.Map<ProductsListViewModel>((allProducts, metaData, searchTerm));
+
+    public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm) =>
+     _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
+
+    public async Task<(IEnumerable<AllProductsDto> products, MetaData metaData)> GetAllProductsAsync(ProductParameters parameters, bool trackChanges)
     {
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            _loggerManager.LogError($"[{nameof(CreateProductAsync)}] User with id {userId} was not found!");
-            throw new UserIdNotFoundException(Guid.Parse(userId));
-        }
+        var productWithMetaData = await 
+            _repositoryManager
+            .ProductRepository
+            .GetProductsAsync(parameters, trackChanges);
 
-        var farmer = await _repositoryManager
-            .FarmerRepository
-            .FindFarmersByConditionAsync(f => f.UserId.ToString() == userId, trackChanges)
-            .FirstOrDefaultAsync();
+        var productDto = _mapper.Map<IEnumerable<AllProductsDto>>(productWithMetaData);
 
-        if (farmer is null)
-        {
-            _loggerManager.LogError($"[{nameof(CreateProductAsync)}] Farmer with id {farmer.Id} was not found!");
-            throw new FarmerIdNotFoundException(Guid.Parse(userId));
-        }
-
-        return farmer;
-    }
-
-    private async Task ValidateCategoryAsync(Guid categoryId, bool trackChanges)
-    {
-        if (!await _repositoryManager.CategoryRepository.DoesCategoryExistByIdAsync(categoryId, trackChanges))
-        {
-            _loggerManager.LogError($"[{nameof(ValidateCategoryAsync)}] Category creation failed: Category with Id '{categoryId}' not found.");
-            throw new CategoryIdNotFoundException(categoryId);
-        }
+        return (products: productDto, metaData: productWithMetaData.MetaData);
     }
 }

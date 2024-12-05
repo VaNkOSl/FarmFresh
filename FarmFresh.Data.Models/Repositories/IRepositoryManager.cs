@@ -15,6 +15,8 @@ public interface IRepositoryManager
 
     IProductRepository ProductRepository { get; }
 
+    IProductPhotoRepository ProductPhotoRepository { get; }
+
     Task SaveAsync(Entity entity);
 
     Task SaveAsync();

@@ -31,4 +31,8 @@
     <None Include="wwwroot\images\farming-crops.jpg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>
