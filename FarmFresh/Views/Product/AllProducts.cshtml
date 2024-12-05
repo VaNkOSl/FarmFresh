@@ -15,11 +15,13 @@
             </div>
 
             <div class="col-md-2">
-                <input type="text" class="form-control" name="MinPrice" placeholder="Enter Min Price" value="@Model.MinPrice" />
+                <input type="text" class="form-control" name="MinPrice" placeholder="Enter Min Price"
+                       value="@(Model.MinPrice.HasValue ? Model.MinPrice.ToString() : string.Empty)" />
             </div>
 
             <div class="col-md-2">
-                <input type="text" class="form-control" name="MaxPrice" placeholder="Enter Max Price" value="@Model.MaxPrice" />
+                <input type="text" class="form-control" name="MaxPrice" placeholder="Enter Max Price"
+                       value="@(Model.MaxPrice.HasValue ? Model.MaxPrice.ToString() : string.Empty)" />
             </div>
 
             <div class="col-md-4">
@@ -62,6 +64,7 @@
         <h3 class="text-center">No products found by the given criteria!</h3>
     }
 
+ 
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
             @if (Model.MetaData.HasPrevious)
@@ -85,5 +88,5 @@
                 </li>
             }
         </ul>
-    </nav>
+    </nav> 
 </div>

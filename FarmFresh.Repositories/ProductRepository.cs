@@ -33,7 +33,6 @@ internal sealed class ProductRepository(FarmFreshDbContext data, IValidateEntity
         var products = await
             FindAllProducts(trackChanges)
             .FilterProductsByPrice(productParameters.MinPrice, productParameters.MaxPrice)
-            .FilterByPriceAscending(productParameters.OrderByPrice)
             .Search(productParameters.SearchTerm)
             .Include(p => p.ProductPhotos)
             .ToListAsync();
