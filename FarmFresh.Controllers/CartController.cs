@@ -64,8 +64,7 @@ namespace FarmFresh.Controllers
 
             return RedirectToAction("Index");
         }
-        [HttpDeleteAttribute]
-        [ValidateAntiForgeryToken]
+
         public IActionResult RemoveFromCart(Guid ProductId)
         {
             var cart = HttpContext.Session.Get<List<CartItemViewModel>>(CartSessionKey) ?? new List<CartItemViewModel>();

@@ -26,11 +26,8 @@
                         <td>@Model[i].Quantity</td>
                         <td>@(Model[i].Price * Model[i].Quantity).ToString("C")</td>
                         <td>
-                            <a asp-action="RemoveFromCart" asp-route-id="@Model[i].ProductId" class="btn btn-danger btn-sm">
+                            <a asp-action="RemoveFromCart" asp-route-productId="@Model[i].ProductId" class="btn btn-danger btn-sm">
                                 Remove
-                            </a>
-                            <a asp-action="UpdateQuantity" asp-route-id="@Model[i].ProductId" class="btn btn-primary btn-sm">
-                                Update
                             </a>
                         </td>
                     </tr>
