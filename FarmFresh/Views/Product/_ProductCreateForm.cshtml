@@ -55,7 +55,7 @@
 
                         <div id="drop-area" class="drop-area">
                             <p>Drag and drop images here, or click to select files.</p>
-                            <input type="file" name="Photos" id="images" multiple style="display: none;" />
+                            <input type="file" name="photos" id="images" multiple style="display: none;" />
                         </div>
                     </div>
                     <div id="preview" class="preview"></div>
@@ -74,10 +74,11 @@
                         <label asp-for="SuitableSeason"></label>
                         <select asp-for="SuitableSeason" class="form-control">
                             <option value="">Select Season</option>
-                            <option value="0">Winter</option>
-                            <option value="1">Spring</option>
-                            <option value="2">Summer</option>
-                            <option value="3">Autumn</option>
+                            <option value="0">Spring</option>
+                            <option value="1">Summer</option>
+                            <option value="2">Autumn</option>
+                            <option value="3">Winter</option>
+                            <option value="4">AllSeasons</option>
                         </select>
                         <span asp-validation-for="SuitableSeason" class="small text-danger"></span>
                     </div>

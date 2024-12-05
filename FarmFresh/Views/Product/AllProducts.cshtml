@@ -37,7 +37,7 @@
                 <div class="card">
                     @if (product.Photos != null && product.Photos.Any())
                     {
-                        var firstPhoto = product.Photos.FirstOrDefault();
+                        var firstPhoto = product.Photos.First();
                         <img src="@firstPhoto.FilePath" class="card-img-top" alt="Farmer Photo" style="max-height: 200px; object-fit: cover;" />
                     }
                     else
