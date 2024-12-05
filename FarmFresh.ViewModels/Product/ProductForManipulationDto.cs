@@ -10,6 +10,7 @@ public abstract record ProductForManipulationDto
     protected ProductForManipulationDto()
     {
         Categories = new HashSet<AllCategoriesDTO>();
+        Photos = new HashSet<IFormFile>();
     }
 
     [Required]
@@ -55,4 +56,6 @@ public abstract record ProductForManipulationDto
     public Guid CategoryId { get; set; }
 
     public virtual IEnumerable<AllCategoriesDTO> Categories { get; set; }
+
+    public virtual ICollection<IFormFile> Photos { get; set; }
 }

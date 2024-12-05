@@ -1,4 +1,5 @@
-﻿using FarmFresh.Infrastructure.Extensions;
+﻿using FarmFresh.Commons.RequestFeatures;
+using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,16 @@ public class ProductController : BaseController
         await _serviceManager.ProductService.CreateProductAsync(model, userId, trackChanges: true);
 
         return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    [HttpGet("allproducts")]
+    public async Task<IActionResult> AllProducts([FromQuery] ProductParameters productParameters)
+    {
+        var (products, metadata) = await _serviceManager.ProductService.GetAllProductsAsync(productParameters, trackChanges: false);
+
+        var model = await _serviceManager.ProductService.CreateProductsViewModelAsync(products, metadata, productParameters.SearchTerm);
+
+        return View(model);
     }
     
     private async Task LoadModelDataAsync(CreateProductDto model)
