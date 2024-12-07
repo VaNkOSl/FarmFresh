@@ -67,7 +67,7 @@ namespace FarmFresh.Data.Models.Econt.DTOs
         [JsonProperty("zoneNameEn")]
         public string? ZoneNameEn { get; set; }
 
-        [JsonProperty("serviceOffices")]
+        [JsonProperty("servingOffices")]
         public List<ServingOfficeElementDTO>? ServingOffices { get; set; }
     }
 }

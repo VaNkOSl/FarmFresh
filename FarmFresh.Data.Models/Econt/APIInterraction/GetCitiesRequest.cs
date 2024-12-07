@@ -23,5 +23,7 @@ namespace FarmFresh.Data.Models.Econt.APIInterraction
                 _countryCode = value;
             }
         }
+
+        public GetCitiesRequest(string code3) => CountryCode = code3;
     }
 }

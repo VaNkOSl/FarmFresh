@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
-    public class Address : Entity_1<int?>
+    public class Address : Entity_1<int>
     {
         [ForeignKey(nameof(City))]
         public int? CityId { get; set; }

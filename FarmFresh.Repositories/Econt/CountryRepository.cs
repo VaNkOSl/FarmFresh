@@ -24,8 +24,24 @@ namespace FarmFresh.Repositories.Econt
 
         public async Task UpdateCountriesAsync(IEnumerable<Country> countries)
         {
-            _data.Countries.RemoveRange(_data.Countries);
-            _data.Countries.AddRange(countries);
+            var existingCountries = _data.Countries.ToDictionary(c => c.Code2);
+
+            foreach (var country in countries)
+            {
+                if (existingCountries.TryGetValue(country.Code2, out var existingCountry))
+                {
+                    //_data.Entry(existingCountry).CurrentValues.SetValues(country);
+                    existingCountry.Name = country.Name;
+                    existingCountry.NameEn = country.NameEn;
+                    existingCountry.IsEU = country.IsEU;
+                    existingCountries.Remove(country.Code2);
+                }
+                else
+                    _data.Countries.Add(country);
+            }
+
+            _data.Countries.RemoveRange(existingCountries.Values);
+
             await _data.SaveChangesAsync();
         }
 

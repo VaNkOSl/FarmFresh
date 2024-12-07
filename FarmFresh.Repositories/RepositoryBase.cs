@@ -1,6 +1,7 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Repositories.Contacts;
 using Microsoft.EntityFrameworkCore;
+using NLog.Targets.Wrappers;
 using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories;
@@ -37,5 +38,6 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
     public void Update(T entity) => _data.Update(entity);
 
     public async Task<T?> GetByIdAsync(int id) => await DbSet<T>().FindAsync(id);
+
     public async Task<T?> GetByIdAsync(Guid id) => await DbSet<T>().FindAsync(id);
 }

@@ -2,7 +2,7 @@
 
 namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
-    public class Quarter : Entity_1<int?>
+    public class Quarter : Entity_1<int>
     {
         public int CityID { get; set; }
 

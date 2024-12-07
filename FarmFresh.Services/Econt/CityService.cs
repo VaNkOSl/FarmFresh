@@ -24,19 +24,15 @@ namespace FarmFresh.Services.Econt
 
         public async Task UpdateCitiesAsync()
         {
-            string[] codes = { "bgr", "grc", "rou" };
-            List<City> cities = new();
+            string[] codes = ["bgr", "grc", "rou"];
 
-            foreach (var code in codes)
-            {
-                GetCitiesRequest request = new();
-                request.CountryCode = code;
+            var tasks = codes.Select(code =>
+                _econtNumenclaturesService.GetCitiesAsync(new GetCitiesRequest(code))
+                .ContinueWith(task => _mapper.Map<List<City>>(task.Result))
+            ).ToArray();
 
-                var citiesDTOs = await _econtNumenclaturesService.GetCitiesAsync(request);
-                var citiesMapped = _mapper.Map<List<City>>(citiesDTOs);
-
-                cities.AddRange(citiesMapped);
-            }
+            var results = await Task.WhenAll(tasks);
+            var cities = results.SelectMany(c => c).ToList();
 
             await _repositoryManager.CityRepository.UpdateCitiesAsync(cities);
         }

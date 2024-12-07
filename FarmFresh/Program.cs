@@ -1,3 +1,4 @@
+using FarmFresh.Data;
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts.Econt;
@@ -82,11 +83,15 @@ app.MapRazorPages();
 //testing econt api calls
 using(var scope = app.Services.CreateScope())
 {
+    var dbContext = scope.ServiceProvider.GetRequiredService<FarmFreshDbContext>();
     var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
-    await countryService.UpdateCountriesAsync();
-
     var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
-    await cityService.UpdateCitiesAsync();
+
+    await DBTransactionHelper.ExecuteTransactionAsync(dbContext, async () =>
+    {
+        await countryService.UpdateCountriesAsync();
+        await cityService.UpdateCitiesAsync();
+    });
 }
 
 app.Run();

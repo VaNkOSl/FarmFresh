@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
-    public class Office : Entity_1<int?>
+    public class Office : Entity_1<int>
     {
         public bool? IsMPS { get; set; }
 

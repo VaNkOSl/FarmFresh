@@ -20,7 +20,8 @@ namespace FarmFresh.Data.SeedDb.Econt
 
             builder.HasOne(c => c.Country)
                 .WithMany()
-                .HasForeignKey(c => c.CountryId);
+                .HasForeignKey(c => c.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.OwnsOne(c => c.Location, navigation =>
             {

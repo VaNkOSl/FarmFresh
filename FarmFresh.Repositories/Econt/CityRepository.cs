@@ -1,6 +1,8 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories.Econt;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,8 +26,43 @@ namespace FarmFresh.Repositories.Econt
         
         public async Task UpdateCitiesAsync(IEnumerable<City> cities)
         {
-            _data.Cities.RemoveRange(_data.Cities);
-            _data.Cities.AddRange(cities);
+            if(cities.IsNullOrEmpty()) return;
+
+            var existingCountries = _data.Countries.ToDictionary(c => c.Code2);
+
+            foreach(var city in cities)
+            {
+                var country = existingCountries[city.Country!.Code2];
+
+                var existingCity = await _data.Cities
+                    .Where(c => c.Id == city.Id)
+                    .Include(c => c.ServingOffices)
+                    .FirstOrDefaultAsync();
+
+                if(country == null) continue;
+
+                city.CountryId = country.Id;
+                city.Country = null;
+
+                if(existingCity != null)
+                {
+                    _data.Entry(existingCity).CurrentValues.SetValues(city);
+
+                    var officesToAdd = city.ServingOffices!
+                        .Where(nso => !existingCity.ServingOffices!.Any(eo => eo.OfficeCode == nso.OfficeCode))
+                        .ToList();
+
+                    var officesToRemove = existingCity.ServingOffices!
+                        .Where(eo => !city.ServingOffices!.Any(nso => nso.OfficeCode == eo.OfficeCode))
+                        .ToList();
+
+                    _data.AddRange(officesToAdd);
+                    _data.RemoveRange(officesToRemove);
+                }
+                else
+                    _data.Cities.Add(city);
+            }
+
             await _data.SaveChangesAsync();
         }
 
