@@ -1,8 +1,8 @@
-﻿namespace LoggerService.Exceptions.Product;
+﻿namespace LoggerService.Exceptions.InternalError.Product;
 
 public class CreateProductException : InternalServiceError
 {
-    public CreateProductException() 
+    public CreateProductException()
         : base("Something went wrong while creating the product. Please try again later.")
     {
     }

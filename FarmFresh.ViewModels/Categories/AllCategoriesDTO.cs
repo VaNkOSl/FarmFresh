@@ -6,6 +6,9 @@ public record class AllCategoriesDTO
     public string Name { get; init; }
     public int ProductCount { get; init; }
 
+    public AllCategoriesDTO() 
+    {
+    }
     public AllCategoriesDTO(Guid id, string name, int productCount)
     {
         Id = id;

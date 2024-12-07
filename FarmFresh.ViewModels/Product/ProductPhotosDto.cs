@@ -6,5 +6,7 @@ public class ProductPhotosDto
 
     public string FilePath { get; set; } = string.Empty;
 
+    public byte[]? Photo { get; set; }
+
     public Guid ProductId { get; set; }
 }

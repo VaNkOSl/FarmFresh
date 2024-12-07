@@ -16,7 +16,7 @@ public class CategoryMappingProfile : Profile
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<Category, AllCategoriesDTO>()
-         .ForMember(dest => dest.ProductCount, opt => opt.MapFrom(src => src.Products.Count()))
-         .ConstructUsing(src => new AllCategoriesDTO(src.Id, src.Name, src.Products.Count()));
+         .ForMember(dest => dest.ProductCount, opt => opt.MapFrom(src => src.Products.Count()));
+         //.ConstructUsing(src => new AllCategoriesDTO(src.Id, src.Name, src.Products.Count()));
     }
 }

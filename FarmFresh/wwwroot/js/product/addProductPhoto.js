@@ -37,7 +37,7 @@ function handleFiles(files) {
 function updateFileInput() {
     const dataTransfer = new DataTransfer();
     droppedFiles.forEach((file) => dataTransfer.items.add(file));
-    fileInput.files = dataTransfer.files; 
+    fileInput.files = dataTransfer.files;
 }
 
 function displayPreview(files) {

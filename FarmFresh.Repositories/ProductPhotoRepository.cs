@@ -2,6 +2,7 @@
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.DataValidator;
+using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories;
 
@@ -17,4 +18,7 @@ internal sealed class ProductPhotoRepository(FarmFreshDbContext data, IValidateE
     public void DeleteProductPhoto(ProductPhoto productPhoto) => Delete(productPhoto);
 
     public void UpdateProductPhoto(ProductPhoto productPhoto) => Update(productPhoto);
+
+    public IQueryable<ProductPhoto> FindProductPhotoByConditionAsync(Expression<Func<ProductPhoto, bool>> condition, bool trackChanges) =>
+        FindByCondition(condition, trackChanges);
 }

@@ -1,13 +1,15 @@
-﻿@model CreateProductDto
+﻿@model UpdateProductDto
 
 <link rel="stylesheet" href="/bootstrap/css/addProduct.css" />
-<h3 class="text-dark mb-4">Add new Product!</h3>
+<h3 class="text-dark mb-4">Update your product!</h3>
 <div class="row">
     <div class="col-lg-8">
         <div class="card shadow mb-4">
             <div class="card-body">
-                <form asp-action="Add" asp-controller="Product" method="post" enctype="multipart/form-data">
-         
+                <form id="editForm" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="PhotoString" />
+                    <input type="hidden" id="ProductId" name="Id" value="@Model.Id" />
+
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label"></label>
                         <input asp-for="Name" class="form-control" />
@@ -50,7 +52,7 @@
                         <span asp-validation-for="ExpirationDate" class="text-danger"></span>
                     </div>
 
-                        <div class="form-group">
+                    <div class="form-group">
                         <label for="images">Upload Images:</label>
 
                         <div id="drop-area" class="drop-area">
@@ -58,7 +60,18 @@
                             <input type="file" name="photos" id="images" multiple style="display: none;" />
                         </div>
                     </div>
-                    <div id="preview" class="preview"></div> 
+                    <div id="preview" class="preview"></div>
+
+                    <div id="current-images" class="current-images">
+                        @foreach (var photo in Model.CurrentPhotos)
+                        {
+                            <div class="image-container">
+                                <img src="@photo.FilePath" class="preview-image" width="30%" height="20%" alt="Current Product Image">
+                                <button type="button" class="close-button" data-photo-id="@photo.Id">X</button>
+                            </div>
+                        }
+                    </div>
+
 
                     <div class="form-group">
                         <label asp-for="CategoryId"></label>
@@ -84,16 +97,20 @@
                     </div>
 
                     <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="productUpdate(event)">Update</button>
                     </div>
+
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="/js/product/addProductPhoto.js"></script>
 @section Scripts
 {
-    <partial name="_ValidationScripts" />
+    <partial name="_ValidationScriptsPartial" />
+    <script src="/js/product/addProductPhoto.js"></script>
+    <script src="/js/productPhoto/deleteProductPhoto.js"></script>
+    <script src="/js/product/updateProduct.js"></script>
 }
+

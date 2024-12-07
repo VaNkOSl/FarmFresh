@@ -222,4 +222,21 @@ internal sealed class FarmerService : IFarmerService
 
         return _mapper.Map<FarmerProfileViewModel>(farmer);
     }
+
+    public async Task<bool> DoesFarmerHasProductsAsync(string userId, Guid productId, bool trackChanges)
+    {
+        var farmer = await
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.UserId.ToString() == userId, trackChanges)
+            .Include(f => f.OwnedProducts)
+            .FirstOrDefaultAsync();
+
+        if(farmer is null)
+        {
+            return false;
+        }
+
+        return farmer.OwnedProducts.Any(op => op.Id  == productId);
+    }
 }

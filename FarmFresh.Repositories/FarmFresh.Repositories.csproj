@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FarmFresh.Data\FarmFresh.Data.csproj" />
+    <ProjectReference Include="..\FarmFresh.ViewModels\FarmFresh.ViewModels.csproj" />
     <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
   </ItemGroup>
 

@@ -55,6 +55,7 @@ public abstract record ProductForManipulationDto
     [Display(Name = "Category")]
     public Guid CategoryId { get; set; }
 
+    public Guid Id { get; set; }
     public virtual IEnumerable<AllCategoriesDTO> Categories { get; set; }
 
     public virtual ICollection<IFormFile> Photos { get; set; }

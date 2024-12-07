@@ -22,4 +22,6 @@ public interface IFarmerService
     Task EditFarmerAsync(FarmerForUpdatingDto model, Guid farmerId, bool trackChanges);
 
     Task<FarmerProfileViewModel> GetFarmerProfileAsync(string userId);
+
+    Task<bool> DoesFarmerHasProductsAsync(string userId, Guid productId ,bool trackChanges);
 }
