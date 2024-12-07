@@ -1,7 +1,9 @@
 ﻿using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
+using LoggerService;
 using LoggerService.Contacts;
+using LoggerService.Exceptions.InternalError.ProductPhotos;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -98,5 +100,38 @@ public static class ProductHelper
         }
     }
 
+    public static async Task DeleteProductPhotoAsync(
+        IRepositoryManager repositoryManager,
+        ILoggerManager loggerManager,
+        Guid productId,
+        bool trackChanges)
+    {
+        var productPhotosForDeleting = await
+            repositoryManager
+            .ProductPhotoRepository
+            .FindProductPhotoByConditionAsync(ph => ph.ProductId == productId, trackChanges)
+            .ToListAsync();
 
+        if(productPhotosForDeleting is null)
+        {
+            loggerManager.LogError($"[{nameof(DeleteProductPhotoAsync)}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
+            throw new ProductIdNotFoundException(productId); ;
+        }
+
+        try
+        {
+            foreach(var photo in productPhotosForDeleting)
+            {
+                 repositoryManager.ProductPhotoRepository.DeleteProductPhoto(photo);
+            }
+
+            await repositoryManager.SaveAsync();
+            loggerManager.LogInfo($"Successfully delete photos of product with ID {productId}");
+        }
+        catch (Exception ex)
+        {
+            loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
+            throw new DeleteProductPhotosException(productId);
+        }
+    }
 }

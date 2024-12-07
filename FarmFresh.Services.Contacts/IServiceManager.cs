@@ -9,4 +9,6 @@ public interface IServiceManager
     ICategoryService CategoryService { get; }
 
     IProductService ProductService { get; }
+
+    IProductPhotoService ProductPhotoService { get; }
 }

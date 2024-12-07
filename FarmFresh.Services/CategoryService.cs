@@ -76,17 +76,12 @@ internal sealed class CategoryService : ICategoryService
         }
     }
 
-    public async Task<IEnumerable<AllCategoriesDTO>> GetAllCategoriesAsync(bool trackChanges)
-    {
-        var categories = _repositoryManager
-                         .CategoryRepository
-                         .GetAllCategories(trackChanges);
-
-        return await categories
-          .Select(category => new AllCategoriesDTO(category.Id, category.Name, category.Products.Count()))
-          .ToListAsync();
-    }
-
+    public async Task<IEnumerable<AllCategoriesDTO>> GetAllCategoriesAsync(bool trackChanges) =>
+        await
+        _repositoryManager
+        .CategoryRepository
+        .GetAllCategoriesAsync(trackChanges);
+        
     public async Task<CategoryUpdateForm> GetCategoryForUpdate(Guid categoryId, bool trackChanges)
     {
         var currentCategory = await _repositoryManager

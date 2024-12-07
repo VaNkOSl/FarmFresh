@@ -1,0 +1,58 @@
+﻿@model ProductPreDeleteDto;
+
+<h2 class="text-center mb-4">Product For Deleting</h2>
+<div class="container">
+    <div class="p-4 shadow rounded bg-light">
+        <div class="row">
+            <div class="col-md-6 text-center mb-4">
+                <label class="form-label font-weight-bold">Photo</label>
+                <div class="border rounded p-3">
+                    <img class="img-fluid rounded"
+                         src="@Model.PhotoString"
+                         alt="Product Image"
+                         style="max-width: 100%; height: auto;" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label font-weight-bold">Product Name</label>
+                    <input asp-for="Name"
+                           class="form-control"
+                           disabled />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Price" class="form-label font-weight-bold">Price</label>
+                    <input asp-for="Price"
+                           class="form-control"
+                           disabled />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Origin" class="form-label font-weight-bold">Origin</label>
+                    <input asp-for="Origin"
+                           class="form-control"
+                           disabled />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CategoryName" class="form-label font-weight-bold">Category</label>
+                    <input asp-for="CategoryName"
+                           class="form-control"
+                           disabled />
+                </div>
+
+                <div class="form-group text-center">
+                    <form id="deleteForm" class="d-inline">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="button" class="btn btn-danger mb-3 w-100 d-flex align-items-center"
+                                onclick="deleteProduct()">
+                            <i class="fas fa-trash-alt me-2"></i> Delete Product!
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js//product/deleteProduct.js"></script>

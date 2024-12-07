@@ -48,7 +48,40 @@ public class ProductController : BaseController
 
         return View(model);
     }
-    
+
+    [HttpGet("delete/{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var model = await _serviceManager.ProductService.GetProductForDeletingAsync(id, trackChanges: false);
+        return View(model);
+    }
+
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> Delete([FromBody] ProductPreDeleteDto model)
+    {
+        await _serviceManager.ProductService.DeleteProductAsync(model.Id, trackChanges: true);
+        return Ok();
+    }
+
+    [HttpGet("edit/{id}")]
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        return View(await 
+            _serviceManager
+            .ProductService
+            .GetProductForUpdateAsync(id, trackChanges: false));
+    }
+
+    [HttpPut("edit/{productId}")]
+    public async Task<IActionResult> Edit(Guid productId, UpdateProductDto model)
+    {
+        if(ModelState.IsValid)
+        {
+            await _serviceManager.ProductService.UpdateProductAsync(model, productId, trackChanges: true);
+        }
+        return Ok(new { success = true });
+    }
+
     private async Task LoadModelDataAsync(CreateProductDto model)
     {
         var categories = await _serviceManager

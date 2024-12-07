@@ -1,4 +1,6 @@
-﻿namespace FarmFresh.Data.Models.Repositories;
+﻿using System.Linq.Expressions;
+
+namespace FarmFresh.Data.Models.Repositories;
 
 public interface IProductPhotoRepository
 {
@@ -7,4 +9,6 @@ public interface IProductPhotoRepository
     void DeleteProductPhoto(ProductPhoto productPhoto);
 
     void UpdateProductPhoto(ProductPhoto productPhoto);
+
+    IQueryable<ProductPhoto> FindProductPhotoByConditionAsync(Expression<Func<ProductPhoto, bool>> condition, bool trackChanges);
 }
