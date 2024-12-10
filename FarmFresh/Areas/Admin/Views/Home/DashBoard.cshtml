@@ -17,9 +17,9 @@
                     <i class="fas fa-list"></i> All
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Product" asp-action="All">All Products</a></li>
+                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Product" asp-action="AllProduct">All Products</a></li>
                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="All">All Categories</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Farmer" asp-action="All">All Farmers</a></li>
+                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Farmer" asp-action="All">All Farmers</a></li>
                 </ul>
             </div>
             <a asp-area="" asp-controller="Product" asp-action="Add" class="btn btn-success btn-lg mx-2"><i class="fas fa-plus"></i> Add Product</a>

@@ -5,6 +5,7 @@ using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Helpers;
+using FarmFresh.ViewModels.Admin;
 using FarmFresh.ViewModels.Categories;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
@@ -191,5 +192,4 @@ internal sealed class ProductService : IProductService
             .Include(ph => ph.ProductPhotos)
             .Include(c => c.Category)
             .FirstOrDefaultAsync();
-
 }

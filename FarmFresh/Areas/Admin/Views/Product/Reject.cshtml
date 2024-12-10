@@ -1,0 +1,115 @@
+﻿@model AdminRejectViewModel
+
+@{
+    ViewData["Title"] = "Reject Product";
+}
+
+<div class="container">
+    <h1>@Model.Name</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Product Details</h3>
+            <dl class="row">
+
+                <dt class="col-sm-4">Description:</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
+
+                <dt class="col-sm-4">Price:</dt>
+                <dd class="col-sm-8">@Model.Price.ToString("C")</dd>
+
+                <dt class="col-sm-4">Stock Quantity:</dt>
+                <dd class="col-sm-8">@Model.StockQuantity</dd>
+
+                <dt class="col-sm-4">Origin:</dt>
+                <dd class="col-sm-8">@Model.Origin</dd>
+
+                <dt class="col-sm-4">Suitable Season:</dt>
+                <dd class="col-sm-8">@Model.SuitableSeason</dd>
+
+                <dt class="col-sm-4">Harvest Date:</dt>
+                <dd class="col-sm-8">@Model.HarvestDate.ToShortDateString()</dd>
+
+                <dt class="col-sm-4">Expiration Date:</dt>
+                <dd class="col-sm-8">@Model.ExpirationDate.ToShortDateString()</dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Farmer Details</h3>
+            <dl class="row">
+                <dt class="col-sm-4">Farmer Name:</dt>
+                <dd class="col-sm-8">@Model.FarmerName</dd>
+
+                <dt class="col-sm-4">Phone Number:</dt>
+                <dd class="col-sm-8">@Model.FarmerPhoneNumber</dd>
+
+                <dt class="col-sm-4">Farmer Email:</dt>
+                <dd class="col-sm-8">@Model.FarmerEmail</dd>
+
+                <dt class="col-sm-4">Farmer Photo:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.FarmerPhoto != null && Model.FarmerPhoto.Length > 0)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.FarmerPhoto)" alt="Farmer Photo" style="max-width: 150px; max-height: 150px;" />
+                    }
+                    else
+                    {
+                        <span>No Photo Available</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div>
+        <h3>Product Photos</h3>
+        <div class="row">
+            @foreach (var photo in Model.Photos)
+            {
+                <div class="col-md-3">
+                    <img src="@photo.FilePath" class="product-photo" alt="Product Photo" />
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h3>Email Information</h3>
+        <form method="post" action="@Url.Action("RejectProduct", "Product")">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="Name" value="@Model.Name" />
+
+            <div class="form-group">
+                <label for="emailSubject">Email Subject</label>
+                <input type="text" class="form-control" id="emailSubject" name="EmailSubject" value="@Model.EmailSubject" />
+            </div>
+
+            <div class="form-group">
+                <label for="emailFrom">Email From</label>
+                <input type="text" class="form-control" id="emailFrom" name="EmailFrom" readonly="readonly" value="@Model.EmailFrom" />
+            </div>
+
+            <div class="form-group">
+                <label for="emailTo">Email To</label>
+                <input type="email" class="form-control" id="emailTo" name="EmailTo" value="@Model.EmailTo" />
+            </div>
+
+            <div class="form-group">
+                <label for="emailBody">Email Body</label>
+                <textarea class="form-control" id="emailBody" name="EmailBody" rows="4">@Model.EmailBody</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-danger">Reject Product</button>
+        </form>
+    </div>
+
+</div>
+
+<style>
+    .product-photo {
+        width: 100%;
+        max-width: 150px;
+        height: auto; 
+        object-fit: cover;
+    }
+</style>
