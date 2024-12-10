@@ -42,7 +42,10 @@ public static class WebApplicationBuilderExtensions
                 adminUser = new ApplicationUser
                 {
                     UserName = email,
-                    Email = email
+                    Email = email,
+                    FirstName = "Admin",
+                    LastName = "Admin",
+                    IsAdmin = true
                 };
 
                 await userManager.CreateAsync(adminUser, defaultPassword);

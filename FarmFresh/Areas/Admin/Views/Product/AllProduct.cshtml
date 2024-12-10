@@ -1,0 +1,91 @@
+﻿@model IEnumerable<AdminAllProductDto>
+
+@{
+    ViewBag.Title = "Products for Review!";
+}
+
+<h2 class="text-center">@ViewBag.Title</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <p>No unapproved products available.</p>
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var product in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="row g-0">
+                            <div class="col-md-6">
+                                <div class="p-3">
+                                    <div class="mt-2">
+                                        @if (product.Photos != null && product.Photos.Any())
+                                        {
+                                            <div class="photo-gallery">
+                                                @foreach (var photo in product.Photos)
+                                                {
+                                                    <img src="@photo.FilePath" class="product-photo" alt="Product Photo" />
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <img src="no_photo.jpg" class="card-img-top" alt="Default Product Photo" style="max-height: 200px; object-fit: cover;" />
+                                        } 
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card-body">
+                                    <h5 class="card-title"><strong>Name:</strong> @product.Name</h5>
+                                    <p class="card-text"><strong>Description:</strong> @product.Description</p>
+                                    <p class="card-text"><strong>Price:</strong> $@product.Price</p>
+                                    <p class="card-text"><strong>Stock:</strong> @product.StockQuantity</p>
+                                    <p class="card-text"><strong>Origin:</strong> @product.Origin</p>
+                                    <p class="card-text"><strong>Season:</strong> @product.SuitableSeason</p>
+                                    <p class="card-text"><strong>Expiration:</strong> @product.ExpirationDate</p>
+                                    <p class="card-text"><strong>Harvest:</strong> @product.HarvestDate</p>
+                                    <p class="card-text"><strong>Category:</strong> @product.CategoryName</p>
+                                    <p class="card-text"><strong>Farmer Contact:</strong> @product.FarmerPhoneNumber</p>
+                                    <img src="data:image/jpeg;base64,@product.PhotoString"
+                                         class="img-fluid rounded-start"
+                                         alt="Farmer Photo"
+                                         style="max-height: 200px; object-fit: cover; width: 100%;" />
+                                    <a asp-area="Admin" asp-controller="Product" asp-action="Reject" asp-route-id="@product.Id" class="btn btn-danger">Reject</a>
+
+                                    <form asp-area="Admin" asp-controller="Product" asp-action="Approve" asp-route-id="@product.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<style>
+    .photo-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .product-photo {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+</style>
