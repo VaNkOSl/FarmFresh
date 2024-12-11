@@ -68,7 +68,7 @@ public class ProductMappingProfile : Profile
             })
             : new List<ProductPhotosDto>()));
 
-        CreateMap<Product, AdminRejectViewModel>()
+        CreateMap<Product, AdminRejectProductViewModel>()
             .ForMember(dest => dest.FarmerName, opt =>
             opt.MapFrom(src => src.Farmer.User.FirstName + " " + src.Farmer.User.LastName))
             .ForMember(dest => dest.FarmerEmail, opt =>

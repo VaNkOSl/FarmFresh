@@ -1,0 +1,64 @@
+﻿@model AdminRejectFarmerDto
+
+@{
+    ViewData["Title"] = "Reject Farmer.";
+}
+
+<div class="container">
+    <h1 class="text-center">@Model.FarmerFullName</h1>
+    <partial name="_Photo" model="@Model.PhotoString" />
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Farmer details!</h3>
+            <d1 class="row">
+
+                <dt class="col-sm-4">Description:</dt>
+                <dd class="col-sm-8">@Model.FarmDescription</dd>
+
+                <dt class="col-sw-4">Location:</dt>
+                <dd class="col-sw-8">@Model.Location</dd>
+
+                <dt class="col-sw-4">Phone Number:</dt>
+                <dd class="col-sw-8">@Model.PhoneNumber</dd>
+
+                <dt class="col-sw-4">Egn:</dt>
+                <dd class="col-sw-8">@Model.Egn</dd>
+
+                <dt class="col-sw-4">Email:</dt>
+                <dd class="col-sw-8">@Model.FarmerEmail</dd>
+
+                <dt class="col-sw-4">Birth Day:</dt>
+                <dd class="col-sw-8">@Model.DateOfBirth.ToString("dd/MM/yyyy")</dd>
+            </d1>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h3>Email Information</h3>
+        <form method="post" action="@Url.Action("RejectFarmer", "Farmer")">
+            <input type="hidden" name="Id" value="@Model.Id"/>
+
+            <div class="form-group">
+                <label for="emailSubject">Email Subject</label>
+                <input type="text" class="form-control" id="emailSubject" name="EmailSubject" value="@Model.EmailSubject" />
+            </div>
+
+            <div class="form-group">
+                <label for="emailfrom">Email From</label>
+                <input type="text" class="form-control" id="emailfrom" name="EmailFrom" readonly="readonly" value="@Model.EmailFrom" />
+            </div>
+
+            <div class="form-group">
+                <label for="emailTo">Email To</label>
+                <input type="email" class="form-control" id="emailTo" name="EmailTo" value="@Model.EmailTo" />
+            </div>
+
+            <div class="form-group">
+                <label for="emailBody">Email Body</label>
+                <textarea class="form-control" id="emailBody" name="EmailBody" rows="4">@Model.EmailBody</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-danger">Reject Farmer!</button>
+        </form>
+    </div>
+</div>

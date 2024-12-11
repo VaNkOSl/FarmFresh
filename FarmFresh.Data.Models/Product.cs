@@ -41,7 +41,7 @@ public class Product : Entity_1<Guid>
     [Required]
     public Seasons SuitableSeason {  get; set; }
 
-    public ProductStatus ProductStatus { get; set; }
+    public Status ProductStatus { get; set; }
 
     [Required]
     public DateTime HarvestDate { get; set; }

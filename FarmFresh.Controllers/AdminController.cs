@@ -20,7 +20,7 @@ public class AdminController : Controller
     public async Task<IActionResult> PendingFarmers()
     {
         var farmers = await _context.Farmers
-                                    .Where(f => !f.IsApproved)
+                                    //.Where(f => !f.IsApproved)
                                     .ToListAsync();
         return View(farmers);
     }
@@ -35,7 +35,7 @@ public class AdminController : Controller
             return RedirectToAction(nameof(PendingFarmers));
         }
 
-        farmer.IsApproved = true;
+       // farmer.IsApproved = true;
         _context.Farmers.Update(farmer);
         await _context.SaveChangesAsync();
 
@@ -70,7 +70,7 @@ public class AdminController : Controller
     public IActionResult AddProduct()
     {
         ViewBag.Categories = _context.Categories.ToList();
-        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+      //  ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
         return View();
     }
     [HttpPost]
@@ -87,7 +87,7 @@ public class AdminController : Controller
             return RedirectToAction(nameof(ManageProducts));
         }
         ViewBag.Categories = _context.Categories.ToList();
-        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+      //  ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
         TempData["Error"] = "Failed to add product. Please check the form.";
         return View(product);
     }
@@ -101,7 +101,7 @@ public class AdminController : Controller
             return RedirectToAction(nameof(ManageProducts));
         }
         ViewBag.Categories = _context.Categories.ToList();
-        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+      //  ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
         return View(product);
     }
 
@@ -117,7 +117,7 @@ public class AdminController : Controller
             return RedirectToAction(nameof(ManageProducts));
         }
         ViewBag.Categories = _context.Categories.ToList();
-        ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
+      //  ViewBag.Farmers = _context.Farmers.Where(f => f.IsApproved).ToList();
         TempData["Error"] = "Failed to update product. Please check the form.";
         return View(product);
     }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models;
+using FarmFresh.ViewModels.Admin;
 using FarmFresh.ViewModels.Farmer;
 
 namespace FarmFresh.Mapper;
@@ -11,7 +12,7 @@ public class FarmerMappingProfile : Profile
     {
         CreateMap<FarmerForCreationDto, Farmer>()
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
-            .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => true))
+            .ForMember(dest => dest.FarmerStatus, opt => opt.MapFrom(src => 0))
             .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.PhotoFile != null ? ConvertToByteArray(src.PhotoFile) : new byte[0]))
             .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.BirthDate));
 
@@ -31,7 +32,8 @@ public class FarmerMappingProfile : Profile
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src =>
                 src.PhoneNumber != null ? src.PhoneNumber : "No Phone Number"))
             .ForMember(dest => dest.PhotoString, opt => opt.MapFrom(src =>
-                src.Photo != null ? Convert.ToBase64String(src.Photo) : string.Empty));
+                src.Photo != null ? Convert.ToBase64String(src.Photo) : string.Empty))
+            .ForMember(dest => dest.ProductCount, opt => opt.MapFrom(src => src.OwnedProducts.Count));
 
         CreateMap<Farmer, FarmerProfileViewModel>()
                 .ForCtorParam("FullName", opt => opt.MapFrom(src =>
@@ -48,6 +50,30 @@ public class FarmerMappingProfile : Profile
           .ForMember(dest => dest.Farmers, opt => opt.MapFrom(src => src.farmers))
           .ForMember(dest => dest.MetaData, opt => opt.MapFrom(src => src.metaData))
           .ForMember(dest => dest.SearchTerm, opt => opt.MapFrom(src => src.searchTerm));
+
+        CreateMap<Farmer, AdminAllFarmersDto>()
+             .ForMember(dest => dest.FarmerFullName, opt => opt.MapFrom(src =>
+                 src.User != null ? src.User.FirstName + " " + src.User.LastName : "No Name"))
+             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src =>
+                 src.PhoneNumber != null ? src.PhoneNumber : "No Phone Number"))
+             .ForMember(dest => dest.PhotoString, opt => opt.MapFrom(src =>
+                 src.Photo != null ? Convert.ToBase64String(src.Photo) : string.Empty));
+
+        CreateMap<Farmer, AdminRejectFarmerDto>()
+             .ForMember(dest => dest.FarmerFullName, opt => opt.MapFrom(src =>
+                 src.User != null ? src.User.FirstName + " " + src.User.LastName : "No Name"))
+             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src =>
+                 src.PhoneNumber != null ? src.PhoneNumber : "No Phone Number"))
+             .ForMember(dest => dest.PhotoString, opt => opt.MapFrom(src =>
+                 src.Photo != null ? Convert.ToBase64String(src.Photo) : string.Empty))
+             .ForMember(dest => dest.EmailFrom, opt => opt.MapFrom(src => "contactfarmfresh2024@abv.bg"))
+             .ForMember(dest => dest.EmailTo, opt => opt.MapFrom(src => src.User.Email))
+             .ForMember(dest => dest.FarmerEmail, opt => opt.MapFrom(src => src.User.Email));
+
+        CreateMap<(IEnumerable<AdminAllFarmersDto> farmers, MetaData metaData, string searchTerm), AdminFarmerListViewModel>()
+              .ForMember(dest => dest.Farmers, opt => opt.MapFrom(src => src.farmers))
+              .ForMember(dest => dest.MetaData, opt => opt.MapFrom(src => src.metaData))
+              .ForMember(dest => dest.SearchTerm, opt => opt.MapFrom(src => src.searchTerm));
     }
 
     private byte[] ConvertToByteArray(IFormFile file)

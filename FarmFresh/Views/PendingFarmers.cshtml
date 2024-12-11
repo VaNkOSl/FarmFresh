@@ -53,14 +53,14 @@
                 <td>@farmer.Egn</td>
                 <td>@farmer.DateOfBirth.ToShortDateString()</td>
                 <td>
-                    @if (farmer.IsApproved)
+                   @*  @if (farmer.IsApproved)
                     {
                         <span class="text-success">Approved</span>
                     }
                     else
                     {
                         <span class="text-warning">Pending</span>
-                    }
+                    } *@
                 </td>
                 <td>
                     <form asp-action="ApproveFarmer" asp-route-id="@farmer.Id" method="post" style="display:inline;">

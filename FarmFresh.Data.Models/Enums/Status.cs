@@ -1,6 +1,6 @@
 ﻿namespace FarmFresh.Data.Models.Enums;
 
-public enum ProductStatus
+public enum Status
 {
     PendingApproval = 0,   
     Approved = 1,          
