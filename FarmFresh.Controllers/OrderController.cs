@@ -25,12 +25,10 @@ namespace FarmFresh.Controllers
     [Authorize]
     public class OrderController : Controller
     {
-        private readonly FarmFreshDbContext _context;
         private readonly IOrderService _orderService;
 
-        public OrderController(FarmFreshDbContext context, IOrderService orderService)
+        public OrderController(IOrderService orderService)
         {
-            _context = context;
             _orderService = orderService;
         }
         public async Task<IActionResult> Index()
