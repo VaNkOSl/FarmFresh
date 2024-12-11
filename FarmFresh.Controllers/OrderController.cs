@@ -108,6 +108,7 @@ namespace FarmFresh.Controllers
             try
             {
                 order.OrderStatus = OrderStatus.Cart;
+                order.CreateOrderdDate= DateTime.Now;
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
@@ -159,7 +160,8 @@ namespace FarmFresh.Controllers
             {
                 return NotFound();
             }
-            order.OrderStatus = OrderStatus.Completed;
+            _context.Orders
+                .Where(o=> o.Id == order.Id).FirstOrDefault().OrderStatus=OrderStatus.Completed;
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Home");
         }
