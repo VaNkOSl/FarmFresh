@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FarmFresh.Data;
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Enums;
+using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Order;
 using FarmFresh.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +25,12 @@ namespace FarmFresh.Controllers
     public class OrderController : Controller
     {
         private readonly FarmFreshDbContext _context;
+        private readonly IOrderService _orderService;
 
-        public OrderController(FarmFreshDbContext context)
+        public OrderController(FarmFreshDbContext context, IOrderService orderService)
         {
             _context = context;
+            _orderService = orderService;
         }
         public IActionResult Index()
         {
@@ -104,15 +107,11 @@ namespace FarmFresh.Controllers
         {
 
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            order.UserId = userId;
+
             try
             {
-                order.OrderStatus = OrderStatus.Cart;
-                order.CreateOrderdDate= DateTime.Now;
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("OrderConfirmation", new { id = order.Id });
+                var orderId = await _orderService.CheckoutAsync(order, OrderProductId, userId);
+                return RedirectToAction("OrderConfirmation", new { id = orderId });
             }
             catch (Exception ex)
             {

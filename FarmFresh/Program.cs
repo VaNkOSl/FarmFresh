@@ -1,4 +1,8 @@
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Extensions;
+using FarmFresh.Repositories;
+using FarmFresh.Services;
+using FarmFresh.Services.Contacts;
 using LoggerService.Contacts;
 using NLog;
 
@@ -15,6 +19,8 @@ builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20);
