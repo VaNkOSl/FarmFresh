@@ -15,8 +15,8 @@ public class ProductController : AdminBaseController
 
     }
 
-    [HttpGet("allproduct")]
-    public async Task<IActionResult> AllProduct() => 
+    [HttpGet("forreview")]
+    public async Task<IActionResult> ForReview() => 
         View(await 
             _serviceManager
             .AdminService
@@ -28,7 +28,7 @@ public class ProductController : AdminBaseController
         await _serviceManager
             .AdminService.ApproveProductAsync(id, trackChanges: true);
 
-        return RedirectToAction("AllProduct", "Product");
+        return RedirectToAction("ForReview", "Product");
     }
 
     [HttpGet("reject/{id}")]
@@ -41,10 +41,9 @@ public class ProductController : AdminBaseController
     }
 
     [HttpPost("rejectproduct")]
-    public async Task<IActionResult> RejectProduct(AdminRejectViewModel model)
+    public async Task<IActionResult> RejectProduct(AdminRejectProductViewModel model)
     {
         await _serviceManager.AdminService.RejectProductAsync(model, trackChanges: true);
-        return RedirectToAction("AllProduct", "Product");
+        return RedirectToAction("ForReview", "Product");
     }
-
 }

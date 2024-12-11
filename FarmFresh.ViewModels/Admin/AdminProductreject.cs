@@ -3,9 +3,9 @@ using FarmFresh.ViewModels.Product;
 
 namespace FarmFresh.ViewModels.Admin;
 
-public record AdminRejectViewModel
+public abstract record AdminProductreject
 {
-    public AdminRejectViewModel()
+    public AdminProductreject()
     {
         Photos = new HashSet<ProductPhotosDto>();
     }
@@ -37,14 +37,6 @@ public record AdminRejectViewModel
     public string PhotoString { get; set; }
 
     public IEnumerable<ProductPhotosDto> Photos { get; set; }
-
-    public string EmailFrom { get; set; }
-
-    public string EmailTo { get; set; }
-
-    public string EmailSubject { get; set; }
-
-    public string EmailBody { get; set; }
 
     public string FarmerName { get; set; }
 

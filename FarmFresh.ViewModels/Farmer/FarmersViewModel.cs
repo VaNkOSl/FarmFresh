@@ -11,4 +11,6 @@ public class FarmersViewModel
     public string PhotoString { get; set; } = string.Empty;
 
     public byte[] Photo {  get; set; } = new byte[0];
+
+    public int ProductCount {  get; set; }
 }

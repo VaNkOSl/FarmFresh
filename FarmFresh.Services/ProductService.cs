@@ -39,6 +39,8 @@ internal sealed class ProductService : IProductService
         {
             var product = _mapper.Map<Product>(model);
             product.FarmerId = farmer.Id;
+            product.Farmer = farmer;
+            product.Farmer.OwnedProducts.Add(product);
 
             await _repositoryManager.ProductRepository.CreateProductAsync(product);
             await _repositoryManager.SaveAsync(product);

@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
+using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Admin;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SendGrid;
-using SendGrid.Helpers.Mail;
-using static FarmFresh.Commons.GeneralApplicationConstants;
-using static FarmFresh.Commons.MessagesConstants;
 
 namespace FarmFresh.Services;
 
@@ -42,13 +40,13 @@ internal sealed class AdminService : IAdminService
 
         CheckProductNotFound(productForApproving, productId, nameof(ApproveProductAsync));
 
-        productForApproving.ProductStatus = ProductStatus.Approved;
+        productForApproving.ProductStatus = Status.Approved;
         _repositoryManager.ProductRepository.UpdateProduct(productForApproving);
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{nameof(ApproveProductAsync)}] Successfully approved produc with Id {productId}");
     }
 
-    public async Task<AdminRejectViewModel> GetProductForRejecAsync(Guid productId,bool trackChanges)
+    public async Task<AdminRejectProductViewModel> GetProductForRejecAsync(Guid productId,bool trackChanges)
     {
         var productForReject = await
             _repositoryManager
@@ -62,7 +60,7 @@ internal sealed class AdminService : IAdminService
 
         CheckProductNotFound(productForReject, productId, nameof(ApproveProductAsync));
 
-        return _mapper.Map<AdminRejectViewModel>(productForReject);
+        return _mapper.Map<AdminRejectProductViewModel>(productForReject);
     }
 
     public async Task<IEnumerable<AdminAllProductDto>> GetUnapprovedProductsAsync(bool trackChanges)
@@ -71,7 +69,7 @@ internal sealed class AdminService : IAdminService
             _repositoryManager
             .ProductRepository
             .FindAllProducts(trackChanges)
-            .Where(p => p.ProductStatus == ProductStatus.PendingApproval)
+            .Where(p => p.ProductStatus == Status.PendingApproval)
             .Include(f => f.Farmer)
             .Include(c => c.Category)
             .Include(ph => ph.ProductPhotos)
@@ -80,7 +78,7 @@ internal sealed class AdminService : IAdminService
         return _mapper.Map<List<AdminAllProductDto>>(products);
     }
 
-    public async Task RejectProductAsync(AdminRejectViewModel model, bool trackChanges)
+    public async Task RejectProductAsync(AdminRejectProductViewModel model, bool trackChanges)
     {
         var product = await
             _repositoryManager
@@ -89,47 +87,14 @@ internal sealed class AdminService : IAdminService
             .FirstOrDefaultAsync();
 
 
-        if (product != null && product.ProductStatus != ProductStatus.Approved)
+        if (product != null && product.ProductStatus != Status.Approved)
         {
-            product.ProductStatus = ProductStatus.Rejected;
+            product.ProductStatus = Status.Rejected;
             _repositoryManager.ProductRepository.UpdateProduct(product);
             await _repositoryManager.SaveAsync();
         }
 
-        await SendRejectProductEmailAsync(model);
-    }
-
-    private async Task SendRejectProductEmailAsync(AdminRejectViewModel model)
-    {
-        var clien = new SendGridClient(_sendGridApiKey);
-
-        var from = new EmailAddress(model.EmailFrom, AdminRoleName);
-        var to = new EmailAddress(model.EmailTo);
-
-
-        var subject = model.EmailSubject ?? ProductRejectNotification;
-        var body = model.EmailBody ?? string.Format(RejectProductEmailBody, model.Name);
-
-        var msg = MailHelper.CreateSingleEmail(from,to,subject, body, body);
-
-        try
-        {
-            var response = await clien.SendEmailAsync(msg);
-
-            if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
-            {
-                var responseBody = await response.Body.ReadAsStringAsync();
-                _loggerManager.LogError($"Failed to send rejection email to {model.EmailTo}. Response code: {response.StatusCode}");
-                _loggerManager.LogError($"Error details: {responseBody}");
-            }
-
-            _loggerManager.LogInfo($"[{nameof(SendRejectProductEmailAsync)}] Successfully send email to farmer with email {model.EmailTo}");
-        }
-        catch (Exception ex)
-        {
-            _loggerManager.LogError($"Error while sending rejection email: {ex.Message}");
-            throw;
-        }
+        await AdminHelper.SendRejectEmailAsync(model, _sendGridApiKey, _loggerManager);
     }
 
     private void CheckProductNotFound(object product, Guid productId, string methodName)
@@ -139,5 +104,81 @@ internal sealed class AdminService : IAdminService
             _loggerManager.LogError($"[{methodName}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
             throw new ProductIdNotFoundException(productId);
         }
+    }  
+
+    private void CheckFarmerNotFound(object farmer, Guid farmerId, string  methodName)
+    {
+        if (farmer is null)
+        {
+            _loggerManager.LogError($"[{nameof(methodName)}] farmerId with Id {farmerId} was not found!");
+            throw new FarmerIdNotFoundException(farmerId);
+        }
+    }
+
+    public async Task<(IEnumerable<AdminAllFarmersDto> farmers, MetaData metaData)> GetUnapprovedFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
+    {
+        var farmerWithMetaData = await
+            _repositoryManager
+            .FarmerRepository
+            .GetUnapprovedFarmersAsync(farmerParameters, trackChanges);
+
+        var farmerDto = _mapper.Map<IEnumerable<AdminAllFarmersDto>>(farmerWithMetaData);
+
+        _loggerManager.LogInfo("Successfully retrieved and mapped farmers. Returning data.");
+        return (farmers: farmerDto, metaData: farmerWithMetaData.MetaData);
+    }
+
+    public async Task<AdminFarmerListViewModel> CreateAdminFarmersListViewModelAsync(IEnumerable<AdminAllFarmersDto> farmers, MetaData metaData, string? searchTerm) =>
+         _mapper.Map<AdminFarmerListViewModel>((farmers, metaData, searchTerm));
+
+    public async Task ApproveFarmerAsync(Guid farmerId, bool trackChanges)
+    {
+        var farmer = await
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        CheckFarmerNotFound(farmer, farmerId, nameof(ApproveFarmerAsync));
+
+        farmer.FarmerStatus = Status.Approved;
+        _repositoryManager.FarmerRepository.UpdateFarmer(farmer);
+        await _repositoryManager.SaveAsync();
+        _loggerManager.LogInfo($"[{nameof(ApproveFarmerAsync)}] Successfully approved farmer with Id: {farmerId}.");
+    }
+
+    public async Task<AdminRejectFarmerDto> GetFarmerForRejectingAsync(Guid farmerId, bool trackChanges)
+    {
+        var farmer = await
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
+            .Include(u => u.User)
+            .FirstOrDefaultAsync();
+
+        CheckFarmerNotFound(farmer, farmerId, nameof(ApproveFarmerAsync));
+
+        return _mapper.Map<AdminRejectFarmerDto>(farmer);
+    }
+
+    public async Task RejectFarmerAsync(AdminRejectFarmerDto model, bool trackChanges)
+    {
+        var farmer = await
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.Id == model.Id, trackChanges)
+            .Include(u => u.User)
+            .FirstOrDefaultAsync();
+
+        CheckFarmerNotFound(farmer, model.Id, nameof(ApproveFarmerAsync));
+
+        if (farmer != null && farmer.FarmerStatus != Status.Approved)
+        {
+            farmer.FarmerStatus = Status.Rejected;
+            _repositoryManager.FarmerRepository.UpdateFarmer(farmer);
+            await _repositoryManager.SaveAsync();
+        }
+
+        await AdminHelper.SendRejectEmailAsync(model, _sendGridApiKey, _loggerManager);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FarmFresh.Data.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using static FarmFresh.Commons.EntityValidationConstants.Farmers;
 
 namespace FarmFresh.Data.Models;
@@ -32,7 +33,7 @@ public class Farmer : Entity_1<Guid>
     [Required]
     public DateTime DateOfBirth { get; set; }
     
-    public bool IsApproved { get; set; }
+    public Status FarmerStatus { get; set; }
 
     public Guid UserId { get; set; }
 
