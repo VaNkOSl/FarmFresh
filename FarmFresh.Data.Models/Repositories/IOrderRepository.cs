@@ -10,6 +10,10 @@ namespace FarmFresh.Data.Models.Repositories
     {
         Task AddOrderAsync(Order order);
 
-
+        Task UpdateOrderAsync(Order order);
+        Task<Order> GetOrderByIdAsync(Guid orderId);
+        Task<Order> GetOrderWithDetailsAsync(Guid orderId);
+        Task<List<OrderProduct>> GetOrderProductsByUserIdAsync(Guid userId);
+        Task<OrderProduct> GetOrderProductDetailsByIdAsync(Guid id);
     }
 }

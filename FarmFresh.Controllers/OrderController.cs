@@ -11,6 +11,7 @@ using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Order;
 using FarmFresh.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -32,59 +33,22 @@ namespace FarmFresh.Controllers
             _context = context;
             _orderService = orderService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var orders = _context.OrderProducts
-                .Include(o => o.Product)
-                .Include(o => o.Order)
-                .ThenInclude(o => o.User)
-                .Where(o => o.Order.UserId.ToString() == userId)
-                .Select(o => new OrderListViewModel
-                {
-                    Id = o.Id,
-                    OrderId = o.OrderId,
-                    ProductName = o.Product.Name,
-                    OrderStatus = o.Order.OrderStatus.ToString(),
-                    Price=o.Price,
-                    Quantity = o.Quantity,
-                    Picture=o.Product.Photo,
-                }).ToList();
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var orders = await _orderService.GetOrdersForUserAsync(userId);
             return View(orders);
         }
-        public IActionResult Details(Guid Id)
+        public async Task<IActionResult> Details(Guid Id)
         {
-            var OrderDetails=_context.OrderProducts
-                .Where(o => o.Id == Id)
-                .Include(o => o.Product)
-                .ThenInclude(o => o.Farmer)
-                .ThenInclude(o => o.User)
-                .Include(o => o.Order)
-                .Select(o => new OrderDetailsViewModel
-                {
-                    Id = o.OrderId,
-                    CreatedDate = o.Order.CreateOrderdDate,
-                    OrderId = o.OrderId,
-                    Quantity = o.Quantity,
-                    Price = o.Price,
-                    FirstName = o.Order.FirstName,
-                    LastName = o.Order.LastName,
-                    Adress = o.Order.Adress,
-                    PhoneNumber = o.Order.PhoneNumber,
-                    Email = o.Order.Email,
-                    ProductName = o.Product.Name,
-                    DeliveryOption = o.Order.DeliveryOption,
-                    OrderStatus = o.Order.OrderStatus.ToString(),
-                    ProductDescription = o.Product.Description,
-                    FarmerName = o.Product.Farmer.User.FirstName + " " + o.Product.Farmer.User.LastName,
-                    Origin = o.Product.Origin,
-                    ProductPrice = o.Product.Price,
-                    Seasons = o.Product.SuitableSeason,
-                    HarvestDate = o.Product.HarvestDate,
-                    ExpirationDate = o.Product.ExpirationDate,
-                    Picture=o.Product.Photo
-                });
-            return View(OrderDetails);
+            var orderDetails = await _orderService.GetOrderDetailsAsync(Id);
+
+            if (orderDetails == null)
+            {
+                return NotFound();
+            }
+
+            return View(orderDetails);
         }
         public IActionResult Checkout()
         {
@@ -121,48 +85,35 @@ namespace FarmFresh.Controllers
 
             return View(order);
         }
-        public IActionResult OrderConfirmation(Guid id)
+        public async Task<IActionResult> OrderConfirmation(Guid id)
         {
+            var orderViewModel = await _orderService.GetOrderConfirmationViewModelAsync(id);
+
+            if (orderViewModel == null)
             {
-                var order = _context.Orders
-                    .Where(o => o.Id == id)
-                    .Select(o => new OrderConfirmationViewModel
-                    {
-                        Id = o.Id,
-                        OrderId = o.Id,
-                        Products = o.OrderProducts.ToList(),
-                        Price = o.OrderProducts.Sum(p => p.Price), 
-                        Quantity = o.OrderProducts.Sum(p => p.Quantity),
-                        TotalPrice = o.OrderProducts.Sum(p => p.Price * p.Quantity),
-                        Picture = o.OrderProducts.FirstOrDefault().Product.Photo,   
-                        FirstName = o.FirstName, 
-                        LastName = o.LastName,
-                        Adress = o.Adress,
-                        PhoneNumber = o.PhoneNumber,
-                        Email = o.Email,
-                        CartItems= HttpContext.Session.Get<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>()
-                    }).FirstOrDefault();
-
-                if (order == null)
-                {
-                    return NotFound();
-                }
-
-                return View(order);
+                return NotFound();
             }
+
+            return View(orderViewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OrderConfirmation(Order order)
         {
-            if (order == null)
+            try
+            {
+                await _orderService.CompleteOrderAsync(order.Id);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-            _context.Orders
-                .Where(o=> o.Id == order.Id).FirstOrDefault().OrderStatus=OrderStatus.Completed;
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index", "Home");
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while completing your order. Please try again.");
+                return View("Error");
+            }
         }
     }
 }
