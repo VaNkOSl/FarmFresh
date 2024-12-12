@@ -27,31 +27,30 @@ public class ProductMappingProfile : Profile
           .ReverseMap();
 
         CreateMap<Product, AllProductsDto>()
-           .ForMember(dest => dest.Photos, opt =>
-               opt.MapFrom(src => src.ProductPhotos != null && src.ProductPhotos.Any()
-                   ? src.ProductPhotos.Select(photo => new ProductPhotosDto
-                   {
-                       Id = photo.Id,
-                       FilePath = "/uploads/" + Path.GetFileName(photo.FilePath),
-                       ProductId = photo.ProductId
-                   })
-                   : new List<ProductPhotosDto>()));
+        .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+        .ForCtorParam("Name", opt => opt.MapFrom(src => src.Name))
+        .ForCtorParam("Price", opt => opt.MapFrom(src => src.Price))
+        .ForCtorParam("StockQuantity", opt => opt.MapFrom(src => src.StockQuantity))
+        .ForCtorParam("Photos", opt => opt.MapFrom(src => src.ProductPhotos));
 
         CreateMap<(IEnumerable<AllProductsDto> products, MetaData metaData, string searchTerm), ProductsListViewModel>()
-            .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.products))
-            .ForMember(dest => dest.MetaData, opt => opt.MapFrom(src => src.metaData))
-            .ForMember(dest => dest.SearchTerm, opt => opt.MapFrom(src => src.searchTerm));
+                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.products))
+                .ForMember(dest => dest.MetaData, opt => opt.MapFrom(src => src.metaData))
+                .ForMember(dest => dest.SearchTerm, opt => opt.MapFrom(src => src.searchTerm));
 
         CreateMap<Product, ProductPreDeleteDto>()
             .ForMember(dest => dest.PhotoString, opt =>
              opt.MapFrom(src => src.ProductPhotos.FirstOrDefault() != null ?
              src.ProductPhotos.FirstOrDefault().FilePath : string.Empty))
-            .ForMember(dest => dest.Photos, opt =>
-             opt.MapFrom(src => src.ProductPhotos.Select(photo => new ProductPhotosDto
-             {
-                 FilePath = photo.FilePath,
-                 ProductId = photo.ProductId,
-             })));
+            .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
+              src.ProductPhotos != null && src.ProductPhotos.Any()
+                ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                    photo.Id,
+                    "/uploads/" + Path.GetFileName(photo.FilePath),
+                    photo.Photo,
+                    photo.ProductId
+                )).ToList()
+                : new List<ProductPhotosDto>()));
 
         CreateMap<Product, AdminAllProductDto>()
             .ForMember(dest => dest.FarmerPhoneNumber, opt => opt.MapFrom(src => src.Farmer.PhoneNumber))
@@ -59,15 +58,15 @@ public class ProductMappingProfile : Profile
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.PhotoString, opt => opt.MapFrom(src =>
                 src.Farmer.Photo != null ? Convert.ToBase64String(src.Farmer.Photo) : string.Empty))
-            .ForMember(dest => dest.Photos, opt =>
-            opt.MapFrom(src => src.ProductPhotos != null && src.ProductPhotos.Any()
-            ? src.ProductPhotos.Select(photo => new ProductPhotosDto
-            {
-                Id = photo.ProductId,
-                FilePath = "/uploads/" + Path.GetFileName(photo.FilePath),
-                ProductId = photo.ProductId
-            })
-            : new List<ProductPhotosDto>()));
+          .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
+              src.ProductPhotos != null && src.ProductPhotos.Any()
+                ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                    photo.Id,
+                    "/uploads/" + Path.GetFileName(photo.FilePath),
+                    photo.Photo,
+                    photo.ProductId
+                )).ToList()
+                : new List<ProductPhotosDto>()));
 
         CreateMap<Product, AdminRejectProductViewModel>()
             .ForMember(dest => dest.FarmerName, opt =>
@@ -80,15 +79,15 @@ public class ProductMappingProfile : Profile
             opt.MapFrom(src => src.Farmer.PhoneNumber))
             .ForMember(dest => dest.EmailFrom, opt => opt.MapFrom(src => "contactfarmfresh2024@abv.bg"))
             .ForMember(dest => dest.EmailTo, opt => opt.MapFrom(src => src.Farmer.User.Email))
-            .ForMember(dest => dest.Photos, opt =>
-            opt.MapFrom(src => src.ProductPhotos != null && src.ProductPhotos.Any()
-            ? src.ProductPhotos.Select(photo => new ProductPhotosDto
-            {
-                Id = photo.Id,
-                FilePath = "/uploads/" + Path.GetFileName(photo.FilePath),
-                ProductId = photo.ProductId
-            })
-            : new List<ProductPhotosDto>()));
+            .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
+              src.ProductPhotos != null && src.ProductPhotos.Any()
+                ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                    photo.Id,
+                    "/uploads/" + Path.GetFileName(photo.FilePath),
+                    photo.Photo,
+                    photo.ProductId
+                )).ToList()
+                : new List<ProductPhotosDto>()));
 
 
         CreateMap<Product, ProductDetailsDto>()
@@ -104,16 +103,14 @@ public class ProductMappingProfile : Profile
             src.Farmer.Photo != null ? Convert.ToBase64String(src.Farmer.Photo) : string.Empty,
             src.Farmer.Id)))
     .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
-        src.ProductPhotos != null && src.ProductPhotos.Any()
-            ? src.ProductPhotos.Select(photo => new ProductPhotosDto
-            {
-                Id = photo.Id,
-                FilePath = "/uploads/" + Path.GetFileName(photo.FilePath),
-                ProductId = photo.ProductId,
-                Photo = photo.Photo
-            })
-            : new List<ProductPhotosDto>()))
-
+            src.ProductPhotos != null && src.ProductPhotos.Any()
+                ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                    photo.Id,
+                    "/uploads/" + Path.GetFileName(photo.FilePath),
+                    photo.Photo,
+                    photo.ProductId
+                )).ToList()
+                : new List<ProductPhotosDto>()))
     .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src =>
         src.Reviews != null && src.Reviews.Any()
             ? src.Reviews.Select(review => new ViewModels.Review.ProductReviewDto
@@ -127,8 +124,6 @@ public class ProductMappingProfile : Profile
                     : "Anonymous"
             }).ToList()
             : new List<ViewModels.Review.ProductReviewDto>()));
-
-
     }
 
     private byte[] ConvertToByteArray(IFormFile file)

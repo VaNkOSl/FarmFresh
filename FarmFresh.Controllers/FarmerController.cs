@@ -82,5 +82,12 @@ public class FarmerController : BaseController
         await _serviceManager.FarmerService.DeleteFarmerAsync(model.Id, trackChanges: true);
         return RedirectToAction(nameof(HomeController.Index), "Home");
     }
+
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var model = await _serviceManager.FarmerService.GetFarmersDetailsByIdAsync(id, trackChanges: false);
+        return View(model);
+    }
 }
 
