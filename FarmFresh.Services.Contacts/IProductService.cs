@@ -1,5 +1,4 @@
 ﻿using FarmFresh.Commons.RequestFeatures;
-using FarmFresh.ViewModels.Admin;
 using FarmFresh.ViewModels.Product;
 
 namespace FarmFresh.Services.Contacts;
@@ -21,4 +20,6 @@ public interface IProductService
     Task<UpdateProductDto> GetProductForUpdateAsync(Guid productId, bool trackChanges);
 
     Task UpdateProductAsync(UpdateProductDto model, Guid productId, bool trackChanges);
+
+    Task<ProductDetailsDto> GetProductDetailsAsync(Guid productId, bool trackChanges);
 }

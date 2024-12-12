@@ -5,8 +5,8 @@ using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Helpers;
-using FarmFresh.ViewModels.Admin;
 using FarmFresh.ViewModels.Categories;
+using FarmFresh.ViewModels.Farmer;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Product;
@@ -187,11 +187,33 @@ internal sealed class ProductService : IProductService
         }
     }
 
+    public async Task<ProductDetailsDto> GetProductDetailsAsync(Guid productId, bool trackChanges)
+    {
+        var product = await GetProductAsync(productId, trackChanges);
+
+        CheckProductNotFound(product, productId, nameof(GetProductDetailsAsync));
+
+        
+        return _mapper.Map<ProductDetailsDto>(product);
+    }
+
     private async Task<Product?> GetProductAsync(Guid productId, bool trackChanges) =>
         await _repositoryManager
-            .ProductRepository
-            .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
-            .Include(ph => ph.ProductPhotos)
-            .Include(c => c.Category)
-            .FirstOrDefaultAsync();
+        .ProductRepository
+        .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
+        .Include(ph => ph.ProductPhotos)
+        .Include(f => f.Farmer)
+        .ThenInclude(u => u.User)
+        .Include(r => r.Reviews)
+        .Include(c => c.Category)
+        .FirstOrDefaultAsync();
+
+    private void CheckProductNotFound(object product, Guid productId, string methodName)
+    {
+        if (product is null)
+        {
+            _loggerManager.LogError($"[{methodName}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
+            throw new ProductIdNotFoundException(productId);
+        }
+    }
 }

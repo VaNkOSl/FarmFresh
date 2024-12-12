@@ -2,6 +2,7 @@
 using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models;
 using FarmFresh.ViewModels.Admin;
+using FarmFresh.ViewModels.Farmer;
 using FarmFresh.ViewModels.Product;
 
 namespace FarmFresh.Mapper;
@@ -88,6 +89,45 @@ public class ProductMappingProfile : Profile
                 ProductId = photo.ProductId
             })
             : new List<ProductPhotosDto>()));
+
+
+        CreateMap<Product, ProductDetailsDto>()
+    .ForMember(dest => dest.CategoryName, opt =>
+        opt.MapFrom(src => src.Category != null ? src.Category.Name : "Unknown"))
+
+    .ForMember(dest => dest.Farmer, opt => opt.MapFrom(src =>
+        new FarmerProfileViewModel(
+            $"{src.Farmer.User.FirstName} {src.Farmer.User.LastName}",
+            src.Farmer.PhoneNumber,
+            src.Farmer.Location,
+            src.Farmer.FarmDescription, 
+            src.Farmer.Photo != null ? Convert.ToBase64String(src.Farmer.Photo) : string.Empty,
+            src.Farmer.Id)))
+    .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
+        src.ProductPhotos != null && src.ProductPhotos.Any()
+            ? src.ProductPhotos.Select(photo => new ProductPhotosDto
+            {
+                Id = photo.Id,
+                FilePath = "/uploads/" + Path.GetFileName(photo.FilePath),
+                ProductId = photo.ProductId,
+                Photo = photo.Photo
+            })
+            : new List<ProductPhotosDto>()))
+
+    .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src =>
+        src.Reviews != null && src.Reviews.Any()
+            ? src.Reviews.Select(review => new ViewModels.Review.ProductReviewDto
+            {
+                Content = review.Content,
+                ProductId = review.ProductId,
+                Rating = review.Rating,
+                ReviewDate = review.ReviewDate,
+                UserFullName = review.User != null
+                    ? $"{review.User.FirstName} {review.User.LastName}"
+                    : "Anonymous"
+            }).ToList()
+            : new List<ViewModels.Review.ProductReviewDto>()));
+
 
     }
 

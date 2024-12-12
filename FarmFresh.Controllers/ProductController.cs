@@ -75,11 +75,18 @@ public class ProductController : BaseController
     [HttpPut("edit/{productId}")]
     public async Task<IActionResult> Edit(Guid productId, UpdateProductDto model)
     {
-        if(ModelState.IsValid)
+        if (ModelState.IsValid)
         {
             await _serviceManager.ProductService.UpdateProductAsync(model, productId, trackChanges: true);
         }
         return Ok(new { success = true });
+    }
+
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var model = await _serviceManager.ProductService.GetProductDetailsAsync(id, trackChanges: false);
+        return View(model);
     }
 
     private async Task LoadModelDataAsync(CreateProductDto model)
