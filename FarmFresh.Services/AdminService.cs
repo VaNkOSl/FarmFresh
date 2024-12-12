@@ -97,24 +97,6 @@ internal sealed class AdminService : IAdminService
         await AdminHelper.SendRejectEmailAsync(model, _sendGridApiKey, _loggerManager);
     }
 
-    private void CheckProductNotFound(object product, Guid productId, string methodName)
-    {
-        if (product is null)
-        {
-            _loggerManager.LogError($"[{methodName}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
-            throw new ProductIdNotFoundException(productId);
-        }
-    }  
-
-    private void CheckFarmerNotFound(object farmer, Guid farmerId, string  methodName)
-    {
-        if (farmer is null)
-        {
-            _loggerManager.LogError($"[{nameof(methodName)}] farmerId with Id {farmerId} was not found!");
-            throw new FarmerIdNotFoundException(farmerId);
-        }
-    }
-
     public async Task<(IEnumerable<AdminAllFarmersDto> farmers, MetaData metaData)> GetUnapprovedFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
     {
         var farmerWithMetaData = await
@@ -180,5 +162,23 @@ internal sealed class AdminService : IAdminService
         }
 
         await AdminHelper.SendRejectEmailAsync(model, _sendGridApiKey, _loggerManager);
+    }
+
+    private void CheckProductNotFound(object product, Guid productId, string methodName)
+    {
+        if (product is null)
+        {
+            _loggerManager.LogError($"[{methodName}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
+            throw new ProductIdNotFoundException(productId);
+        }
+    }
+
+    private void CheckFarmerNotFound(object farmer, Guid farmerId, string methodName)
+    {
+        if (farmer is null)
+        {
+            _loggerManager.LogError($"[{nameof(methodName)}] farmerId with Id {farmerId} was not found!");
+            throw new FarmerIdNotFoundException(farmerId);
+        }
     }
 }

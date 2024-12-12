@@ -136,17 +136,7 @@ public sealed class AccountService : IAccountService
             .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
             .FirstOrDefaultAsync();
 
-        var farmerForDeleting = await
-            _repositoryManager
-            .FarmerRepository
-            .FindFarmersByConditionAsync(f => f.UserId == userId, trackChanges)
-            .FirstOrDefaultAsync();
-
-        if (farmerForDeleting != null)
-        {
-            _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
-            _loggerManager.LogInfo($"[{nameof(DeleteUserAsync)}] Farmer linked to user with ID {userId} successfully deleted.");
-        }
+        await DeleteFarmerAsync(userId, trackChanges);
 
         if (userForDeleting is null)
         {
@@ -166,8 +156,21 @@ public sealed class AccountService : IAccountService
             _loggerManager.LogError($"[{nameof(DeleteUserAsync)}] Error while deleting user with ID {userId}: {ex.Message}");
             throw new DeleteUserSomethingWentWrong();
         }
+    }
 
- 
+    private async Task DeleteFarmerAsync(Guid userId, bool trackChanges)
+    {
+        var farmerForDeleting = await 
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.UserId == userId, trackChanges)
+            .SingleOrDefaultAsync();
+
+        if (farmerForDeleting != null)
+        {
+            _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
+            _loggerManager.LogInfo($"Farmer linked to user with ID {userId} successfully deleted.");
+        }
     }
 
     public async Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges)
