@@ -46,7 +46,7 @@ namespace FarmFresh.Controllers
                 return NotFound();
             }
 
-            return View(orderDetails);
+            return View(new List<OrderDetailsViewModel> { orderDetails });
         }
         public IActionResult Checkout()
         {
