@@ -33,7 +33,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FarmFresh.Infrastructure", "FarmFresh.Infrastructure\FarmFresh.Infrastructure.csproj", "{CBB39909-B82B-47F0-B52F-C803F0004C42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmFresh.Services.Contacts", "FarmFresh.Services.Contacts\FarmFresh.Services.Contacts.csproj", "{96B97C60-993A-408B-BF2C-810524453D76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FarmFresh.Services.Contacts", "FarmFresh.Services.Contacts\FarmFresh.Services.Contacts.csproj", "{96B97C60-993A-408B-BF2C-810524453D76}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityDataGenerator", "EntityDataGenerator\EntityDataGenerator.csproj", "{C9F1BDCB-485F-4574-8250-7549CDFEFFB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{63899B20-CFAA-4ACF-9234-0D2D395858D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +89,14 @@ Global
 		{96B97C60-993A-408B-BF2C-810524453D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96B97C60-993A-408B-BF2C-810524453D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96B97C60-993A-408B-BF2C-810524453D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9F1BDCB-485F-4574-8250-7549CDFEFFB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F1BDCB-485F-4574-8250-7549CDFEFFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F1BDCB-485F-4574-8250-7549CDFEFFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F1BDCB-485F-4574-8250-7549CDFEFFB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63899B20-CFAA-4ACF-9234-0D2D395858D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63899B20-CFAA-4ACF-9234-0D2D395858D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63899B20-CFAA-4ACF-9234-0D2D395858D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63899B20-CFAA-4ACF-9234-0D2D395858D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +112,8 @@ Global
 		{6CDED5E6-B8A5-4DEE-BD45-087D16886707} = {31083572-ACEB-423D-97E9-B869FDDA1282}
 		{CBB39909-B82B-47F0-B52F-C803F0004C42} = {43D15C36-9B7A-4436-846A-540093F70365}
 		{96B97C60-993A-408B-BF2C-810524453D76} = {31083572-ACEB-423D-97E9-B869FDDA1282}
+		{C9F1BDCB-485F-4574-8250-7549CDFEFFB6} = {DF3B8AF5-3BB3-4F71-962C-A8BFA3050264}
+		{63899B20-CFAA-4ACF-9234-0D2D395858D2} = {DF3B8AF5-3BB3-4F71-962C-A8BFA3050264}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4E4DE5A0-6A58-4B3E-BBE5-DB6D880460A5}
