@@ -26,4 +26,6 @@ public interface IFarmerService
     Task<bool> DoesFarmerHasProductsAsync(string userId, Guid productId ,bool trackChanges);
 
     Task<FarmerDetailsDto> GetFarmersDetailsByIdAsync(Guid farmerId, bool trackChanges);
+
+    Task<Guid> GetFarmerByUserIdAsync(Guid userId, bool trackChanges);
 }
