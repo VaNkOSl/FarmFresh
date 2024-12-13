@@ -89,6 +89,17 @@ public class ProductController : BaseController
         return View(model);
     }
 
+    [HttpGet("mine/{id}")]
+    public async Task<IActionResult> Mine(Guid id)
+    {
+        var currentFarmerId = await
+            _serviceManager.FarmerService.GetFarmerByUserIdAsync(id, trackChanges: false);
+
+        var model = await _serviceManager.ProductService.GetAllFarmersProductByFarmerIdAsync(currentFarmerId, trackChanges: false);
+        return View(model);
+    }
+
+
     private async Task LoadModelDataAsync(CreateProductDto model)
     {
         var categories = await _serviceManager

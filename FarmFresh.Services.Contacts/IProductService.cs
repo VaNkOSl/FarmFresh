@@ -22,4 +22,6 @@ public interface IProductService
     Task UpdateProductAsync(UpdateProductDto model, Guid productId, bool trackChanges);
 
     Task<ProductDetailsDto> GetProductDetailsAsync(Guid productId, bool trackChanges);
+
+    Task<IEnumerable<MineProductsDto>> GetAllFarmersProductByFarmerIdAsync(Guid farmerId, bool  trackChanges);
 }

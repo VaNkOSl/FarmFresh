@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Farmer;
-using FarmFresh.ViewModels.Product;
-using LoggerService;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.BadRequest;
 using LoggerService.Exceptions.InternalError.Farmers;
@@ -237,6 +236,19 @@ internal sealed class FarmerService : IFarmerService
         ChekFarmerNotFound(farmer, farmerId, nameof(GetFarmersDetailsByIdAsync));
 
         return _mapper.Map<FarmerDetailsDto>(farmer);
+    }
+
+    public async Task<Guid> GetFarmerByUserIdAsync(Guid userId, bool trackChanges)
+    {
+        var farmer = await
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.UserId == userId && f.FarmerStatus == Status.Approved, trackChanges)
+            .FirstOrDefaultAsync();
+
+        ChekFarmerNotFound(farmer, userId, nameof(GetFarmerByUserIdAsync));
+
+        return farmer.Id;
     }
 
     private void ChekFarmerNotFound(object farmer, Guid farmerId, string methodName)

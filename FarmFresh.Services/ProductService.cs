@@ -6,12 +6,12 @@ using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Categories;
-using FarmFresh.ViewModels.Farmer;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Product;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
+using static FarmFresh.Commons.EntityValidationConstants;
 
 namespace FarmFresh.Services;
 
@@ -207,6 +207,28 @@ internal sealed class ProductService : IProductService
         .Include(r => r.Reviews)
         .Include(c => c.Category)
         .FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<MineProductsDto>> GetAllFarmersProductByFarmerIdAsync(Guid farmerId, bool trackChanges)
+    {
+        var product = await
+            _repositoryManager
+            .ProductRepository
+            .FindProductByConditionAsync(p => p.FarmerId == farmerId, trackChanges)
+            .Include(ph => ph.ProductPhotos)
+            .Include(f => f.Farmer)
+            .Include(c => c.Category)
+            .ToListAsync();
+
+        try
+        {
+            return _mapper.Map<IEnumerable<MineProductsDto>>(product);
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
 
     private void CheckProductNotFound(object product, Guid productId, string methodName)
     {

@@ -91,47 +91,55 @@ public class ProductMappingProfile : Profile
 
 
         CreateMap<Product, ProductDetailsDto>()
-    .ForMember(dest => dest.CategoryName, opt =>
-        opt.MapFrom(src => src.Category != null ? src.Category.Name : "Unknown"))
+        .ForMember(dest => dest.CategoryName, opt =>
+            opt.MapFrom(src => src.Category != null ? src.Category.Name : "Unknown"))
+        .ForMember(dest => dest.Farmer, opt => opt.MapFrom(src =>
+            new FarmerProfileViewModel(
+                $"{src.Farmer.User.FirstName} {src.Farmer.User.LastName}",
+                src.Farmer.PhoneNumber,
+                src.Farmer.Location,
+                src.Farmer.FarmDescription, 
+                src.Farmer.Photo != null ? Convert.ToBase64String(src.Farmer.Photo) : string.Empty,
+                src.Farmer.Id)))
+        .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
+                src.ProductPhotos != null && src.ProductPhotos.Any()
+                    ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                        photo.Id,
+                        "/uploads/" + Path.GetFileName(photo.FilePath),
+                        photo.Photo,
+                        photo.ProductId
+                    )).ToList()
+                    : new List<ProductPhotosDto>()))
+        .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src =>
+            src.Reviews != null && src.Reviews.Any()
+                ? src.Reviews.Select(review => new ViewModels.Review.ProductReviewDto
+                {
+                    Content = review.Content,
+                    ProductId = review.ProductId,
+                    Rating = review.Rating,
+                    ReviewDate = review.ReviewDate,
+                    UserFullName = review.User != null
+                        ? $"{review.User.FirstName} {review.User.LastName}"
+                        : "Anonymous"
+                }).ToList()
+                : new List<ViewModels.Review.ProductReviewDto>()));
 
-    .ForMember(dest => dest.Farmer, opt => opt.MapFrom(src =>
-        new FarmerProfileViewModel(
-            $"{src.Farmer.User.FirstName} {src.Farmer.User.LastName}",
-            src.Farmer.PhoneNumber,
-            src.Farmer.Location,
-            src.Farmer.FarmDescription, 
-            src.Farmer.Photo != null ? Convert.ToBase64String(src.Farmer.Photo) : string.Empty,
-            src.Farmer.Id)))
-    .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
-            src.ProductPhotos != null && src.ProductPhotos.Any()
-                ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
-                    photo.Id,
-                    "/uploads/" + Path.GetFileName(photo.FilePath),
-                    photo.Photo,
-                    photo.ProductId
-                )).ToList()
-                : new List<ProductPhotosDto>()))
-    .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src =>
-        src.Reviews != null && src.Reviews.Any()
-            ? src.Reviews.Select(review => new ViewModels.Review.ProductReviewDto
-            {
-                Content = review.Content,
-                ProductId = review.ProductId,
-                Rating = review.Rating,
-                ReviewDate = review.ReviewDate,
-                UserFullName = review.User != null
-                    ? $"{review.User.FirstName} {review.User.LastName}"
-                    : "Anonymous"
-            }).ToList()
-            : new List<ViewModels.Review.ProductReviewDto>()));
-    }
-
-    private byte[] ConvertToByteArray(IFormFile file)
-    {
-        using (var memoryStream = new MemoryStream())
-        {
-            file.CopyTo(memoryStream);
-            return memoryStream.ToArray();
-        }
+        CreateMap<Product, MineProductsDto>()
+            .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+            .ForCtorParam("Name", opt => opt.MapFrom(src => src.Name))
+            .ForCtorParam("Price", opt => opt.MapFrom(src => src.Price))
+            .ForCtorParam("StockQuantity", opt => opt.MapFrom(src => src.StockQuantity))
+            .ForCtorParam("ProductStatus", opt => opt.MapFrom(src => src.ProductStatus))
+            .ForCtorParam("CategoryName", opt => opt.MapFrom(src => src.Category.Name))
+            .ForCtorParam("FarmerId", opt => opt.MapFrom(src => src.FarmerId))
+            .ForCtorParam("Photos", opt => opt.MapFrom(src =>
+             src.ProductPhotos != null && src.ProductPhotos.Any()
+                    ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                        photo.Id,
+                        "/uploads/" + Path.GetFileName(photo.FilePath),
+                        photo.Photo,
+                        photo.ProductId
+                    )).ToList()
+                    : new List<ProductPhotosDto>()));
     }
 }
