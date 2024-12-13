@@ -2,6 +2,7 @@
 using FarmFresh.Data.Models.Econt.DTOs;
 using FarmFresh.Data.Models.Enums;
 using Newtonsoft.Json;
+using System;
 
 namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
@@ -19,6 +20,8 @@ namespace FarmFresh.Data.Models.Econt.Nomenclatures
 
         public List<string>? Emails { get; set; }
 
+        public int? AddressId { get; set; }
+
         public Address? Address { get; set; }
 
         public string? Info { get; set; }
@@ -27,19 +30,19 @@ namespace FarmFresh.Data.Models.Econt.Nomenclatures
 
         public string? Language { get; set; }
 
-        public TimeOnly NormalBusinessHoursFrom { get; set; }
+        public long? NormalBusinessHoursFrom { get; set; }
 
-        public TimeOnly NormalBusinessHoursTo { get; set; }
+        public long? NormalBusinessHoursTo { get; set; }
 
-        public TimeOnly HalfDayBusinessHoursFrom { get; set; }
+        public long? HalfDayBusinessHoursFrom { get; set; }
 
-        public TimeOnly HalfDayBusinessHoursTo { get; set; }
+        public long? HalfDayBusinessHoursTo { get; set; }
 
-        public TimeOnly SundayBusinessHoursFrom { get; set; }
+        public long? SundayBusinessHoursFrom { get; set; }
 
-        public TimeOnly SundayBusinessHoursTo { get; set; }
+        public long? SundayBusinessHoursTo { get; set; }
 
-        public ShipmentType? ShipmentType { get; set; }
+        public List<string>? ShipmentTypes { get; set; }
 
         public string? PartnerCode { get; set; }
 
@@ -50,5 +53,15 @@ namespace FarmFresh.Data.Models.Econt.Nomenclatures
         public string? HubNameEn { get; set; }
 
         public bool? IsDrive { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not Office other) return false;
+            return Id == other.Id
+                && NameEn == other.NameEn
+                && AddressId == other.AddressId;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Id, NameEn);
     }
 }

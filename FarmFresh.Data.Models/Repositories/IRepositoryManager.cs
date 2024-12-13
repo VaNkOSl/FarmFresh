@@ -1,8 +1,8 @@
 ﻿using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Data.Models.Repositories.Econt;
+using FarmFresh.Repositories.Contacts;
 
-namespace FarmFresh.Repositories.Contacts;
+namespace FarmFresh.Data.Models.Repositories;
 
 public interface IRepositoryManager
 {
@@ -14,9 +14,15 @@ public interface IRepositoryManager
 
     ICategoryRepository CategoryRepository { get; }
 
+    //Econt database specific
+
     ICountryRepository CountryRepository { get; }
 
     ICityRepository CityRepository { get; }
+
+    IOfficeRepository OfficeRepository { get; }
+
+    IAddressRespository AddressRepository { get; }
 
     Task SaveAsync(Entity entity);
 

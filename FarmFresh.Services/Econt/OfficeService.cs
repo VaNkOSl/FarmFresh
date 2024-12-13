@@ -12,29 +12,29 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Services.Econt
 {
-    public class CityService(
+    public class OfficeService(
         IEcontNumenclaturesService econtNumenclaturesService,
         IRepositoryManager repositoryManager,
         IMapper mapper)
-        : ICityService
+        : IOfficeService
     {
         private readonly IEcontNumenclaturesService _econtNumenclaturesService = econtNumenclaturesService;
         private readonly IRepositoryManager _repositoryManager = repositoryManager;
         private readonly IMapper _mapper = mapper;
 
-        public async Task UpdateCitiesAsync()
+        public async Task UpdateOfficesAsync()
         {
             string[] codes = ["bgr", "grc", "rou"];
 
             var tasks = codes.Select(code =>
-                _econtNumenclaturesService.GetCitiesAsync(new GetCitiesRequest(code))
-                .ContinueWith(task => _mapper.Map<List<City>>(task.Result))
+                _econtNumenclaturesService.GetOfficesAsync(new GetOfficesRequest(code))
+                .ContinueWith(task => _mapper.Map<List<Office>>(task.Result))
             ).ToArray();
 
             var results = await Task.WhenAll(tasks);
-            var cities = results.SelectMany(c => c).ToList();
+            var offices = results.SelectMany(o => o).ToList();
 
-            await _repositoryManager.CityRepository.UpdateCitiesAsync(cities);
+            await _repositoryManager.OfficeRepository.UpdateOfficesAsync(offices);
         }
     }
 }

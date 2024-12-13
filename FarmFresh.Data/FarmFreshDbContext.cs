@@ -38,13 +38,13 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
     //Econt DbSets
     //** SUBJECT TO CHANGE ** (if changed, don't forget the configurations as well)
 
-    //public virtual DbSet<Address> Addresses { get; set; }
+    public virtual DbSet<Address> Addresses { get; set; }
 
     public virtual DbSet<City> Cities { get; set; }
 
     public virtual DbSet<Country> Countries { get; set; }
 
-    //public virtual DbSet<Office> Offices { get; set; }
+    public virtual DbSet<Office> Offices { get; set; }
 
     //public virtual DbSet<Quarter> Quarters { get; set; }
 
@@ -60,10 +60,10 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
         builder.ApplyConfiguration(new ProductPhotoConfiguration());
         builder.ApplyConfiguration(new CategoryConfiguration());
 
-        //builder.ApplyConfiguration(new AddressConfiguration());
+        builder.ApplyConfiguration(new AddressConfiguration());
         builder.ApplyConfiguration(new CityConfiguration());
         builder.ApplyConfiguration(new CountryConfiguration());
-        //builder.ApplyConfiguration(new OfficeConfiguration());
+        builder.ApplyConfiguration(new OfficeConfiguration());
         //builder.ApplyConfiguration(new QuarterConfiguration());
         //builder.ApplyConfiguration(new StreetConfiguration());
     }

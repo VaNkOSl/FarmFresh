@@ -1,6 +1,7 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories.Econt;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Repositories.Econt
 {
-    internal sealed class CountryRepository(FarmFreshDbContext data) : RepositoryBase<Country>(data), ICountryRepository
+    public sealed class CountryRepository(FarmFreshDbContext data) : RepositoryBase<Country>(data), ICountryRepository
     {
         public async Task<Country> CreateCountryAsync(Country country)
         {
@@ -30,7 +31,6 @@ namespace FarmFresh.Repositories.Econt
             {
                 if (existingCountries.TryGetValue(country.Code2, out var existingCountry))
                 {
-                    //_data.Entry(existingCountry).CurrentValues.SetValues(country);
                     existingCountry.Name = country.Name;
                     existingCountry.NameEn = country.NameEn;
                     existingCountry.IsEU = country.IsEU;
@@ -47,9 +47,15 @@ namespace FarmFresh.Repositories.Econt
 
         public IQueryable<Country> FindAllCountries(bool trackChanges) => FindAll(trackChanges);
 
-        public IQueryable<Country> FindCountryByConditionAsync(Expression<Func<Country, bool>> expression, bool trackChanges)
+        public IQueryable<Country> FindCountriesByCondition(Expression<Func<Country, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
         public async Task<Country?> GetCountryByIdAsync(int id) => await GetByIdAsync(id);
+
+        public Country? FindFirstCountryByCondition(Expression<Func<Country, bool>> expression, bool trackChanges)
+            => FindFirstByCondition(expression, trackChanges);
+
+        public Task<Country?> FindFirstCountryByConditionAsync(Expression<Func<Country, bool>> expression, bool trackChanges)
+            => FindFirstByConditionAsync(expression, trackChanges);
     }
 }

@@ -30,20 +30,20 @@ namespace FarmFresh.Repositories.Econt
 
             var existingCountries = _data.Countries.ToDictionary(c => c.Code2);
 
-            foreach(var city in cities)
+            foreach (var city in cities)
             {
                 var country = existingCountries[city.Country!.Code2];
-
-                var existingCity = await _data.Cities
-                    .Where(c => c.Id == city.Id)
-                    .Include(c => c.ServingOffices)
-                    .FirstOrDefaultAsync();
 
                 if(country == null) continue;
 
                 city.CountryId = country.Id;
                 city.Country = null;
 
+                var existingCity = await _data.Cities
+                    .Where(c => c.Id == city.Id)
+                    .Include(c => c.ServingOffices)
+                    .FirstOrDefaultAsync();
+                
                 if(existingCity != null)
                 {
                     _data.Entry(existingCity).CurrentValues.SetValues(city);
@@ -68,9 +68,15 @@ namespace FarmFresh.Repositories.Econt
 
         public IQueryable<City> FindAllCities(bool trackChanges) => FindAll(trackChanges);
 
-        public IQueryable<City> FindCityByConditionAsync(Expression<Func<City, bool>> expression, bool trackChanges)
+        public IQueryable<City> FindCitiesByCondition(Expression<Func<City, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
         public async Task<City?> GetCityByIdAsync(int id) => await GetByIdAsync(id);
+
+        public City? FindFirstCityByCondition(Expression<Func<City, bool>> expression, bool trackChanges)
+            => FindFirstByCondition(expression, trackChanges);
+
+        public Task<City?> FindFirstCityByConditionAsync(Expression<Func<City, bool>> expression, bool trackChanges)
+            => FindFirstByConditionAsync(expression, trackChanges);
     }
 }

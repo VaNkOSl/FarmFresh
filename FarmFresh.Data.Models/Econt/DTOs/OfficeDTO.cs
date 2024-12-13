@@ -41,26 +41,25 @@ namespace FarmFresh.Data.Models.Econt.DTOs
         public string? Language { get; set; }
 
         [JsonProperty("normalBusinessHoursFrom")]
-        public TimeOnly NormalBusinessHoursFrom { get; set; }
+        public long? NormalBusinessHoursFrom { get; set; }
 
         [JsonProperty("normalBusinessHoursTo")]
-        public TimeOnly NormalBusinessHoursTo { get; set; }
+        public long? NormalBusinessHoursTo { get; set; }
 
         [JsonProperty("halfDayBusinessHoursFrom")]
-        public TimeOnly HalfDayBusinessHoursFrom { get; set; }
+        public long? HalfDayBusinessHoursFrom { get; set; }
 
         [JsonProperty("halfDayBusinessHoursTo")]
-        public TimeOnly HalfDayBusinessHoursTo { get; set; }
+        public long? HalfDayBusinessHoursTo { get; set; }
 
         [JsonProperty("sundayBusinessHoursFrom")]
-        public TimeOnly SundayBusinessHoursFrom { get; set; }
+        public long? SundayBusinessHoursFrom { get; set; }
 
         [JsonProperty("sundayBusinessHoursTo")]
-        public TimeOnly SundayBusinessHoursTo { get; set; }
+        public long? SundayBusinessHoursTo { get; set; }
 
-        [JsonProperty("shipmentType")]
-        [JsonConverter(typeof(ShipmentTypeConverter))]
-        public ShipmentType? ShipmentType { get; set; }
+        [JsonProperty("shipmentTypes")]
+        public List<string>? ShipmentTypes { get; set; }
 
         [JsonProperty("partnerCode")]
         public string? PartnerCode { get; set; }

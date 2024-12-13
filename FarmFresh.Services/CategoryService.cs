@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
-using FarmFresh.Repositories.Contacts;
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Category;
 using LoggerService.Contacts;

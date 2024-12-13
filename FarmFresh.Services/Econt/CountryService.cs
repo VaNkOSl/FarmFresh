@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models.Econt.APIInterraction;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Data.Models.Repositories.Econt;
-using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;

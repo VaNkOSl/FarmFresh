@@ -1,5 +1,6 @@
 ﻿using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
+using FarmFresh.Services.Econt;
 
 namespace FarmFresh.Services.Contacts;
 
@@ -12,13 +13,17 @@ public interface IServiceManager
     ICategoryService CategoryService { get; }
 
 
-    //API Services
+    //Econt Services
 
     IEcontNumenclaturesService EcontNumenclaturesService { get; }
 
-    //Database Services
+    //Econt database specific
 
     ICountryService CountryService { get; }
 
     ICityService CityService { get; }
+
+    IOfficeService OfficeService { get; }
+
+    IAddressService AddressService { get; }
 }

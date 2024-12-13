@@ -87,10 +87,23 @@ namespace FarmFresh.Services.Econt.APIServices
             return null!;
         }
 
-        public Task<List<OfficeDTO>> GetOfficesAsync()
+        public async Task<List<OfficeDTO>> GetOfficesAsync(GetOfficesRequest request)
         {
-            //WIP
-            return Task.FromResult(new List<OfficeDTO>());
+            var json = JsonConvert.SerializeObject(request);
+            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
+
+            var response = await _httpClient.PostAsync(testApiUrl + getOfficesEndpoint, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var officesResponse = JsonConvert.DeserializeObject<GetOfficesResponse>(responseContent);
+
+                if (officesResponse != null && officesResponse.Offices != null)
+                    return officesResponse.Offices;
+            }
+
+            return null!;
         }
 
         public Task<List<StreetDTO>> GetStreetsAsync()

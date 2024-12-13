@@ -17,6 +17,8 @@ namespace FarmFresh.Data.Models.Repositories.Econt
         void UpdateCountry(Country country);
         Task UpdateCountriesAsync(IEnumerable<Country> countries);
         IQueryable<Country> FindAllCountries(bool trackChanges);
-        IQueryable<Country> FindCountryByConditionAsync(Expression<Func<Country, bool>> expression, bool trackChanges);
+        IQueryable<Country> FindCountriesByCondition(Expression<Func<Country, bool>> expression, bool trackChanges);
+        Country? FindFirstCountryByCondition(Expression<Func<Country, bool>> expression, bool trackChanges);
+        Task<Country?> FindFirstCountryByConditionAsync(Expression<Func<Country, bool>> expression, bool trackChanges);
     }
 }

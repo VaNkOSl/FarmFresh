@@ -16,6 +16,8 @@ namespace FarmFresh.Data.Models.Repositories.Econt
         void UpdateCity(City city);
         Task UpdateCitiesAsync(IEnumerable<City> cities);
         IQueryable<City> FindAllCities(bool trackChanges);
-        IQueryable<City> FindCityByConditionAsync(Expression<Func<City, bool>> expression, bool trackChanges);
+        IQueryable<City> FindCitiesByCondition(Expression<Func<City, bool>> expression, bool trackChanges);
+        City? FindFirstCityByCondition(Expression<Func<City, bool>> expression, bool trackChanges);
+        Task<City?> FindFirstCityByConditionAsync(Expression<Func<City, bool>> expression, bool trackChanges);
     }
 }

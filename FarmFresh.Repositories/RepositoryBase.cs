@@ -24,16 +24,32 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
     public IQueryable<T> FindAll(bool trackChanges) =>
         !trackChanges ?
         _data.Set<T>()
-        .AsNoTracking() :
+            .AsNoTracking() :
         _data.Set<T>();
 
     public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
-         !trackChanges ?
+        !trackChanges ?
         _data.Set<T>()
-        .Where(expression)
-        .AsNoTracking() :
+            .Where(expression)
+            .AsNoTracking() :
         _data.Set<T>()
-        .Where(expression);
+            .Where(expression);
+
+    public T? FindFirstByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
+        !trackChanges ?
+        _data.Set<T>()
+            .AsNoTracking()
+            .FirstOrDefault(expression) :
+        _data.Set<T>()
+            .FirstOrDefault(expression);
+
+    public Task<T?> FindFirstByConditionAsync(Expression<Func<T, bool>> expression, bool trackChanges) =>
+        !trackChanges ?
+        _data.Set<T>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(expression) :
+        _data.Set<T>()
+            .FirstOrDefaultAsync(expression);
 
     public void Update(T entity) => _data.Update(entity);
 

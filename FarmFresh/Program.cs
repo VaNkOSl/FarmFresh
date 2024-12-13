@@ -29,6 +29,8 @@ builder.Services.ConfigureServicesCORS();
 builder.Services.AddScoped<IEcontNumenclaturesService, EcontNumenclaturesService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<IOfficeService, OfficeService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -83,14 +85,20 @@ app.MapRazorPages();
 //testing econt api calls
 using(var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<FarmFreshDbContext>();
-    var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
-    var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
-
-    await DBTransactionHelper.ExecuteTransactionAsync(dbContext, async () =>
+    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     {
+        var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
         await countryService.UpdateCountriesAsync();
+    });
+    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    {
+        var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
         await cityService.UpdateCitiesAsync();
+    });
+    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    {
+        var officeService = scope.ServiceProvider.GetRequiredService<IOfficeService>();
+        await officeService.UpdateOfficesAsync();
     });
 }
 

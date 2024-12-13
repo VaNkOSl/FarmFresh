@@ -3,9 +3,9 @@ using FarmFresh.Data.Models.Enums;
 
 namespace FarmFresh.Data.Models.CustomConverters
 {
-    public class ShipmentTypeConverter : JsonConverter<ShipmentType>
+    public static class ShipmentTypeConverter
     {
-        private static readonly Dictionary<string, ShipmentType> _mapping = new Dictionary<string, ShipmentType>
+        private static readonly Dictionary<string, ShipmentType> _mapping = new()
         {
             { "document", ShipmentType.Document },
             { "pack", ShipmentType.Pack },
@@ -19,31 +19,15 @@ namespace FarmFresh.Data.Models.CustomConverters
             { "pp", ShipmentType.PostTransfer }
         };
 
-        public override ShipmentType ReadJson(JsonReader reader, Type objectType, ShipmentType existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public static ShipmentType Convert(string econtStringEqivalent)
         {
-            var value = reader.Value?.ToString().ToLower();
+            if (string.IsNullOrEmpty(econtStringEqivalent))
+                throw new ArgumentException("Value cannot be null or empty. ", nameof(econtStringEqivalent));
 
-            if(_mapping.ContainsKey(value))
-                return _mapping[value];
+            if(_mapping.TryGetValue(econtStringEqivalent, out var shipmentType))
+                return shipmentType;
 
-            throw new JsonSerializationException($"Invalid shipment type value: {value}");
-        }
-        public override void WriteJson(JsonWriter writer, ShipmentType value, JsonSerializer serializer)
-        {
-            string shipmentTypeStr = value switch
-            {
-                ShipmentType.Document => "document",
-                ShipmentType.Pack => "pack",
-                ShipmentType.PostPack => "post_pack",
-                ShipmentType.Pallet => "pallet",
-                ShipmentType.Cargo => "cargo",
-                ShipmentType.DocumentPallet => "documentpallet",
-                ShipmentType.BigLetter => "big_letter",
-                ShipmentType.SmallLetter => "small_letter",
-                ShipmentType.MoneyTransfer => "money_transfer",
-                ShipmentType.PostTransfer => "pp",
-                _ => throw new JsonSerializationException($"Unknown shipping type: {value}")
-            };
+            throw new ArgumentException($"Invalid shipment string equivalent : {econtStringEqivalent}");
         }
     }
 }

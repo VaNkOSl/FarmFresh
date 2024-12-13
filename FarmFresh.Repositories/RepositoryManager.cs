@@ -20,6 +20,8 @@ public sealed class RepositoryManager : IRepositoryManager
     private readonly Lazy<ICategoryRepository> _categoryRepository;
     private readonly Lazy<ICountryRepository> _countryRepository;
     private readonly Lazy<ICityRepository> _cityRepository;
+    private readonly Lazy<IOfficeRepository> _officeRepository;
+    private readonly Lazy<IAddressRespository> _addressRepository;
     private readonly IValidateEntity _validateEntityRepo;
 
     public RepositoryManager(FarmFreshDbContext data, IServiceProvider serviceProvider)
@@ -31,6 +33,8 @@ public sealed class RepositoryManager : IRepositoryManager
         _categoryRepository = new Lazy<ICategoryRepository>(() => new CategoryRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _countryRepository = new Lazy<ICountryRepository>(() => new CountryRepository(data));
         _cityRepository = new Lazy<ICityRepository>(() => new CityRepository(data));
+        _addressRepository = new Lazy<IAddressRespository>(() => new AddressRepository(data));
+        _officeRepository = new Lazy<IOfficeRepository>(() => new OfficeRepository(data, AddressRepository));
         _validateEntityRepo = serviceProvider.GetRequiredService<IValidateEntity>();
     }
 
@@ -45,6 +49,10 @@ public sealed class RepositoryManager : IRepositoryManager
     public ICountryRepository CountryRepository => _countryRepository.Value;
 
     public ICityRepository CityRepository => _cityRepository.Value;
+
+    public IOfficeRepository OfficeRepository => _officeRepository.Value;
+
+    public IAddressRespository AddressRepository => _addressRepository.Value;
 
     public async Task SaveAsync(Entity entity)
     {
