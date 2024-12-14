@@ -19,9 +19,11 @@ namespace FarmFresh.Repositories.Econt
             return country;
         }
 
-        public void DeleteCountry(Country country) => Delete(country);
+        public void DeleteCountry(Country country)
+            => Delete(country);
 
-        public void UpdateCountry(Country country) => Update(country);
+        public void UpdateCountry(Country country)
+            => Update(country);
 
         public async Task UpdateCountriesAsync(IEnumerable<Country> countries)
         {
@@ -45,17 +47,19 @@ namespace FarmFresh.Repositories.Econt
             await _data.SaveChangesAsync();
         }
 
-        public IQueryable<Country> FindAllCountries(bool trackChanges) => FindAll(trackChanges);
+        public IQueryable<Country> FindAllCountries(bool trackChanges)
+            => FindAll(trackChanges);
 
         public IQueryable<Country> FindCountriesByCondition(Expression<Func<Country, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
-        public async Task<Country?> GetCountryByIdAsync(int id) => await GetByIdAsync(id);
+        public async Task<Country?> GetCountryByIdAsync(int id)
+            => await GetByIdAsync(id);
 
         public Country? FindFirstCountryByCondition(Expression<Func<Country, bool>> expression, bool trackChanges)
             => FindFirstByCondition(expression, trackChanges);
 
-        public Task<Country?> FindFirstCountryByConditionAsync(Expression<Func<Country, bool>> expression, bool trackChanges)
-            => FindFirstByConditionAsync(expression, trackChanges);
+        public async Task<Country?> FindFirstCountryByConditionAsync(Expression<Func<Country, bool>> expression, bool trackChanges)
+            => await FindFirstByConditionAsync(expression, trackChanges);
     }
 }

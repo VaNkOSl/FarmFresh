@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Data.Models.Econt.APIInterraction
 {
-    public class GetCitiesRequest
+    public class GetCitiesRequest : RequestBase
     {
         private string? _countryCode;
 

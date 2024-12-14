@@ -14,6 +14,14 @@ namespace FarmFresh.Data.SeedDb.Econt
     {
         public void Configure(EntityTypeBuilder<Quarter> builder)
         {
+            builder.HasKey(q => q.Id);
+            builder.Property(q => q.Id)
+                .ValueGeneratedNever();
+
+            builder.HasOne<City>()
+                .WithMany()
+                .HasForeignKey(q => q.CityID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

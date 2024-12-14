@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Data.Models.Econt.APIInterraction
 {
-    public class GetOfficesResponse
+    public class GetOfficesResponse : ResponseBase
     {
         public List<OfficeDTO>? Offices { get; set; }
     }

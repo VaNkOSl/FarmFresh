@@ -46,9 +46,9 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
 
     public virtual DbSet<Office> Offices { get; set; }
 
-    //public virtual DbSet<Quarter> Quarters { get; set; }
+    public virtual DbSet<Quarter> Quarters { get; set; }
 
-    //public virtual DbSet<Street> Streets { get; set; }
+    public virtual DbSet<Street> Streets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -64,7 +64,7 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
         builder.ApplyConfiguration(new CityConfiguration());
         builder.ApplyConfiguration(new CountryConfiguration());
         builder.ApplyConfiguration(new OfficeConfiguration());
-        //builder.ApplyConfiguration(new QuarterConfiguration());
-        //builder.ApplyConfiguration(new StreetConfiguration());
+        builder.ApplyConfiguration(new QuarterConfiguration());
+        builder.ApplyConfiguration(new StreetConfiguration());
     }
 }

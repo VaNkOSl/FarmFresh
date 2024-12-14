@@ -24,6 +24,10 @@ public interface IRepositoryManager
 
     IAddressRespository AddressRepository { get; }
 
+    IStreetRepository StreetRepository { get; }
+
+    IQuarterRepository QuarterRepository { get; }
+
     Task SaveAsync(Entity entity);
 
     Task SaveAsync();

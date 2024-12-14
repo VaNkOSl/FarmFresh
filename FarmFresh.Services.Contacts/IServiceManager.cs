@@ -1,4 +1,5 @@
-﻿using FarmFresh.Services.Contacts.Econt;
+﻿using FarmFresh.Data.Models.Repositories.Econt;
+using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
 using FarmFresh.Services.Econt;
 
@@ -26,4 +27,8 @@ public interface IServiceManager
     IOfficeService OfficeService { get; }
 
     IAddressService AddressService { get; }
+
+    IStreetService StreetService { get; }
+
+    IQuarterService QuarterService { get; }
 }

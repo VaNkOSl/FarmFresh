@@ -20,9 +20,11 @@ namespace FarmFresh.Repositories.Econt
             return city;
         }
         
-        public void DeleteCity(City city) => Delete(city);
+        public void DeleteCity(City city)
+            => Delete(city);
         
-        public void UpdateCity(City city) => Update(city);
+        public void UpdateCity(City city)
+            => Update(city);
         
         public async Task UpdateCitiesAsync(IEnumerable<City> cities)
         {
@@ -66,7 +68,8 @@ namespace FarmFresh.Repositories.Econt
             await _data.SaveChangesAsync();
         }
 
-        public IQueryable<City> FindAllCities(bool trackChanges) => FindAll(trackChanges);
+        public IQueryable<City> FindAllCities(bool trackChanges)
+            => FindAll(trackChanges);
 
         public IQueryable<City> FindCitiesByCondition(Expression<Func<City, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
@@ -76,7 +79,7 @@ namespace FarmFresh.Repositories.Econt
         public City? FindFirstCityByCondition(Expression<Func<City, bool>> expression, bool trackChanges)
             => FindFirstByCondition(expression, trackChanges);
 
-        public Task<City?> FindFirstCityByConditionAsync(Expression<Func<City, bool>> expression, bool trackChanges)
-            => FindFirstByConditionAsync(expression, trackChanges);
+        public async Task<City?> FindFirstCityByConditionAsync(Expression<Func<City, bool>> expression, bool trackChanges)
+            => await FindFirstByConditionAsync(expression, trackChanges);
     }
 }

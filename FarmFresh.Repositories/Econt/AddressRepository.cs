@@ -19,7 +19,8 @@ namespace FarmFresh.Repositories.Econt
             return address;
         }
 
-        public void DeleteAddress(Address address) => Delete(address);
+        public void DeleteAddress(Address address)
+            => Delete(address);
 
         public async Task DeleteOrphanedAddressesAsync()
         {
@@ -37,16 +38,19 @@ namespace FarmFresh.Repositories.Econt
         public IQueryable<Address> FindAddressesByCondition(Expression<Func<Address, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
-        public IQueryable<Address> FindAllAddresses(bool trackChanges) => FindAll(trackChanges);
+        public IQueryable<Address> FindAllAddresses(bool trackChanges)
+            => FindAll(trackChanges);
 
         public Address? FindFirstAddressByCondition(Expression<Func<Address, bool>> expression, bool trackChanges)
             => FindFirstByCondition(expression, trackChanges);
 
-        public Task<Address?> FindFirstAddressByConditionAsync(Expression<Func<Address, bool>> expression, bool trackChanges)
-            => FindFirstByConditionAsync(expression, trackChanges);
+        public async Task<Address?> FindFirstAddressByConditionAsync(Expression<Func<Address, bool>> expression, bool trackChanges)
+            => await FindFirstByConditionAsync(expression, trackChanges);
 
-        public async Task<Address?> GetAddressByIdAsync(int id) => await GetByIdAsync(id);
+        public async Task<Address?> GetAddressByIdAsync(int id)
+            => await GetByIdAsync(id);
 
-        public void UpdateAddress(Address address) => Update(address);
+        public void UpdateAddress(Address address)
+            => Update(address);
     }
 }

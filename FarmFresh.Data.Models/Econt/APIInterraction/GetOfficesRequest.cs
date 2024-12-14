@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Data.Models.Econt.APIInterraction
 {
-    public class GetOfficesRequest(string code3)
+    public class GetOfficesRequest(string code3) : RequestBase
     {
         public string CountryCode { get; set; } = code3;
         public int? CityID { get; set; }

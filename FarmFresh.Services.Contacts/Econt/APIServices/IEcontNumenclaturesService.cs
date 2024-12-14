@@ -13,7 +13,7 @@ namespace FarmFresh.Services.Contacts.Econt.APIServices
         Task<List<CountryDTO>> GetCountriesAsync(GetCountriesRequest request);
         Task<List<CityDTO>> GetCitiesAsync(GetCitiesRequest request);
         Task<List<OfficeDTO>> GetOfficesAsync(GetOfficesRequest request);
-        Task<List<StreetDTO>> GetStreetsAsync();
-        Task<List<QuarterDTO>> GetQuartersAsync();
+        Task<List<StreetDTO>> GetStreetsAsync(GetStreetsRequest request);
+        Task<List<QuarterDTO>> GetQuartersAsync(GetQuartersRequest request);
     }
 }

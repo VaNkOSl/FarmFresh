@@ -1,4 +1,5 @@
 ﻿using FarmFresh.Data.Models.Econt.DTOs;
+using FarmFresh.Data.Models.Econt.Nomenclatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace FarmFresh.Data.Models.Econt.APIInterraction
 {
-    public class GetCitiesResponse : ResponseBase
+    public class GetQuartersResponse : ResponseBase
     {
-        public List<CityDTO>? Cities { get; set; }
+        public List<QuarterDTO>? Quarters { get; set; }
     }
 }

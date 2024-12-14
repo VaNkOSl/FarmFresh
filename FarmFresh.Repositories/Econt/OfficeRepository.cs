@@ -29,8 +29,8 @@ namespace FarmFresh.Repositories.Econt
         public Office? FindFirstOfficeByCondition(Expression<Func<Office, bool>> expression, bool trackChanges)
             => FindFirstByCondition(expression, trackChanges);
 
-        public Task<Office?> FindFirstOfficeByConditionAsync(Expression<Func<Office, bool>> expression, bool trackChanges)
-            => FindFirstByConditionAsync(expression, trackChanges);
+        public async Task<Office?> FindFirstOfficeByConditionAsync(Expression<Func<Office, bool>> expression, bool trackChanges)
+            => await FindFirstByConditionAsync(expression, trackChanges);
 
         public IQueryable<Office> FindOfficesByCondition(Expression<Func<Office, bool>> expression, bool trackChanges)
              => FindByCondition(expression, trackChanges);
@@ -54,8 +54,8 @@ namespace FarmFresh.Repositories.Econt
                 var existingCity = await _data.Cities
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c =>
-                    c.Id == office.Address.CityId
-                    && c.NameEn == office.Address.City.NameEn);
+                        c.Id == office.Address.CityId
+                        && c.NameEn == office.Address.City.NameEn);
 
                 if (existingCity == null) continue;
 

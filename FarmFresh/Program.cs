@@ -31,6 +31,8 @@ builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IOfficeService, OfficeService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IStreetService, StreetService>();
+builder.Services.AddScoped<IQuarterService, QuarterService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -85,21 +87,31 @@ app.MapRazorPages();
 //testing econt api calls
 using(var scope = app.Services.CreateScope())
 {
-    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    {
-        var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
-        await countryService.UpdateCountriesAsync();
-    });
-    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    {
-        var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
-        await cityService.UpdateCitiesAsync();
-    });
-    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    {
-        var officeService = scope.ServiceProvider.GetRequiredService<IOfficeService>();
-        await officeService.UpdateOfficesAsync();
-    });
+    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    //{
+    //    var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
+    //    await countryService.UpdateCountriesAsync();
+    //});
+    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    //{
+    //    var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
+    //    await cityService.UpdateCitiesAsync();
+    //});
+    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    //{
+    //    var officeService = scope.ServiceProvider.GetRequiredService<IOfficeService>();
+    //    await officeService.UpdateOfficesAsync();
+    //});
+    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    //{
+    //    var streetService = scope.ServiceProvider.GetRequiredService<IStreetService>();
+    //    await streetService.UpdateStreetsAsync();
+    //});
+    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+    //{
+    //    var quarterService = scope.ServiceProvider.GetRequiredService<IQuarterService>();
+    //    await quarterService.UpdateQuartersAsync();
+    //});
 }
 
 app.Run();

@@ -3,6 +3,7 @@ using FarmFresh.Data.Models.Econt.APIInterraction;
 using FarmFresh.Data.Models.Econt.DTOs;
 using FarmFresh.Services.Contacts.Econt.APIServices;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,9 +12,8 @@ namespace FarmFresh.Services.Econt.APIServices
 {
     public class EcontNumenclaturesService : IEcontNumenclaturesService
     {
-        private IConfiguration _configuration;
-        private HttpClient _httpClient;
-        private IMapper _mapper;
+        private readonly IConfiguration _configuration;
+        private readonly HttpClient _httpClient;
 
         private readonly string credentials;
 
@@ -26,7 +26,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         private const string requestBodyFormat = "application/json";
 
-        public EcontNumenclaturesService(IConfiguration configuration, HttpClient httpClient, IMapper mapper)
+        public EcontNumenclaturesService(IConfiguration configuration, HttpClient httpClient)
         {
             _configuration = configuration;
             _httpClient = httpClient;
@@ -39,8 +39,6 @@ namespace FarmFresh.Services.Econt.APIServices
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
-            _mapper = mapper;
-
             testApiUrl = _configuration["Econt:TestApiUrl"]!;
             getCountriesEndpoint = _configuration["Econt:Endpoints:GetCountries"]!;
             getCitiesEndpoint = _configuration["Econt:Endpoints:GetCities"]!;
@@ -51,18 +49,15 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<CountryDTO>> GetCountriesAsync(GetCountriesRequest request)
         {
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
-
-            var response = await _httpClient.PostAsync(testApiUrl + getCountriesEndpoint, content);
+            var response = await GetResponse(request, getCountriesEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var countriesResponse = JsonConvert.DeserializeObject<GetCountriesResponse>(responseContent);
 
-                if (countriesResponse != null && countriesResponse.Countries != null)
-                    return countriesResponse.Countries;
+                if (countriesResponse != null && !countriesResponse.Countries.IsNullOrEmpty())
+                    return countriesResponse.Countries!;
             }
 
             return null!;
@@ -70,18 +65,15 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<CityDTO>> GetCitiesAsync(GetCitiesRequest request)
         {
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
-            
-            var response  = await _httpClient.PostAsync(testApiUrl + getCitiesEndpoint, content);
+            var response = await GetResponse(request, getCitiesEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var citiesResponse = JsonConvert.DeserializeObject<GetCitiesResponse>(responseContent);
 
-                if(citiesResponse != null && citiesResponse.Cities != null)
-                    return citiesResponse.Cities;
+                if(citiesResponse != null && !citiesResponse.Cities.IsNullOrEmpty())
+                    return citiesResponse.Cities!;
             }
 
             return null!;
@@ -89,33 +81,59 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<OfficeDTO>> GetOfficesAsync(GetOfficesRequest request)
         {
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
-
-            var response = await _httpClient.PostAsync(testApiUrl + getOfficesEndpoint, content);
+            var response = await GetResponse(request, getOfficesEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var officesResponse = JsonConvert.DeserializeObject<GetOfficesResponse>(responseContent);
 
-                if (officesResponse != null && officesResponse.Offices != null)
-                    return officesResponse.Offices;
+                if (officesResponse != null && !officesResponse.Offices.IsNullOrEmpty())
+                    return officesResponse.Offices!;
             }
 
             return null!;
         }
 
-        public Task<List<StreetDTO>> GetStreetsAsync()
+        public async Task<List<StreetDTO>> GetStreetsAsync(GetStreetsRequest request)
         {
-            //WIP
-            return Task.FromResult(new List<StreetDTO>());
+            var response = await GetResponse(request, getStreetsEndpoint);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var streetsResponse = JsonConvert.DeserializeObject<GetStreetsResponse>(responseContent);
+
+                if(streetsResponse != null && !streetsResponse.Streets.IsNullOrEmpty())
+                    return streetsResponse.Streets!;
+            }
+
+            return null!;
         }
 
-        public Task<List<QuarterDTO>> GetQuartersAsync()
+        public async Task<List<QuarterDTO>> GetQuartersAsync(GetQuartersRequest request)
         {
-            //WIP
-            return Task.FromResult(new List<QuarterDTO>());
+            var response = await GetResponse(request, getQuartersEndpoint);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var quartersResponse = JsonConvert.DeserializeObject<GetQuartersResponse>(responseContent);
+
+                if(quartersResponse != null && !quartersResponse.Quarters.IsNullOrEmpty())
+                    return quartersResponse.Quarters!;
+            }
+
+            return null!;
+        }
+
+        private async Task<HttpResponseMessage> GetResponse(RequestBase request, string endpoint)
+        {
+            var json = JsonConvert.SerializeObject(request);
+            var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);
+
+            var response = await _httpClient.PostAsync(testApiUrl + endpoint, content);
+            return response;
         }
     }
 }
