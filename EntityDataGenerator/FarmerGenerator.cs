@@ -50,10 +50,10 @@ public class FarmerGenerator : IEntityGenerator
         var farmer = new Farmer(
             Guid.NewGuid(),
             $"Description{_farmersCount}",
-            $"Location{_farmersCount}",
-            $"PhoneNumber{_farmersCount}",
+            $"FarmerLocation{_farmersCount}",
+            $"088845688{_farmersCount}",
             photo,
-            $"0123456789{_farmersCount}",
+            $"123456789{_farmersCount}",
             new DateTime(2000, 1, 1),
             Status.PendingApproval,
             Guid.NewGuid());

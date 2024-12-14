@@ -44,15 +44,17 @@ public sealed class RepositoryManager : IRepositoryManager
 
     public IProductPhotoRepository ProductPhotoRepository => _productPhotoRepository.Value;
 
-    public async Task SaveAsync(Entity entity)
+    public async Task<CRUDResult> SaveAsync(Entity entity)
     {
         var validationResult =  _validateEntityRepo.Validate(entity);
         if (validationResult != CRUDResult.Success)
         {
-            throw new EntityValidationException();
+            return CRUDResult.EntityValidationFailed;
         }
 
         await _data.SaveChangesAsync();
+        
+        return CRUDResult.Success;
     }
 
      public async Task SaveAsync() => await _data.SaveChangesAsync();    

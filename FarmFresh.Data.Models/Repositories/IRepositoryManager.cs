@@ -1,4 +1,5 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 
 namespace FarmFresh.Repositories.Contacts;
@@ -17,7 +18,7 @@ public interface IRepositoryManager
 
     IProductPhotoRepository ProductPhotoRepository { get; }
 
-    Task SaveAsync(Entity entity);
+    Task<CRUDResult> SaveAsync(Entity entity);
 
     Task SaveAsync();
 }

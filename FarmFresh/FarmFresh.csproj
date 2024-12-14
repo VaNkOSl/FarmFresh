@@ -24,6 +24,7 @@
     <ProjectReference Include="..\FarmFresh.Data\FarmFresh.Data.csproj" />
     <ProjectReference Include="..\FarmFresh.Repositories\FarmFresh.Repositories.csproj" />
     <ProjectReference Include="..\FarmFresh.Services\FarmFresh.Services.csproj" />
+    <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
 ﻿using EntityDataGenerator.Interfaces;
+using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
 
 namespace EntityDataGenerator;
@@ -14,13 +15,21 @@ public class DataGenerator : IDataGenerator
         _generators.Add(new FarmerGenerator());
     }
 
-    public void GenerateFarmers(Dictionary<string, string>? options)
+    public async void GenerateFarmers(Dictionary<string, string>? options)
     {
         var entites = _generators.Single(x => x.GetType() == typeof(FarmerGenerator)).Generate(options);
 
         foreach(var entity in entites)
         {
-            _repositoryManager.SaveAsync(entity);
+            if (entity is Farmer farmer)
+            {
+                await _repositoryManager.FarmerRepository.CreateFarmerAsync(farmer);
+                await _repositoryManager.SaveAsync(farmer);
+            }
+            else
+            {
+                throw new InvalidCastException($"Entity is not of type Farmer. Actual type: {entity.GetType()}");
+            }
         }
     }
 }
