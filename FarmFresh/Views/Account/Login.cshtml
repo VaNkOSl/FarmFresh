@@ -4,26 +4,45 @@
     ViewData["Title"] = "Log in";
 }
 
-<h1 class="text-center">@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4 offset-md-4">
+<h1 class="text-center text-primary">@ViewData["Title"]</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
         <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
+            <form id="account" method="post" class="p-4 shadow rounded bg-white">
+                <h2 class="text-center mb-3">Welcome Back!</h2>
+                <p class="text-center text-muted">Please enter your credentials to log in.</p>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
                 <div class="form-floating mb-3">
-                    <input asp-for="UserNameOrEmail" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="UserNameOrEmail" class="form-label"></label>
+                    <input asp-for="UserNameOrEmail" class="form-control form-control-lg" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <label asp-for="UserNameOrEmail" class="form-label">Username or Email</label>
                     <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
                 </div>
+
                 <div class="form-floating mb-3">
-                    <input asp-for="Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <input asp-for="Password" class="form-control form-control-lg" type="password" autocomplete="current-password" aria-required="true" placeholder="password" id="password" />
                     <label asp-for="Password" class="form-label">Password</label>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="show-password">
+                    <label class="form-check-label" for="show-password">Show Password</label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe" />
+                    <label class="form-check-label" for="rememberMe">Remember Me</label>
+                </div>
+
+                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">
+                    Log in
+                </button>
+
+                <div class="text-center mt-3">
+                    <a href="/api/account/ForgotPassword" class="text-muted">Forgot your password?</a>
                 </div>
             </form>
         </section>
@@ -32,4 +51,10 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('show-password').addEventListener('change', function () {
+            var passwordField = document.getElementById('password');
+            passwordField.type = this.checked ? 'text' : 'password';
+        });
+    </script>
 }
