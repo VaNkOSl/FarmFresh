@@ -107,6 +107,51 @@ public class AccountController : BaseController
         return Ok(new { success = true });
     }
 
+    [HttpGet("forgotpassword")]
+    public IActionResult ForgotPassword() =>
+        View();
+
+    [HttpPost("forgotpassword")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        if(ModelState.IsValid)
+        {
+            await _accountService.ForgotPasswordAsync(model.Email, trackChanges: false);
+        }
+
+        TempData[SuccessMessage] = string.Format(SendEmailForResetingPassword, model.Email);
+        return View(model);
+    }
+
+    [HttpGet("resetpassword")]
+    public async Task<IActionResult> ResetPassword(string email, string token)
+    {
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+        {
+            return RedirectToAction("Error", "Home");
+        }
+
+        var model = new ResetPasswordViewModel { Token = token, Email = email };
+        return View(model);
+    }
+
+    [HttpPost("resetpassword")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+
+        var result = await _accountService.ResetPasswordAsync(model.Email, model.Token, model.Password, trackChanges:false);
+
+        if (result)
+        {
+            TempData[SuccessMessage] = SuccessfullyResetThePassword;
+            return RedirectToAction("Login", "Account");
+        }
+
+        ModelState.AddModelError(string.Empty, "Password reset failed. Please try again.");
+        
+        return View(model);
+    }
+
     public async Task<IActionResult> Logout()
     {
         await _accountService.Logout();
