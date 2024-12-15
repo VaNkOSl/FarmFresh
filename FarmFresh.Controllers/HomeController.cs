@@ -37,7 +37,7 @@ public class HomeController : BaseController
         return View();
     }
 
-    public async Task<List<FarmerLocation>> GetFarmerLocations()
+    private async Task<List<FarmerLocation>> GetFarmerLocations()
     {
         var cachedLocations = _memoryCache.Get<List<FarmerLocation>>("allFarmerLocations");
         if (cachedLocations != null)
