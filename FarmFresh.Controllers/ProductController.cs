@@ -3,6 +3,8 @@ using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
+using static FarmFresh.Commons.MessagesConstants.Products;
+using static FarmFresh.Commons.NotificationMessagesConstants;
 
 namespace FarmFresh.Controllers;
 
@@ -35,6 +37,7 @@ public class ProductController : BaseController
         }
 
         await _serviceManager.ProductService.CreateProductAsync(model, userId, trackChanges: true);
+        TempData[SuccessMessage] = string.Format(SuccessfullyCreateProduct, model.Name);
 
         return RedirectToAction(nameof(HomeController.Index), "Home");
     }
@@ -75,10 +78,13 @@ public class ProductController : BaseController
     [HttpPut("edit/{productId}")]
     public async Task<IActionResult> Edit(Guid productId, UpdateProductDto model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            await _serviceManager.ProductService.UpdateProductAsync(model, productId, trackChanges: true);
+            await LoadModelDataAsync(model);
+            return View(model);
         }
+
+        await _serviceManager.ProductService.UpdateProductAsync(model, productId, trackChanges: true);
         return Ok(new { success = true });
     }
 
@@ -99,13 +105,19 @@ public class ProductController : BaseController
         return View(model);
     }
 
-
-    private async Task LoadModelDataAsync(CreateProductDto model)
+    private async Task LoadModelDataAsync<T>(T model)
     {
         var categories = await _serviceManager
             .ProductService
             .PrepareCreateProductModelAsync(trackChanges: false);
 
-        model.Categories = categories.Categories;
+        var categoriesProperty = typeof(T).GetProperty("Categories");
+
+        if (categoriesProperty == null || !categoriesProperty.CanWrite)
+        {
+            throw new InvalidOperationException($"Type {typeof(T).Name} must have a writable property named 'Categories'.");
+        }
+
+        categoriesProperty.SetValue(model, categories.Categories);
     }
 }

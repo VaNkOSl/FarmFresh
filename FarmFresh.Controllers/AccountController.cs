@@ -2,6 +2,8 @@
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.User;
 using Microsoft.AspNetCore.Mvc;
+using static FarmFresh.Commons.MessagesConstants.Users;
+using static FarmFresh.Commons.NotificationMessagesConstants;
 
 namespace FarmFresh.Controllers;
 
@@ -51,6 +53,7 @@ public class AccountController : BaseController
             }
         }
 
+        TempData[SuccessMessage] = string.Format(SuccessfullyRegister, model.FirstName + " " + model.LastName);
         return View(model);
     }
 
@@ -67,7 +70,7 @@ public class AccountController : BaseController
 
         if (userProfile is null)
         {
-            ViewBag.ErrorMessage = "User profile not found.";
+            TempData[ErrorMessage] = UserNotFound;
             return View("Error404");
         }
 

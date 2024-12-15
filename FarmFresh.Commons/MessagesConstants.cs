@@ -8,4 +8,15 @@ public static class MessagesConstants
     {
         public static string SuccessfullyBecomeAFarmer = "Congratulations! You have successfully applied to become a farmer. The administrator will review your application, and you will receive a response as soon as possible.";
     }
+
+    public static class Products
+    {
+        public static string SuccessfullyCreateProduct = "Congratulations! You successfully create product with name {0}. The administrator will review your product, and you will receive a response as soon as possible.";
+    }
+
+    public static class Users
+    {
+        public static string UserNotFound = "User profile not found. Please try again later or contact the administrator.";
+        public static string SuccessfullyRegister = "Hello {0}, you have successfully registered! Welcome aboard.";
+    }
 }
