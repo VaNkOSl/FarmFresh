@@ -19,4 +19,8 @@ public interface IAccountService
     Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges);
 
     Task UpdateUserAsync(UserForUpdateDto model, bool trackChanges);
+
+    Task ForgotPasswordAsync(string email, bool trackChanges);
+
+    Task<bool> ResetPasswordAsync(string email, string token, string newPassword, bool trackChanges);
 }

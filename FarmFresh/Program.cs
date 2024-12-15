@@ -1,6 +1,8 @@
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
 using LoggerService.Contacts;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using NLog;
 
 using static FarmFresh.Commons.GeneralApplicationConstants;
@@ -20,6 +22,11 @@ builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+{
+    opt.TokenLifespan = TimeSpan.FromHours(2);
+});
 
 builder.Services.AddControllersWithViews();
 

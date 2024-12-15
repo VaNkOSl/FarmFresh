@@ -2,6 +2,7 @@
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.User;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Users;
@@ -11,7 +12,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
+using System.Web;
 
 namespace FarmFresh.Services;
 
@@ -24,12 +27,14 @@ public sealed class AccountService : IAccountService
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+    private readonly string _sendGridApiKey;
     public AccountService(IRepositoryManager repositoryManager,
                           IMapper mapper,
                           ILoggerManager loggerManager,
                           IPasswordHasher<ApplicationUser> passwordHasher, 
                           IHttpContextAccessor httpContextAccessor,
-                          UserManager<ApplicationUser> userManager)
+                          UserManager<ApplicationUser> userManager,
+                          IConfiguration configuration)
     {
         _repositoryManager = repositoryManager;
         _mapper = mapper;
@@ -37,6 +42,7 @@ public sealed class AccountService : IAccountService
         _passwordHasher = passwordHasher;
         _httpContextAccessor = httpContextAccessor;
         _userManager = userManager;
+        _sendGridApiKey = configuration["SendGrid:ApiKey"];
     }
 
     public async Task<bool> Login(LoginViewModel model, bool trackChanges)
@@ -47,11 +53,7 @@ public sealed class AccountService : IAccountService
             u.Email == model.UserNameOrEmail, 
             trackChanges).FirstOrDefaultAsync();
 
-        if (user is null)
-        {
-            _loggerManager.LogError($"[{nameof(Login)}] Login attempt failed. User not found.");
-            throw new UserNotFounException();
-        }
+        ChekIfUserIsNull(user, user.Id, nameof(Login));
 
         try
         {
@@ -119,11 +121,7 @@ public sealed class AccountService : IAccountService
             trackChanges)
             .FirstOrDefaultAsync();
 
-        if (user is null)
-        {
-            _loggerManager.LogWarning($"User with ID {userId} was not found.");
-            throw new UserIdNotFoundException(Guid.Parse(userId));
-        }
+        ChekIfUserIsNull(user, Guid.Parse(userId), nameof(GetUserProfileAsync));
 
         return _mapper.Map<ProfileViewModel>(user);
     }
@@ -137,12 +135,7 @@ public sealed class AccountService : IAccountService
             .FirstOrDefaultAsync();
 
         await DeleteFarmerAsync(userId, trackChanges);
-
-        if (userForDeleting is null)
-        {
-            _loggerManager.LogError($"[{nameof(DeleteUserAsync)}] User with Id {userId} was not found!");
-            throw new UserIdNotFoundException(userId);
-        }
+        ChekIfUserIsNull(userForDeleting, userId, nameof(DeleteUserAsync));
 
         try
         {
@@ -166,11 +159,7 @@ public sealed class AccountService : IAccountService
             .FindFarmersByConditionAsync(f => f.UserId == userId, trackChanges)
             .SingleOrDefaultAsync();
 
-        if (farmerForDeleting != null)
-        {
-            _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
-            _loggerManager.LogInfo($"Farmer linked to user with ID {userId} successfully deleted.");
-        }
+        ChekIfUserIsNull(farmerForDeleting, userId, nameof(DeleteFarmerAsync));
     }
 
     public async Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges)
@@ -181,11 +170,7 @@ public sealed class AccountService : IAccountService
             .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
             .FirstOrDefaultAsync();
 
-        if (userForUpdate is null)
-        {
-            _loggerManager.LogError($"[{nameof(GetUserForUpdateAsync)}] User with Id {userId} was not found!");
-            throw new UserIdNotFoundException(userId);
-        }
+        ChekIfUserIsNull(userForUpdate, userId, nameof(GetUserForUpdateAsync));
 
         return _mapper.Map<UserForUpdateDto>(userForUpdate);
     }
@@ -198,11 +183,7 @@ public sealed class AccountService : IAccountService
           .FindUsersByConditionAsync(u => u.Id == model.Id, trackChanges)
           .FirstOrDefaultAsync();
 
-        if (currentUserForUpdate is null)
-        {
-            _loggerManager.LogError($"[{nameof(DeleteUserAsync)}] User with Id {model.Id} was not found!");
-            throw new UserIdNotFoundException(model.Id);
-        }
+        ChekIfUserIsNull(currentUserForUpdate, model.Id, nameof(UpdateUserAsync));
 
         try
         {
@@ -222,6 +203,63 @@ public sealed class AccountService : IAccountService
     {
         await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         _loggerManager.LogInfo("User successfully logged out.");
+    }
+
+    private void ChekIfUserIsNull(object user, Guid userId, string methodName)
+    {
+        if(user is null)
+        {
+            _loggerManager.LogError($"[{nameof(methodName)}] User with Id {userId} was not found!");
+            throw new UserIdNotFoundException(userId);
+        }
+    }
+
+    public async Task ForgotPasswordAsync(string email, bool trackChanges)
+    {
+        var user = await
+            _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.Email == email, trackChanges)
+            .FirstOrDefaultAsync();
+
+        ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync));
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var request = _httpContextAccessor.HttpContext.Request;
+        var resetLink = $"{request.Scheme}://{request.Host}/api/account/resetpassword?token={HttpUtility.UrlEncode(token)}&email={email}";
+
+        _loggerManager.LogInfo($"Reset Password Link: {resetLink}");
+
+        var model = new PasswordResetEmailModel
+        {
+          EmailFrom = "contactfarmfresh2024@abv.bg",
+          EmailTo = email,
+          EmailSubject = "Password Reset",
+          EmailBody = $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>"
+        };
+
+        await AdminHelper.SendRejectEmailAsync(model, _sendGridApiKey, _loggerManager);
+    }
+
+    public async Task<bool> ResetPasswordAsync(string email, string token, string newPassword, bool trackChanges)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync));
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+        if (result.Succeeded)
+        {
+            return true;
+        }
+
+        foreach (var error in result.Errors)
+        {
+            _loggerManager.LogError($"Password reset failed for {email}: {error.Description}");
+        }
+
+        return false;
     }
 
     private async Task SignInUserAsync(ApplicationUser user)
