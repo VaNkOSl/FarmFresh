@@ -1,7 +1,6 @@
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
 using LoggerService.Contacts;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using NLog;
 
