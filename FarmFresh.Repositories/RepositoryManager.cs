@@ -4,7 +4,6 @@ using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.DataValidator;
-using LoggerService.Exceptions.BadRequest;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FarmFresh.Repositories;
@@ -18,6 +17,7 @@ public sealed class RepositoryManager : IRepositoryManager
     private Lazy<ICategoryRepository> _categoryRepository;
     private Lazy<IProductRepository> _productRepository;
     private Lazy<IProductPhotoRepository> _productPhotoRepository;
+    private Lazy<IReviewRepository> _reviewRepository;
     private IValidateEntity _validateEntityRepo;
 
     public RepositoryManager(FarmFreshDbContext data, IServiceProvider serviceProvider)
@@ -29,6 +29,7 @@ public sealed class RepositoryManager : IRepositoryManager
         _categoryRepository = new Lazy<ICategoryRepository>(() => new CategoryRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _productRepository = new Lazy<IProductRepository>(() => new ProductRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _productPhotoRepository = new Lazy<IProductPhotoRepository>(() => new ProductPhotoRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
+        _reviewRepository = new Lazy<IReviewRepository>(() => new ReviewRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _validateEntityRepo = serviceProvider.GetRequiredService<IValidateEntity>();
     }
 
@@ -43,6 +44,8 @@ public sealed class RepositoryManager : IRepositoryManager
     public IProductRepository ProductRepository => _productRepository.Value;
 
     public IProductPhotoRepository ProductPhotoRepository => _productPhotoRepository.Value;
+
+    public IReviewRepository ReviewRepository => _reviewRepository.Value;
 
     public async Task<CRUDResult> SaveAsync(Entity entity)
     {

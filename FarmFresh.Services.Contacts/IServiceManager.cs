@@ -11,4 +11,6 @@ public interface IServiceManager
     IProductService ProductService { get; }
 
     IProductPhotoService ProductPhotoService { get; }
+
+    IReviewService ReviewService { get; }
 }

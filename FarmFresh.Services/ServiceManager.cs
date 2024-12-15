@@ -13,6 +13,7 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<ICategoryService> _categoryService;
     private readonly Lazy<IProductService> _productService;
     private readonly Lazy<IProductPhotoService> _productPhotoService;
+    private readonly Lazy<IReviewService> _reviewService;
 
     public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, ILoggerManager loggerManager, IConfiguration configuration)
     {
@@ -21,6 +22,7 @@ public sealed class ServiceManager : IServiceManager
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
         _productService = new Lazy<IProductService>(() => new ProductService(repositoryManager, loggerManager, mapper));
         _productPhotoService = new Lazy<IProductPhotoService>(() => new ProductPhotoService(repositoryManager, loggerManager, mapper));
+        _reviewService = new Lazy<IReviewService>(() => new ReviewService(repositoryManager, loggerManager, mapper));
     }
 
     public IFarmerService FarmerService => _farmerService.Value;
@@ -32,4 +34,6 @@ public sealed class ServiceManager : IServiceManager
     public IProductService ProductService => _productService.Value;
 
     public IProductPhotoService ProductPhotoService => _productPhotoService.Value;
+
+    public IReviewService ReviewService => _reviewService.Value;
 }
