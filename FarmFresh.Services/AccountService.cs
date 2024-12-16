@@ -160,6 +160,9 @@ public sealed class AccountService : IAccountService
             .SingleOrDefaultAsync();
 
         AccountHelper.ChekIfUserIsNull(farmerForDeleting, userId, nameof(DeleteFarmerAsync), _loggerManager);
+
+        _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
+        await _repositoryManager.SaveAsync();
     }
 
     public async Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges)
