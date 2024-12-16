@@ -37,8 +37,8 @@
                     <div class="card border-light mb-3">
                         <div class="card-body">
                             <p><strong>Order ID:</strong> @Model.OrderId</p>
-                            <p><strong>Total Quantity:</strong> @Model.CartItems.Sum(q=> q.Quantity)</p>
-                            <p><strong>Total Price:</strong> <span class="text-success">@Model.CartItems.Sum(p=>p.Quantity*p.Price) лв.</span></p>
+                                <p><strong>Total Quantity:</strong> @Model.Products.Sum(p => p.Quantity)</p>
+                                <p><strong>Total Price:</strong> <span class="text-success">@Model.Products.Sum(p => p.Price * p.Quantity) лв.</span></p>
                         </div>
                     </div>
                 </div>
@@ -58,10 +58,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var product in Model.CartItems)
+                                @foreach (var product in Model.Products)
                             {
                                 <tr>
-                                    <td>@product.ProductName</td>
+                                    <td>@product.Product.Name</td>
                                     <td>@product.Quantity</td>
                                     <td>@product.Price.ToString("C")</td>
                                     <td>@(product.Price * product.Quantity) лв.</td>

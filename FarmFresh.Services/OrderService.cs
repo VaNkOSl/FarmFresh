@@ -26,10 +26,31 @@ namespace FarmFresh.Services
         public async Task<Guid> CheckoutAsync(Order order, Guid orderProductId, Guid userId)
         {
             order.UserId = userId;
-            order.OrderStatus = OrderStatus.Cart;
-            order.CreateOrderdDate = DateTime.Now;
+            order.OrderStatus = OrderStatus.Cart; 
+            order.CreateOrderdDate = DateTime.Now; 
+            var cartItems = _httpContextAccessor.HttpContext.Session.Get<List<CartItemViewModel>>("Cart");
 
+            if (cartItems == null || !cartItems.Any())
+            {
+                throw new InvalidOperationException("Cart is empty.");
+            }
             await _orderRepository.AddOrderAsync(order);
+
+            foreach (var cartItem in cartItems)
+            {
+                var orderProduct = new OrderProduct
+                {
+                    OrderId = order.Id,
+                    ProductId = cartItem.ProductId,
+                    Quantity = cartItem.Quantity,
+                    Price = cartItem.Price
+                };
+
+                await _orderRepository.AddOrderProductAsync(orderProduct);
+            }
+
+            _httpContextAccessor.HttpContext.Session.Remove("Cart");
+
             return order.Id;
         }
         public async Task CompleteOrderAsync(Guid orderId)
@@ -46,9 +67,11 @@ namespace FarmFresh.Services
         public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId)
         {
             var order = await _orderRepository.GetOrderWithDetailsAsync(orderId);
-            if (order == null) return null;
 
-            var cartItems = _httpContextAccessor.HttpContext.Session.Get<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>();
+            if (order == null)
+            {
+                throw new KeyNotFoundException("Order not found.");
+            }
 
             return new OrderConfirmationViewModel
             {
@@ -64,7 +87,6 @@ namespace FarmFresh.Services
                 Adress = order.Adress,
                 PhoneNumber = order.PhoneNumber,
                 Email = order.Email,
-                CartItems = cartItems
             };
         }
         public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId)

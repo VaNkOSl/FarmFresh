@@ -64,5 +64,11 @@ namespace FarmFresh.Repositories
                 .Include(o => o.Order)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
+
+        public async Task AddOrderProductAsync(OrderProduct orderProduct)
+        {
+            _context.OrderProducts.Add(orderProduct);
+            await _context.SaveChangesAsync();
+        }
     }
 }

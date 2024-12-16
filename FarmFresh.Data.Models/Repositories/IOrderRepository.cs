@@ -15,5 +15,6 @@ namespace FarmFresh.Data.Models.Repositories
         Task<Order> GetOrderWithDetailsAsync(Guid orderId);
         Task<List<OrderProduct>> GetOrderProductsByUserIdAsync(Guid userId);
         Task<OrderProduct> GetOrderProductDetailsByIdAsync(Guid id);
+        Task AddOrderProductAsync(OrderProduct orderProduct);
     }
 }
