@@ -103,7 +103,7 @@ internal sealed class FarmerService : IFarmerService
                                       .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
                                       .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(farmerForDeleting, farmerId, nameof(DeleteFarmerAsync));
+        FarmerHelper.ChekFarmerNotFound(farmerForDeleting, farmerId, nameof(DeleteFarmerAsync), _loggerManager);
 
         try
         {
@@ -132,7 +132,7 @@ internal sealed class FarmerService : IFarmerService
                               .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
                               .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(farmerForEdit, farmerId, nameof(GetFarmerForEditAsync));
+        FarmerHelper.ChekFarmerNotFound(farmerForEdit, farmerId, nameof(GetFarmerForEditAsync), _loggerManager);
 
         return _mapper.Map<FarmerForUpdatingDto>(farmerForEdit);
     }
@@ -144,7 +144,7 @@ internal sealed class FarmerService : IFarmerService
                               .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
                               .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(existingFarmer, farmerId, nameof(EditFarmerAsync));
+        FarmerHelper.ChekFarmerNotFound(existingFarmer, farmerId, nameof(EditFarmerAsync), _loggerManager);
 
         try
         {
@@ -203,7 +203,7 @@ internal sealed class FarmerService : IFarmerService
          .Include(u => u.User)
          .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(farmer, Guid.Parse(userId), nameof(GetFarmerProfileAsync));
+        FarmerHelper.ChekFarmerNotFound(farmer, Guid.Parse(userId), nameof(GetFarmerProfileAsync), _loggerManager);
 
         return _mapper.Map<FarmerProfileViewModel>(farmer);
     }
@@ -236,7 +236,7 @@ internal sealed class FarmerService : IFarmerService
             .Include(u => u.User)
             .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(farmer, farmerId, nameof(GetFarmersDetailsByIdAsync));
+        FarmerHelper.ChekFarmerNotFound(farmer, farmerId, nameof(GetFarmersDetailsByIdAsync), _loggerManager);
 
         return _mapper.Map<FarmerDetailsDto>(farmer);
     }
@@ -249,17 +249,8 @@ internal sealed class FarmerService : IFarmerService
             .FindFarmersByConditionAsync(f => f.UserId == userId && f.FarmerStatus == Status.Approved, trackChanges)
             .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(farmer, userId, nameof(GetFarmerByUserIdAsync));
+        FarmerHelper.ChekFarmerNotFound(farmer, userId, nameof(GetFarmerByUserIdAsync), _loggerManager);
 
         return farmer.Id;
-    }
-
-    private void ChekFarmerNotFound(object farmer, Guid farmerId, string methodName)
-    {
-        if(farmer is null)
-        {
-            _loggerManager.LogError($"[{nameof(methodName)}] Farmer with user ID {farmerId} not found.");
-            throw new FarmerIdNotFoundException(farmerId);
-        }
     }
 }

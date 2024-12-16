@@ -1,5 +1,9 @@
-﻿using FarmFresh.ViewModels.Email;
+﻿using FarmFresh.Data.Models;
+using FarmFresh.Repositories.Contacts;
+using FarmFresh.ViewModels.Email;
+using LoggerService;
 using LoggerService.Contacts;
+using Microsoft.EntityFrameworkCore;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using static FarmFresh.Commons.GeneralApplicationConstants;
@@ -42,5 +46,35 @@ public static class AdminHelper
             loggerManager.LogError($"Error while sending rejection email: {ex.Message}");
             throw;
         }
+    }
+
+    public static async Task<Product> GetProductByIdAsync(
+        Guid productId,
+        bool trackChanges,
+        IRepositoryManager _repositoryManager,
+        ILoggerManager _loggerManager)
+    {
+        var product = await _repositoryManager.ProductRepository
+            .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
+        .FirstOrDefaultAsync();
+
+        ProductHelper.CheckProductNotFound(product, productId, nameof(GetProductByIdAsync), _loggerManager);
+        return product;
+    }
+
+    public static async Task<Farmer> GetFarmerByIdAsync(
+        Guid farmerId,
+        bool trackChanges,
+        IRepositoryManager _repositoryManager,
+        ILoggerManager _loggerManager)
+    {
+        var farmer = await _repositoryManager.FarmerRepository
+            .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
+            .Include(u => u.User)
+        .FirstOrDefaultAsync();
+
+        FarmerHelper.ChekFarmerNotFound(farmer, farmerId, nameof(GetFarmerByIdAsync), _loggerManager);
+
+        return farmer;
     }
 }
