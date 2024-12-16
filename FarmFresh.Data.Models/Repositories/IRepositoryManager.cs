@@ -19,6 +19,7 @@ public interface IRepositoryManager
     IProductPhotoRepository ProductPhotoRepository { get; }
 
     IReviewRepository ReviewRepository { get; }
+    IOrderRepository OrderRepository { get; }
 
     Task<CRUDResult> SaveAsync(Entity entity);
 

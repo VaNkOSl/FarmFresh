@@ -18,6 +18,7 @@ public sealed class RepositoryManager : IRepositoryManager
     private Lazy<IProductRepository> _productRepository;
     private Lazy<IProductPhotoRepository> _productPhotoRepository;
     private Lazy<IReviewRepository> _reviewRepository;
+    private Lazy<IOrderRepository> _orderRepository;
     private IValidateEntity _validateEntityRepo;
 
     public RepositoryManager(FarmFreshDbContext data, IServiceProvider serviceProvider)
@@ -30,6 +31,7 @@ public sealed class RepositoryManager : IRepositoryManager
         _productRepository = new Lazy<IProductRepository>(() => new ProductRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _productPhotoRepository = new Lazy<IProductPhotoRepository>(() => new ProductPhotoRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _reviewRepository = new Lazy<IReviewRepository>(() => new ReviewRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
+        _orderRepository = new Lazy<IOrderRepository> (() => new OrderRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _validateEntityRepo = serviceProvider.GetRequiredService<IValidateEntity>();
     }
 
@@ -47,6 +49,7 @@ public sealed class RepositoryManager : IRepositoryManager
 
     public IReviewRepository ReviewRepository => _reviewRepository.Value;
 
+    public IOrderRepository OrderRepository => _orderRepository.Value;
     public async Task<CRUDResult> SaveAsync(Entity entity)
     {
         var validationResult =  _validateEntityRepo.Validate(entity);

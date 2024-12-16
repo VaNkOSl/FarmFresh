@@ -6,49 +6,46 @@ using System.Threading.Tasks;
 using FarmFresh.Data;
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
+using FarmFresh.Repositories.DataValidator;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    internal sealed class OrderRepository (FarmFreshDbContext data, IValidateEntity validateEntity) :
+    RepositoryBase<Farmer>(data), IOrderRepository
     {
-        private readonly FarmFreshDbContext _context;
-
-        public OrderRepository(FarmFreshDbContext context)
-        {
-            _context = context;
-        }
+     
 
         public async Task AddOrderAsync(Order order)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            data.Orders.Add(order);
+            await data.SaveChangesAsync();
         }
         public async Task<Order> GetOrderByIdAsync(Guid orderId)
         {
-            return await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+            return await data.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
         }
         public async Task UpdateOrder(Order order)
         {
-            _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
+            data.Orders.Update(order);
+            await data.SaveChangesAsync();
         }
         public async Task<Order> GetOrderWithDetailsAsync(Guid orderId)
         {
-            return await _context.Orders
+            return await data.Orders
                 .Include(o => o.OrderProducts)
                     .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
         public async Task UpdateOrderAsync(Order order)
         {
-            _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
+            data.Orders.Update(order);
+            await data.SaveChangesAsync();
         }
 
         public async Task<List<OrderProduct>> GetOrderProductsByUserIdAsync(Guid userId)
         {
-            return await _context.OrderProducts
+            return await data.OrderProducts
                 .Include(o => o.Product)
                 .Include(o => o.Order)
                 .ThenInclude(o => o.User)
@@ -57,7 +54,7 @@ namespace FarmFresh.Repositories
         }
         public async Task<OrderProduct> GetOrderProductDetailsByIdAsync(Guid id)
         {
-            return await _context.OrderProducts
+            return await data.OrderProducts
                 .Include(o => o.Product)
                     .ThenInclude(p => p.Farmer)
                     .ThenInclude(f => f.User)
@@ -67,8 +64,8 @@ namespace FarmFresh.Repositories
 
         public async Task AddOrderProductAsync(OrderProduct orderProduct)
         {
-            _context.OrderProducts.Add(orderProduct);
-            await _context.SaveChangesAsync();
+            data.OrderProducts.Add(orderProduct);
+            await data.SaveChangesAsync();
         }
     }
 }
