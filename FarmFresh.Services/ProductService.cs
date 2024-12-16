@@ -9,9 +9,7 @@ using FarmFresh.ViewModels.Categories;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Product;
-using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
-using static FarmFresh.Commons.EntityValidationConstants;
 
 namespace FarmFresh.Services;
 
@@ -97,15 +95,12 @@ internal sealed class ProductService : IProductService
     {
         var productForDeleting = await GetProductAsync(productId, trackChanges);
 
-        if (productForDeleting is null)
-        {
-            _loggerManager.LogError($"[{nameof(DeleteProductAsync)}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
-            throw new ProductIdNotFoundException(productId);
-        }
+        ProductHelper.CheckProductNotFound(productForDeleting, productId, nameof(DeleteProductAsync), _loggerManager);
 
         try
         {
             await ProductHelper.DeleteProductPhotoAsync(_repositoryManager, _loggerManager, productId, trackChanges);
+            await ProductHelper.DeleteProductReviewAsync(_repositoryManager, _loggerManager, productId, trackChanges);
 
             _repositoryManager.ProductRepository.DeleteProduct(productForDeleting);
            await _repositoryManager.SaveAsync();
@@ -121,11 +116,7 @@ internal sealed class ProductService : IProductService
     {
         var productForDeleting = await GetProductAsync(productId, trackChanges);
 
-        if (productForDeleting is null)
-        {
-            _loggerManager.LogError($"[{nameof(GetProductForDeletingAsync)}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
-            throw new ProductIdNotFoundException(productId);
-        }
+        ProductHelper.CheckProductNotFound(productForDeleting, productId, nameof(GetProductForDeletingAsync), _loggerManager);
 
         return _mapper.Map<ProductPreDeleteDto>(productForDeleting);
     }
@@ -134,11 +125,7 @@ internal sealed class ProductService : IProductService
     {
         var productToEdit = await GetProductAsync(productId, trackChanges);
 
-        if (productToEdit is null)
-        {
-            _loggerManager.LogError($"[{nameof(GetProductForUpdateAsync)}] Product with ID {productId} was not found!");
-            throw new ProductIdNotFoundException(productId);
-        }
+        ProductHelper.CheckProductNotFound(productToEdit, productId, nameof(GetProductForUpdateAsync), _loggerManager);
 
         var category = await
                     _repositoryManager
@@ -154,11 +141,7 @@ internal sealed class ProductService : IProductService
     {
         var product = await GetProductAsync(productId, trackChanges);
 
-        if (product == null)
-        {
-            _loggerManager.LogError($"Product with ID {productId} was not found.");
-            throw new ProductIdNotFoundException(productId);
-        }
+        ProductHelper.CheckProductNotFound(product, productId, nameof(UpdateProductAsync), _loggerManager);
 
         try
         {
@@ -183,7 +166,7 @@ internal sealed class ProductService : IProductService
         catch (Exception ex)
         {
             _loggerManager.LogError($"An error occurred while updating the product: {ex.Message}");
-            throw;
+            throw new UpdateProductException();
         }
     }
 
@@ -191,9 +174,8 @@ internal sealed class ProductService : IProductService
     {
         var product = await GetProductAsync(productId, trackChanges);
 
-        CheckProductNotFound(product, productId, nameof(GetProductDetailsAsync));
+       ProductHelper.CheckProductNotFound(product, productId, nameof(GetProductDetailsAsync), _loggerManager);
 
-        
         return _mapper.Map<ProductDetailsDto>(product);
     }
 
@@ -227,15 +209,6 @@ internal sealed class ProductService : IProductService
         {
 
             throw;
-        }
-    }
-
-    private void CheckProductNotFound(object product, Guid productId, string methodName)
-    {
-        if (product is null)
-        {
-            _loggerManager.LogError($"[{methodName}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
-            throw new ProductIdNotFoundException(productId);
         }
     }
 }
