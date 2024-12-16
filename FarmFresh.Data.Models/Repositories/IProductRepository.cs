@@ -16,4 +16,5 @@ public interface IProductRepository
     IQueryable<Product> FindAllProducts(bool trackChanges);
 
     Task<PagedList<Product>> GetProductsAsync(ProductParameters productParameters, bool trackChanges);
+    Task<Product> GetProductByIdAsync(Guid productId);
 }

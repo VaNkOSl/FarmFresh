@@ -1,0 +1,77 @@
+﻿ @model IEnumerable<FarmFresh.ViewModels.Order.OrderDetailsViewModel>
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<h1 class="text-center my-4">Order Details</h1>
+
+<div class="container">
+    @foreach (var item in Model)
+    {
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>Order ID: @item.OrderId</span>
+                    <small class="text-light">Created: @item.CreatedDate.ToString("yyyy-MM-dd")</small>
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class=" mb-4">
+                    <img src="@(item.Picture != null
+           ? $"data:image/jpeg;base64,{Convert.ToBase64String(item.Picture)}"
+           : "/images/Placeholder.png")"
+                         alt="Product Image" width="100" height="100" />
+                </div>
+                <!-- Customer Information -->
+                <h5 class="card-title text-primary"><i class="bi bi-person-fill"></i> Customer Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> @item.FirstName @item.LastName</p>
+                        <p><strong>Address:</strong> @item.Adress</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Phone:</strong> @item.PhoneNumber</p>
+                        <p><strong>Email:</strong> @item.Email</p>
+                    </div>
+                </div>
+
+                <!-- Product Information -->
+                <h5 class="card-title text-primary mt-4"><i class="bi bi-box-seam"></i> Product Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Product Name:</strong> @item.ProductName</p>
+                        <p><strong>Price:</strong> @item.Price.ToString("C")</p>
+                        <p><strong>Quantity:</strong> @item.Quantity</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Origin:</strong> @item.Origin</p>
+                        <p><strong>Harvest Date:</strong> @item.HarvestDate.ToString("yyyy-MM-dd")</p>
+                        <p><strong>Expiration Date:</strong> @item.ExpirationDate.ToString("yyyy-MM-dd")</p>
+                    </div>
+                </div>
+                <p><strong>Description:</strong> @item.ProductDescription</p>
+                <p><strong>Suitable Seasons:</strong> @item.Seasons</p>
+
+                <!-- Farmer Information -->
+                <h5 class="card-title text-primary mt-4"><i class="bi bi-people-fill"></i> Farmer Information</h5>
+                <p><strong>Farmer:</strong> @item.FarmerName</p>
+
+                <!-- Order Details -->
+                <h5 class="card-title text-primary mt-4"><i class="bi bi-truck"></i> Order Details</h5>
+                <p><strong>Delivery Option:</strong> @item.DeliveryOption</p>
+                <p><strong>Status:</strong> @item.OrderStatus</p>
+                <p><strong>TotalPrice:</strong> @item.Price.ToString("C")</p>
+            </div>
+
+            <div class="card-footer text-muted">
+                <p class="mb-0">Thank you for shopping with us!</p>
+            </div>
+        </div>
+    }
+</div>
+
+<a href="@Url.Action("Index", "Order")" class="btn btn-outline-primary btn-lg d-block mx-auto mt-4" style="width: 200px;">
+    <i class="bi bi-arrow-left"></i> Back to Orders
+</a>

@@ -40,4 +40,8 @@ internal sealed class ProductRepository(FarmFreshDbContext data, IValidateEntity
         return PagedList<Product>
                .ToPagedList(products, productParameters.PageNumber, productParameters.PageSize);
     }
+    public async Task<Product> GetProductByIdAsync(Guid productId)
+    {
+        return await data.Products.FirstOrDefaultAsync(p => p.Id == productId);
+    }
 }
