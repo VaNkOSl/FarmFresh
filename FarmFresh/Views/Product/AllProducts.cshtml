@@ -51,7 +51,7 @@
                         <h5 class="card-title">@product.Name</h5>
                         <p class="card-text">Price: @product.Price</p>
                         <p class="card-text">StockQuantity: @product.StockQuantity</p>
-                        @if (await _serviceManager.FarmerService.DoesFarmerHasProductsAsync(User.GetId(), product.Id, trackChanges: false))
+                        @if (await _serviceManager.FarmerService.DoesFarmerHasProductsAsync(User.GetId(), product.Id, trackChanges: false) == true)
                         {
                             <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-warning btn-sm">Edit</a>
                             <a asp-area="" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>

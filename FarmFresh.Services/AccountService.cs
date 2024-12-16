@@ -53,7 +53,7 @@ public sealed class AccountService : IAccountService
             u.Email == model.UserNameOrEmail, 
             trackChanges).FirstOrDefaultAsync();
 
-        ChekIfUserIsNull(user, user.Id, nameof(Login));
+        AccountHelper.ChekIfUserIsNull(user, user.Id, nameof(Login), _loggerManager);
 
         try
         {
@@ -121,7 +121,7 @@ public sealed class AccountService : IAccountService
             trackChanges)
             .FirstOrDefaultAsync();
 
-        ChekIfUserIsNull(user, Guid.Parse(userId), nameof(GetUserProfileAsync));
+        AccountHelper.ChekIfUserIsNull(user, Guid.Parse(userId), nameof(GetUserProfileAsync), _loggerManager);
 
         return _mapper.Map<ProfileViewModel>(user);
     }
@@ -135,7 +135,7 @@ public sealed class AccountService : IAccountService
             .FirstOrDefaultAsync();
 
         await DeleteFarmerAsync(userId, trackChanges);
-        ChekIfUserIsNull(userForDeleting, userId, nameof(DeleteUserAsync));
+        AccountHelper.ChekIfUserIsNull(userForDeleting, userId, nameof(DeleteUserAsync), _loggerManager);
 
         try
         {
@@ -159,7 +159,7 @@ public sealed class AccountService : IAccountService
             .FindFarmersByConditionAsync(f => f.UserId == userId, trackChanges)
             .SingleOrDefaultAsync();
 
-        ChekIfUserIsNull(farmerForDeleting, userId, nameof(DeleteFarmerAsync));
+        AccountHelper.ChekIfUserIsNull(farmerForDeleting, userId, nameof(DeleteFarmerAsync), _loggerManager);
     }
 
     public async Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges)
@@ -170,7 +170,7 @@ public sealed class AccountService : IAccountService
             .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
             .FirstOrDefaultAsync();
 
-        ChekIfUserIsNull(userForUpdate, userId, nameof(GetUserForUpdateAsync));
+        AccountHelper.ChekIfUserIsNull(userForUpdate, userId, nameof(GetUserForUpdateAsync), _loggerManager);
 
         return _mapper.Map<UserForUpdateDto>(userForUpdate);
     }
@@ -183,7 +183,7 @@ public sealed class AccountService : IAccountService
           .FindUsersByConditionAsync(u => u.Id == model.Id, trackChanges)
           .FirstOrDefaultAsync();
 
-        ChekIfUserIsNull(currentUserForUpdate, model.Id, nameof(UpdateUserAsync));
+        AccountHelper.ChekIfUserIsNull(currentUserForUpdate, model.Id, nameof(UpdateUserAsync), _loggerManager);
 
         try
         {
@@ -205,15 +205,6 @@ public sealed class AccountService : IAccountService
         _loggerManager.LogInfo("User successfully logged out.");
     }
 
-    private void ChekIfUserIsNull(object user, Guid userId, string methodName)
-    {
-        if(user is null)
-        {
-            _loggerManager.LogError($"[{nameof(methodName)}] User with Id {userId} was not found!");
-            throw new UserIdNotFoundException(userId);
-        }
-    }
-
     public async Task ForgotPasswordAsync(string email, bool trackChanges)
     {
         var user = await
@@ -222,7 +213,7 @@ public sealed class AccountService : IAccountService
             .FindUsersByConditionAsync(u => u.Email == email, trackChanges)
             .FirstOrDefaultAsync();
 
-        ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync));
+        AccountHelper.ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync), _loggerManager);
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var request = _httpContextAccessor.HttpContext.Request;
@@ -245,7 +236,7 @@ public sealed class AccountService : IAccountService
     {
         var user = await _userManager.FindByEmailAsync(email);
 
-        ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync));
+        AccountHelper.ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync), _loggerManager);
 
         var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
 

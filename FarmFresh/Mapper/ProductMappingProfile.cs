@@ -114,10 +114,12 @@ public class ProductMappingProfile : Profile
             src.Reviews != null && src.Reviews.Any()
                 ? src.Reviews.Select(review => new ViewModels.Review.ProductReviewDto
                 {
+                    Id = review.Id,
                     Content = review.Content,
                     ProductId = review.ProductId,
                     Rating = review.Rating,
                     ReviewDate = review.ReviewDate,
+                    UserId = review.UserId,
                     UserFullName = review.User != null
                         ? $"{review.User.FirstName} {review.User.LastName}"
                         : "Anonymous"

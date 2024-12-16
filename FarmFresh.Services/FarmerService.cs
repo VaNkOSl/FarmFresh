@@ -217,7 +217,10 @@ internal sealed class FarmerService : IFarmerService
             .Include(f => f.OwnedProducts)
             .FirstOrDefaultAsync();
 
-        ChekFarmerNotFound(farmer, Guid.Parse(userId), nameof(DoesFarmerHasProductsAsync));
+        if (farmer is null)
+        {
+            return false;
+        }
 
         return farmer.OwnedProducts.Any(op => op.Id  == productId);
     }

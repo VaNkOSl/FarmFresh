@@ -1,9 +1,9 @@
 ﻿using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
-using LoggerService;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.ProductPhotos;
+using LoggerService.Exceptions.InternalError.ProductReview;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -132,6 +132,53 @@ public static class ProductHelper
         {
             loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
             throw new DeleteProductPhotosException(productId);
+        }
+    }
+
+    public static async Task DeleteProductReviewAsync(
+        IRepositoryManager repositoryManager,
+        ILoggerManager loggerManager,
+        Guid productId,
+        bool trackChanges)
+    {
+        var productReviewForDeleting = await
+            repositoryManager
+            .ReviewRepository
+            .FindReviewByConditionAsync(r => r.ProductId == productId,trackChanges)
+            .ToListAsync();
+
+        if(productReviewForDeleting is null)
+        {
+            loggerManager.LogError($"[{nameof(DeleteProductReviewAsync)}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
+            throw new ProductIdNotFoundException(productId);
+        }
+
+        try
+        {
+            foreach(var review in productReviewForDeleting)
+            {
+                repositoryManager.ReviewRepository.DeleteReview(review);
+            }
+
+            await repositoryManager.SaveAsync();
+        }
+        catch (Exception ex)
+        {
+            loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
+            throw new DeleteProductReviewException(productId);
+        }
+    }
+
+    public static void CheckProductNotFound(
+        object product,
+        Guid productId,
+        string methodName,
+        ILoggerManager _loggerManager)
+    {
+        if (product is null)
+        {
+            _loggerManager.LogError($"[{methodName}] Product with Id {productId} was not found at Date: {DateTime.UtcNow}");
+            throw new ProductIdNotFoundException(productId);
         }
     }
 }
