@@ -18,6 +18,9 @@ public sealed class RepositoryManager : IRepositoryManager
     private Lazy<IProductRepository> _productRepository;
     private Lazy<IProductPhotoRepository> _productPhotoRepository;
     private Lazy<IReviewRepository> _reviewRepository;
+    private Lazy<IOrderRepository> _orderRepository;
+    private Lazy<IOrderProductRepository> _orderProductRepository;
+    private Lazy<ICartItemRepository> _cartItemRepository;
     private IValidateEntity _validateEntityRepo;
 
     public RepositoryManager(FarmFreshDbContext data, IServiceProvider serviceProvider)
@@ -30,6 +33,9 @@ public sealed class RepositoryManager : IRepositoryManager
         _productRepository = new Lazy<IProductRepository>(() => new ProductRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _productPhotoRepository = new Lazy<IProductPhotoRepository>(() => new ProductPhotoRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _reviewRepository = new Lazy<IReviewRepository>(() => new ReviewRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
+        _orderRepository = new Lazy<IOrderRepository>(() => new OrderRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
+        _orderProductRepository = new Lazy<IOrderProductRepository>(() => new OrderProductRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
+        _cartItemRepository = new Lazy<ICartItemRepository>(() => new CartItemRepository(data, serviceProvider.GetRequiredService<IValidateEntity>()));
         _validateEntityRepo = serviceProvider.GetRequiredService<IValidateEntity>();
     }
 
@@ -46,6 +52,12 @@ public sealed class RepositoryManager : IRepositoryManager
     public IProductPhotoRepository ProductPhotoRepository => _productPhotoRepository.Value;
 
     public IReviewRepository ReviewRepository => _reviewRepository.Value;
+
+    public IOrderRepository OrderRepository => _orderRepository.Value;
+
+    public IOrderProductRepository OrderProductRepository => _orderProductRepository.Value;
+
+    public ICartItemRepository CartItemRepository => _cartItemRepository.Value;
 
     public async Task<CRUDResult> SaveAsync(Entity entity)
     {

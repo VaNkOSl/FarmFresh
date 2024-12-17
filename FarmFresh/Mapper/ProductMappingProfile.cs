@@ -144,4 +144,13 @@ public class ProductMappingProfile : Profile
                     )).ToList()
                     : new List<ProductPhotosDto>()));
     }
+
+    private byte[] ConvertToByteArray(IFormFile file)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            file.CopyTo(memoryStream);
+            return memoryStream.ToArray();
+        }
+    }
 }

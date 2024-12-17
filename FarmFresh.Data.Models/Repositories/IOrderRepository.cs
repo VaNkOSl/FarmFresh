@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
-namespace FarmFresh.Data.Models.Repositories
+namespace FarmFresh.Data.Models.Repositories;
+
+public interface IOrderRepository
 {
-    public interface IOrderRepository
-    {
-        Task AddOrderAsync(Order order);
+    Task<Order> AddOrderAsync(Order order);
 
-        Task UpdateOrderAsync(Order order);
-        Task<Order> GetOrderByIdAsync(Guid orderId);
-        Task<Order> GetOrderWithDetailsAsync(Guid orderId);
-        Task<List<OrderProduct>> GetOrderProductsByUserIdAsync(Guid userId);
-        Task<OrderProduct> GetOrderProductDetailsByIdAsync(Guid id);
-    }
+    void DeleteOrder(Order order);
+
+    void UpdateOrder(Order order);
+
+    IQueryable<Order> FindOrderByConditionAsync(Expression<Func<Order, bool>> condition, bool trackChanges);
+
+    IQueryable<Order> FindAllOrders(bool trackChanges);
 }

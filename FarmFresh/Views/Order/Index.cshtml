@@ -1,4 +1,4 @@
-﻿@model List<FarmFresh.ViewModels.Order.OrderListViewModel>
+﻿@model List<OrderListViewModel>
 
 @{
 	ViewData["Title"] = "Order List";
@@ -49,12 +49,13 @@ else
 						</td>
 						<td>@order.Price.ToString("C")</td> 
 						<td>@order.Quantity</td>
-						<td>@(order.Price * order.Quantity)</td> 
+						<td>@(order.Price * order.Quantity)</td>
 						<td>
-							<img src="@(order.Picture != null
-                                ? $"data:image/jpeg;base64,{Convert.ToBase64String(order.Picture)}"
-                                : "/images/Placeholder.png")"
-								 alt="Product Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" />
+							@foreach (var photo in order.Photos)
+							{
+								<img src="@photo.FilePath" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" alt="Product Photo" />
+							}
+
 						</td>
 						<td>
 							<a asp-action="Details" asp-route-id="@order.Id" class="btn btn-outline-primary btn-sm">

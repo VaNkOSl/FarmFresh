@@ -20,6 +20,12 @@ public interface IRepositoryManager
 
     IReviewRepository ReviewRepository { get; }
 
+    IOrderRepository OrderRepository { get; }
+
+    IOrderProductRepository OrderProductRepository { get; }
+
+    ICartItemRepository CartItemRepository { get; }
+
     Task<CRUDResult> SaveAsync(Entity entity);
 
     Task SaveAsync();

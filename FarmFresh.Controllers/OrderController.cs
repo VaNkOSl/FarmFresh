@@ -1,117 +1,107 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using FarmFresh.Data;
-using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Enums;
+﻿using FarmFresh.Data.Models;
+using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Order;
-using FarmFresh.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using static FarmFresh.Commons.EntityValidationConstants;
 
-namespace FarmFresh.Controllers
+namespace FarmFresh.Controllers;
+
+[Authorize]
+[Route("api/order")]
+public class OrderController : Controller
 {
-    [Authorize]
-    public class OrderController : Controller
+    private readonly IServiceManager _serviceManager;
+
+    public OrderController(IServiceManager serviceManager)
     {
-        private readonly IOrderService _orderService;
+        _serviceManager = serviceManager;
+    }
 
-        public OrderController(IOrderService orderService)
+    [HttpGet("index")]
+    public async Task<IActionResult> Index()
+    {
+        var userId = Guid.Parse(User.GetId());
+        var orders = await _serviceManager.OrderService.GetOrdersForUserAsync(userId, trackChanges: false);
+        return View(orders);
+    }
+
+    [HttpGet("details")]
+    public async Task<IActionResult> Details(Guid Id)
+    {
+        var orderDetails = await _serviceManager.OrderService.GetOrderDetailsAsync(Id, trackChanges: false);
+
+        if (orderDetails == null)
         {
-            _orderService = orderService;
+            return NotFound();
         }
-        public async Task<IActionResult> Index()
+
+        return View(new List<OrderDetailsViewModel> { orderDetails });
+    }
+
+    [HttpPost("checkout")]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Checkout(CreateOrderDto model, Guid productId)
+    {
+
+        var userId = Guid.Parse(User.GetId());
+
+        try
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var orders = await _orderService.GetOrdersForUserAsync(userId);
-            return View(orders);
+            var orderId = await _serviceManager.OrderService.CheckoutAsync(model, userId, trackChanges: true);
+            return RedirectToAction("OrderConfirmation", new { id = orderId });
+
         }
-        public async Task<IActionResult> Details(Guid Id)
+        catch (Exception ex)
         {
-            var orderDetails = await _orderService.GetOrderDetailsAsync(Id);
-
-            if (orderDetails == null)
-            {
-                return NotFound();
-            }
-
-            return View(new List<OrderDetailsViewModel> { orderDetails });
+            ModelState.AddModelError("", "An error occurred while processing your order. Please try again.");
         }
-        public IActionResult Checkout()
+
+
+        return View(model);
+    }
+
+    [HttpGet("orderconfirmation")]
+    public async Task<IActionResult> OrderConfirmation(Guid id)
+    {
+        var orderViewModel = await _serviceManager.OrderService.GetOrderConfirmationViewModelAsync(id, trackChanges: false);
+
+        if (orderViewModel == null)
         {
-
-            var DeliveryList = Enum.GetValues(typeof(DeliveryOption))
-         .Cast<DeliveryOption>()
-         .Select(s => new SelectListItem
-         {
-             Text = s.ToString(),
-             Value = ((int)s).ToString()
-         })
-         .ToList();
-            ViewData["DeliveryOption"] = DeliveryList;
-            return View();
+            return NotFound();
         }
-        [HttpPost]
-        [Authorize]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(Order order, Guid OrderProductId)
+
+        return View(orderViewModel);
+    }
+
+    [HttpPost("orderconfirmation")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> OrderConfirmation(Order order)
+    {
+        try
         {
-
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-            try
-            {
-                var orderId = await _orderService.CheckoutAsync(order, OrderProductId, userId);
-                return RedirectToAction("OrderConfirmation", new { id = orderId });
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "An error occurred while processing your order. Please try again.");
-            }
-
-
-            return View(order);
+            await _serviceManager.OrderService.CompleteOrderAsync(order.Id, trackChanges: true);
+            return RedirectToAction("Index", "Home");
         }
-        public async Task<IActionResult> OrderConfirmation(Guid id)
+        catch (KeyNotFoundException)
         {
-            var orderViewModel = await _orderService.GetOrderConfirmationViewModelAsync(id);
-
-            if (orderViewModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(orderViewModel);
+            return NotFound();
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OrderConfirmation(Order order)
+        catch (Exception ex)
         {
-            try
-            {
-                await _orderService.CompleteOrderAsync(order.Id);
-                return RedirectToAction("Index", "Home");
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "An error occurred while completing your order. Please try again.");
-                return View("Error");
-            }
+            ModelState.AddModelError("", "An error occurred while completing your order. Please try again.");
+            return View("Error");
         }
+    }
+
+    [HttpGet("getorderbyseller")]
+    public async Task<IActionResult> GetOrderBySeller()
+    {
+        var userId = User.GetId();
+
+        var farmerId = await _serviceManager.FarmerService.GetFarmerByUserIdAsync(Guid.Parse(userId), trackChanges: false);
+        //var model = await _serviceManager.OrderService.GetOrderConfirmationForFarmersViewModelAsync(farmerId, trackChanges: false);
+        return View();
     }
 }
