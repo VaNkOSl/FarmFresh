@@ -1,4 +1,4 @@
-﻿@model FarmFresh.ViewModels.Order.OrderConfirmationViewModel
+﻿@model OrderConfirmationViewModel
 
 <div class="container mt-5">
     <div class="card shadow-sm">
@@ -7,11 +7,11 @@
         </div>
                     <form class="needs-validation" asp-action="OrderConfirmation">
         <div class="card-body">
-            <!-- Customer Information -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <h4>Customer Information</h4>
                     <ul class="list-group list-group-flush">
+                        <input type="hidden" name="id" value="@Model.Id"/>
                         <li class="list-group-item"><strong>Name:</strong> @Model.FirstName @Model.LastName</li>
                         <li class="list-group-item"><strong>Address:</strong> @Model.Adress</li>
                         <li class="list-group-item"><strong>Phone:</strong> @Model.PhoneNumber</li>
@@ -19,9 +19,12 @@
                     </ul>
                 </div>
                 <div class="col-md-6 text-center">
-                    @if (Model.Picture != null)
+                    @if (Model.Photos != null && Model.Photos.Any())
                     {
-                        <img src="data:image/png;base64,@(Convert.ToBase64String(Model.Picture))" class="img-fluid rounded" alt="Order Picture" />
+                            @foreach (var photo in Model.Photos)
+                            {
+                                <img src="@photo.FilePath" class="product-photo" alt="Product Photo" />
+                            }
                     }
                     else
                     {
@@ -30,13 +33,12 @@
                 </div>
             </div>
 
-            <!-- Order Summary -->
             <div class="row mb-4">
                 <div class="col-md-12">
                     <h4>Order Summary</h4>
                     <div class="card border-light mb-3">
                         <div class="card-body">
-                            <p><strong>Order ID:</strong> @Model.OrderId</p>
+                            <p><strong>Order ID:</strong> @Model.Id</p>
                             <p><strong>Total Quantity:</strong> @Model.CartItems.Sum(q=> q.Quantity)</p>
                             <p><strong>Total Price:</strong> <span class="text-success">@Model.CartItems.Sum(p=>p.Quantity*p.Price) лв.</span></p>
                         </div>
@@ -44,7 +46,6 @@
                 </div>
             </div>
 
-            <!-- Products Table -->
             <div class="row">
                 <div class="col-md-12">
                     <h4>Products</h4>

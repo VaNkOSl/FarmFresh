@@ -22,9 +22,16 @@ builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(1); 
+    options.Cookie.HttpOnly = true; 
+    options.Cookie.IsEssential = true; 
+});
+
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
 {
-    opt.TokenLifespan = TimeSpan.FromHours(2);
+    opt.TokenLifespan = TimeSpan.FromMinutes(2);
 });
 
 builder.Services.AddControllersWithViews();
@@ -40,6 +47,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 app.UseCors("AllowAll");
+app.UseSession();
+
 
 var logger = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(logger);

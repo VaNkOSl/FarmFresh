@@ -33,6 +33,8 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
 
     public virtual DbSet<FarmerLocation> FarmerLocations { get; set; }
 
+    public virtual DbSet<CartItem> CartItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

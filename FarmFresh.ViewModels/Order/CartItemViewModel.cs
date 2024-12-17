@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FarmFresh.ViewModels.Product;
 
-namespace FarmFresh.ViewModels.Order
-{
-    public class CartItemViewModel
-    {
-        public Guid ProductId { get; set; }
-        public string ProductName { get; set; }
-        public int Quantity { get; set; }
-        public decimal Price { get; set; }
-        public decimal TotalPrice => Quantity * Price;
-    }
-}
+namespace FarmFresh.ViewModels.Order;
+
+public record CartItemViewModel(
+    Guid ProductId,
+    string ProductName,
+    int Quantity,
+    decimal Price,
+    decimal TotalPrice,
+    IEnumerable<ProductPhotosDto> Photos);

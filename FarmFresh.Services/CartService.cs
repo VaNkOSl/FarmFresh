@@ -1,82 +1,90 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FarmFresh.Data.Models.Repositories;
+﻿using AutoMapper;
+using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Order;
-using Microsoft.AspNetCore.Http;
+using LoggerService.Contacts;
+using Microsoft.EntityFrameworkCore;
 
-namespace FarmFresh.Services
+namespace FarmFresh.Services;
+
+internal class CartService : ICartService
 {
-    public class CartService : ICartService
+    private readonly IRepositoryManager _repositoryManager;
+    private readonly ILoggerManager _loggerManager;
+    private readonly IMapper _mapper;
+
+    public CartService(IRepositoryManager repositoryManager,
+                        ILoggerManager loggerManager,
+                        IMapper mapper)
     {
-        private readonly IProductRepository _productRepository;
+        _repositoryManager = repositoryManager;
+        _loggerManager = loggerManager;
+        _mapper = mapper;
+    }
 
-        public CartService(IProductRepository productRepository)
+    public async Task<bool> AddToCartAsync(Guid userId, Guid productId, int quantity, bool trackChanges)
+    {
+        var order = await CartHelper.EnsureOrderExistsAsync(userId, trackChanges, _repositoryManager);
+
+        await CartHelper.EnsureCartItemExistsAsync(userId, productId, quantity, trackChanges, _repositoryManager);
+
+        await CartHelper.AddOrUpdateOrderProductAsync(order.Id, productId, quantity, trackChanges, _repositoryManager);
+
+        return true;
+    }
+
+    public async Task<IEnumerable<CartItemViewModel>> GetAllCartItemsAsync(Guid userId, bool trackChanges)
+    {
+        var cartItems = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(ci => ci.UserId == userId, trackChanges)
+            .Include(p => p.Product)
+            .ThenInclude(ph => ph.ProductPhotos)
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
+    }
+
+
+    public async Task RemoveFromCart(Guid productId, bool trackChanges)
+    {
+        var cartItem = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(ci => ci.ProductId == productId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        var orderProductToRemove = await _repositoryManager.OrderProductRepository
+            .FindOrderProductByConditionAsync(oi => oi.ProductId == productId, trackChanges)
+            .Include(o => o.Order)
+            .FirstOrDefaultAsync();
+
+        var order = await _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(o => o.UserId == orderProductToRemove.Order.UserId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        _repositoryManager.CartItemRepository.DeleteItem(cartItem);
+        _repositoryManager.OrderProductRepository.DeleteOrderProduct(orderProductToRemove);
+        _repositoryManager.OrderRepository.DeleteOrder(order);
+        await _repositoryManager.SaveAsync();
+    }
+
+    public async Task<bool> UpdateCartQuantityAsync(Guid productId, int quantityChange, bool trackChanges)
+    {
+        var cart = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(ci => ci.ProductId == productId, trackChanges)
+            .Include(p => p.Product)
+            .FirstOrDefaultAsync();
+
+        int newQuantity = cart.Quantity + quantityChange;
+
+        if(newQuantity > cart.Product.StockQuantity || newQuantity < 1)
         {
-            _productRepository = productRepository;
-        }
-        public async Task<bool> AddToCartAsync(Guid productId, string sessionKey, ISession session)
-        {
-            var cart = session.Get<List<CartItemViewModel>>(sessionKey) ?? new List<CartItemViewModel>();
-            var existingItem = cart.FirstOrDefault(c => c.ProductId == productId);
+            return false;
 
-            var product = await _productRepository.GetProductByIdAsync(productId);
-            if (product == null) return false;
-
-            int requestedQuantity = existingItem != null ? existingItem.Quantity + 1 : 1;
-            if (product.StockQuantity < requestedQuantity) return false;
-
-            if (existingItem != null)
-            {
-                existingItem.Quantity++;
-            }
-            else
-            {
-                cart.Add(new CartItemViewModel
-                {
-                    ProductId = productId,
-                    ProductName = product.Name,
-                    Quantity = 1,
-                    Price = product.Price
-                });
-            }
-
-            session.Set(sessionKey, cart);
-            return true;
         }
 
-        public void RemoveFromCart(Guid productId, string sessionKey, ISession session)
-        {
-            var cart = session.Get<List<CartItemViewModel>>(sessionKey) ?? new List<CartItemViewModel>();
-            var item = cart.FirstOrDefault(c => c.ProductId == productId);
-
-            if (item != null)
-            {
-                cart.Remove(item);
-                session.Set(sessionKey, cart);
-            }
-        }
-
-        public async Task<bool> UpdateCartQuantityAsync(Guid productId, int quantityChange, string sessionKey, ISession session)
-        {
-            var cart = session.Get<List<CartItemViewModel>>(sessionKey) ?? new List<CartItemViewModel>();
-            var itemInCart = cart.FirstOrDefault(c => c.ProductId == productId);
-
-            if (itemInCart == null) return false;
-
-            var product = await _productRepository.GetProductByIdAsync(productId);
-            if (product == null) return false;
-
-            int newQuantity = itemInCart.Quantity + quantityChange;
-
-            if (newQuantity > product.StockQuantity || newQuantity < 1) return false;
-
-            itemInCart.Quantity = newQuantity;
-            session.Set(sessionKey, cart);
-            return true;
-        }
+        cart.Quantity = newQuantity;
+        _repositoryManager.CartItemRepository.UpdateItem(cart);
+        await _repositoryManager.SaveAsync();
+        return true;
     }
 }

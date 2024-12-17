@@ -1,133 +1,171 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using FarmFresh.Data.Models.Enums;
-using FarmFresh.Data.Models.Repositories;
-using FarmFresh.Data.Models;
+using FarmFresh.Repositories.Contacts;
+using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
-using Microsoft.AspNetCore.Http;
 using FarmFresh.ViewModels.Order;
+using FarmFresh.ViewModels.Product;
+using LoggerService.Contacts;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
 using System.Text.Json;
 
-namespace FarmFresh.Services
+namespace FarmFresh.Services;
+
+internal class OrderService : IOrderService
 {
-    public class OrderService : IOrderService
+    private readonly IRepositoryManager _repositoryManager;
+    private readonly ILoggerManager _loggerManager;
+    private readonly IMapper _mapper;
+
+    public OrderService(IRepositoryManager repositoryManager,
+                        ILoggerManager loggerManager,
+                        IMapper mapper)
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public OrderService(IOrderRepository orderRepository, IHttpContextAccessor httpContextAccessor)
-        {
-            _orderRepository = orderRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public async Task<Guid> CheckoutAsync(Order order, Guid orderProductId, Guid userId)
-        {
-            order.UserId = userId;
-            order.OrderStatus = OrderStatus.Cart;
-            order.CreateOrderdDate = DateTime.Now;
-
-            await _orderRepository.AddOrderAsync(order);
-            return order.Id;
-        }
-        public async Task CompleteOrderAsync(Guid orderId)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            if (order == null)
-            {
-                throw new KeyNotFoundException("Order not found.");
-            }
-
-            order.OrderStatus = OrderStatus.Completed;
-            await _orderRepository.UpdateOrderAsync(order);
-        }
-        public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId)
-        {
-            var order = await _orderRepository.GetOrderWithDetailsAsync(orderId);
-            if (order == null) return null;
-
-            var cartItems = _httpContextAccessor.HttpContext.Session.Get<List<CartItemViewModel>>("Cart") ?? new List<CartItemViewModel>();
-
-            return new OrderConfirmationViewModel
-            {
-                Id = order.Id,
-                OrderId = order.Id,
-                Products = order.OrderProducts.ToList(),
-                Price = order.OrderProducts.Sum(p => p.Price),
-                Quantity = order.OrderProducts.Sum(p => p.Quantity),
-                TotalPrice = order.OrderProducts.Sum(p => p.Price * p.Quantity),
-                Picture = order.OrderProducts.FirstOrDefault()?.Product?.Photo,
-                FirstName = order.FirstName,
-                LastName = order.LastName,
-                Adress = order.Adress,
-                PhoneNumber = order.PhoneNumber,
-                Email = order.Email,
-                CartItems = cartItems
-            };
-        }
-        public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId)
-        {
-            var orderProducts = await _orderRepository.GetOrderProductsByUserIdAsync(userId);
-
-            return orderProducts.Select(o => new OrderListViewModel
-            {
-                Id = o.Id,
-                OrderId = o.OrderId,
-                ProductName = o.Product.Name,
-                OrderStatus = o.Order.OrderStatus.ToString(),
-                Price = o.Price,
-                Quantity = o.Quantity,
-                Picture = o.Product.Photo
-            }).ToList();
-        }
-        public async Task<OrderDetailsViewModel> GetOrderDetailsAsync(Guid id)
-        {
-            var orderProduct = await _orderRepository.GetOrderProductDetailsByIdAsync(id);
-            if (orderProduct == null)
-            {
-                return null;
-            }
-
-            return new OrderDetailsViewModel
-            {
-                Id = orderProduct.OrderId,
-                CreatedDate = orderProduct.Order.CreateOrderdDate,
-                OrderId = orderProduct.OrderId,
-                Quantity = orderProduct.Quantity,
-                Price = orderProduct.Price,
-                FirstName = orderProduct.Order.FirstName,
-                LastName = orderProduct.Order.LastName,
-                Adress = orderProduct.Order.Adress,
-                PhoneNumber = orderProduct.Order.PhoneNumber,
-                Email = orderProduct.Order.Email,
-                ProductName = orderProduct.Product.Name,
-                DeliveryOption = orderProduct.Order.DeliveryOption,
-                OrderStatus = orderProduct.Order.OrderStatus.ToString(),
-                ProductDescription = orderProduct.Product.Description,
-                FarmerName = $"{orderProduct.Product.Farmer.User.FirstName} {orderProduct.Product.Farmer.User.LastName}",
-                Origin = orderProduct.Product.Origin,
-                ProductPrice = orderProduct.Product.Price,
-                Seasons = orderProduct.Product.SuitableSeason,
-                HarvestDate = orderProduct.Product.HarvestDate,
-                ExpirationDate = orderProduct.Product.ExpirationDate,
-                Picture = orderProduct.Product.Photo
-            };
-        }
+        _repositoryManager = repositoryManager;
+        _loggerManager = loggerManager;
+        _mapper = mapper;
     }
-    public static class SessionExtension
+
+
+    public async Task<Guid> CheckoutAsync(CreateOrderDto model, Guid userId, bool trackChanges)
     {
-        public static void Set<T>(this ISession session, string key, T value)
+
+        var order = await _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(u => u.UserId == userId, trackChanges)
+            .Include(ph => ph.OrderProducts)
+            .ThenInclude(p => p.Product)
+            .ThenInclude(ph => ph.ProductPhotos)
+            .FirstOrDefaultAsync();
+
+        order.FirstName = model.FirstName;
+        order.LastName = model.LastName;
+        order.PhoneNumber = model.PhoneNumber;
+        order.Email = model.Email;
+        order.DeliveryOption = model.DeliveryOption;
+        order.Adress = model.Adress;
+
+        foreach (var item in order.OrderProducts)
         {
-            session.SetString(key, JsonSerializer.Serialize(value));
+            var product = item.Product;
+
+            foreach(var photo in product.ProductPhotos)
+            {
+                order.ProductPhotos.Add(photo);
+            }
         }
 
-        public static T Get<T>(this ISession session, string key)
-        {
-            var value = session.GetString(key);
-            return value == null ? default : JsonSerializer.Deserialize<T>(value);
-        }
-
+        _repositoryManager.OrderRepository.UpdateOrder(order);
+        await _repositoryManager.SaveAsync(order);
+        return order.Id;
     }
+
+    public async Task CompleteOrderAsync(Guid orderId, bool trackChanges)
+    {
+        var order = await _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(r => r.Id == orderId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        var cartItemToRemove = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        if (order == null)
+        {
+            throw new KeyNotFoundException("Order not found.");
+        }
+
+        _repositoryManager.CartItemRepository.DeleteItem(cartItemToRemove);
+        order.OrderStatus = OrderStatus.Completed;
+        _repositoryManager.OrderRepository.UpdateOrder(order);
+        await _repositoryManager.SaveAsync();
+    }
+    public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId, bool trackChanges)
+    {
+        var order = await _repositoryManager.OrderRepository
+                                       .FindOrderByConditionAsync(o => o.Id == orderId, trackChanges)
+                                       .Include(o => o.OrderProducts)
+                                       .ThenInclude(p => p.Product)
+                                       .ThenInclude(ph => ph.ProductPhotos)
+                                       .FirstOrDefaultAsync();
+        if (order == null) return null;
+
+        var cartItems = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
+            .Include(p => p.Product)
+            .Include(u => u.User)
+            .ToListAsync();
+
+        var cartItemViewModels = _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
+
+        return new OrderConfirmationViewModel(
+          Id: order.Id,
+          Price: order.OrderProducts != null && order.OrderProducts.Any()
+              ? order.OrderProducts.Sum(p => p.Price)
+              : 0,
+          Quantity: order.OrderProducts != null && order.OrderProducts.Any()
+              ? order.OrderProducts.Sum(p => p.Quantity)
+              : 0,
+          TotalPrice: order.OrderProducts != null && order.OrderProducts.Any()
+              ? order.OrderProducts.Sum(p => p.Price * p.Quantity)
+              : 0,
+          FirstName: order.FirstName,
+          LastName: order.LastName,
+          Adress: order.Adress,
+          PhoneNumber: order.PhoneNumber,
+          Email: order.Email,
+          Products: order.OrderProducts.ToList(),
+          CartItems: cartItemViewModels,
+          Photos: order.OrderProducts
+              .SelectMany(op => op.Product.ProductPhotos)
+              .Select(pp => new ProductPhotosDto(
+                  pp.Id,
+                  "/uploads/" + Path.GetFileName(pp.FilePath),
+                  pp.Photo,
+                  pp.ProductId
+              ))
+              .ToList()
+      );
+    }
+
+    public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId, bool trackChanges)
+    {
+        var orderProducts = await _repositoryManager.OrderRepository
+                .FindAllOrders(trackChanges) 
+                .GetOrderProductsByUserId(userId)
+                .Include(p => p.Product)
+                .ThenInclude(ph => ph.ProductPhotos)
+                .ToListAsync();
+
+        return _mapper.Map<List<OrderListViewModel>>(orderProducts);
+    }
+    public async Task<OrderDetailsViewModel> GetOrderDetailsAsync(Guid id, bool trackChanges)
+    {
+        var orderProduct = await _repositoryManager.OrderProductRepository
+                  .FindAllOrderProducts(trackChanges)
+                  .GetOrderProductDetailsById(id)
+                  .FirstOrDefaultAsync();
+
+        if (orderProduct == null)
+        {
+            return null;
+        }
+
+       return _mapper.Map<OrderDetailsViewModel>(orderProduct);
+    }
+}
+public static class SessionExtension
+{
+    public static void Set<T>(this ISession session, string key, T value)
+    {
+        session.SetString(key, JsonSerializer.Serialize(value));
+    }
+
+    public static T Get<T>(this ISession session, string key)
+    {
+        var value = session.GetString(key);
+        return value == null ? default : JsonSerializer.Deserialize<T>(value);
+    }
+
 }

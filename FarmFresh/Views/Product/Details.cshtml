@@ -43,7 +43,7 @@
 
                 @if (Model.StockQuantity >= 1)
                 {
-                    <form asp-action="AddToCart" asp-controller="ShoppingCart" method="post" class="form-inline">
+                    <form asp-action="AddToCart" asp-controller="Cart" method="post" class="form-inline">
                         <input type="hidden" name="Id" value="@Model.Id" />
                         <label for="quantity" class="ml-2">Quantity:</label>
                         <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.StockQuantity" class="form-control ml-2" style="width: 70px;" />

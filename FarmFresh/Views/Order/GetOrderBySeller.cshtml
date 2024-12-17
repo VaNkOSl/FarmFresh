@@ -1,0 +1,81 @@
+﻿@model IEnumerable<OrderConfirmationViewModel>
+
+<div class="container mt-5">
+    @foreach (var order in Model)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white text-center">
+                <h2>Order Confirmation</h2>
+            </div>
+            <form class="needs-validation" asp-action="OrderConfirmation">
+                <div class="card-body">
+                    <!-- Customer Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h4>Customer Information</h4>
+                            <ul class="list-group list-group-flush">
+                                <input type="hidden" name="id" value="@order.Id" />
+                                <li class="list-group-item"><strong>Name:</strong> @order.FirstName @order.LastName</li>
+                                <li class="list-group-item"><strong>Address:</strong> @order.Adress</li>
+                                <li class="list-group-item"><strong>Phone:</strong> @order.PhoneNumber</li>
+                                <li class="list-group-item"><strong>Email:</strong> @order.Email</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 text-center">
+                           @*  @if (order.Picture != null)
+                            {
+                                 <img src="data:image/png;base64,@(Convert.ToBase64String(order.Picture))" class="img-fluid rounded" alt="Order Picture" /> 
+                            }
+                            else
+                            {
+                                <img src="https://via.placeholder.com/150" class="img-fluid rounded" alt="No Picture Available" />
+                            } *@
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h4>Order Summary</h4>
+                            <div class="card border-light mb-3">
+                                <div class="card-body">
+                                    <p><strong>Order ID:</strong> @order.Id</p>
+                                    <p><strong>Total Quantity:</strong> @order.CartItems.Sum(q => q.Quantity)</p>
+                                    <p><strong>Total Price:</strong> <span class="text-success">@order.CartItems.Sum(p => p.Quantity * p.Price) лв.</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Products</h4>
+                            <table class="table table-bordered table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in order.CartItems)
+                                    {
+                                        <tr>
+                                            <td>@product.ProductName</td>
+                                            <td>@product.Quantity</td>
+                                            <td>@product.Price.ToString("C")</td>
+                                            <td>@(product.Price * product.Quantity) лв.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+</div>
