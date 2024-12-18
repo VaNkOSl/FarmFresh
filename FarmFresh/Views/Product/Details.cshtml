@@ -1,0 +1,182 @@
+﻿@using FarmFresh.Commons.RequestFeatures;
+@using FarmFresh.Services.Contacts;
+@using FarmFresh.Infrastructure.Extensions;
+@model ProductDetailsDto
+@inject IServiceManager _serviceManager
+
+@{
+    ViewBag.Title = "Product Details";
+    bool userHasProduct = await _serviceManager.FarmerService.DoesFarmerHasProductsAsync(User.GetId(), Model.Id, trackChanges: false);
+}
+
+<link rel="stylesheet" href="/bootstrap/css/productDetails.css"/>
+<h2 class="text-center">@ViewBag.Title</h2>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            @foreach (var photo in Model.Photos)
+            {
+                <img src="@photo.FilePath" class="product-photo" alt="Product Photo" />
+            }
+        </div>
+
+        <div class="col-md-8">
+            <div class="product-details">
+                <h3>@Model.Name</h3>
+                <p><strong>Price:</strong> @Model.Price $</p>
+                <p><strong>Origin:</strong> @Model.Origin</p>
+                <p><strong>Category:</strong> @Model.CategoryName</p>
+                <p><strong>Suitable Season:</strong> @Model.SuitableSeason</p>
+                <p><strong>Harvest Date:</strong> @Model.HarvestDate.ToShortDateString()</p>
+                <p><strong>Expiration Date:</strong> @Model.ExpirationDate.ToShortDateString()</p>
+                <div class="stock-status mt-3">
+                    <p><strong>Stock Status:</strong></p>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: @(Model.StockQuantity * 100 / 100)%;" aria-valuenow="@Model.StockQuantity" aria-valuemin="0" aria-valuemax="100">
+                            @Model.StockQuantity left
+                        </div>
+                    </div>
+                </div>
+
+                <p>@Model.Description</p>
+
+                @if (Model.StockQuantity >= 1)
+                {
+                    <form asp-action="AddToCart" asp-controller="Cart" method="post" class="form-inline">
+                        <input type="hidden" name="Id" value="@Model.Id" />
+                        <label for="quantity" class="ml-2">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.StockQuantity" class="form-control ml-2" style="width: 70px;" />
+                        <button type="submit" class="btn btn-custom btn-primary ml-2">Add to Cart</button>
+                    </form>
+                }
+
+                <div class="form-inline mt-3">
+                    @if (this.User.Identity.IsAuthenticated && userHasProduct == true)
+                    {
+                        <a class="btn btn-warning btn-custom" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                        <a class="btn btn-danger btn-custom ml-2" asp-controller="Product" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+                        <a class="btn btn-info btn-custom ml-2" asp-controller="Product" asp-action="ApplyDiscount" asp-route-id="@Model.Id">Apply Discount</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6 farmer-info text-center">
+            <div class="card">
+                <div class="card-body">
+                    <img src="data:image/jpeg;base64,@Model.Farmer.PhotoString" alt="Farmer Photo" />
+                    <h5 class="card-title mt-3">@Model.Farmer.FullName</h5>
+                    <p>@Model.Farmer.Location</p>
+                    <p>@Model.Farmer.PhoneNumber</p>
+                    <a class="btn btn-success btn-custom" asp-controller="Product" asp-action="FarmerProducts" asp-route-id="@Model.Farmer.Id">View Other Products</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h3 class="text-center">Reviews</h3>
+    @if (Model.Reviews.Any())
+    {
+        @foreach (var review in Model.Reviews)
+        {
+            <div class="card mb-3" id="review-@review.Id">
+                <div class="card-body">
+                    <p><strong>@review.UserFullName</strong></p>
+
+                    <div id="review-content-@review.Id">
+                        <p>@review.Content</p>
+                        <p>
+                            Rating:
+                            @for (int i = 0; i < review.Rating; i++)
+                            {
+                                <span class="star">&#9733;</span>
+                            }
+                        </p>
+                        <p>Date: @review.ReviewDate.ToShortDateString()</p>
+                    </div>
+
+                    @if (review.UserId.ToString() == User.GetId())
+                    {
+                        <div id="edit-form-@review.Id" class="d-none">
+                            <form asp-action="EditProductReview" asp-controller="Review" method="post" id="editForm">
+                                <input type="hidden" id="ReviewId" name="ReviewId" value="@review.Id" />
+                                <div class="form-group">
+                                    <label for="editContent-@review.Id">Your Review:</label>
+                                    <textarea class="form-control" id="editContent-@review.Id" name="Content" rows="3">@review.Content</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editRating-@review.Id">Rating</label>
+                                    <div class="star-rating">
+                                        @for (int i = 5; i >= 1; i--)
+                                        {
+                                            <input type="radio" id="editRating-@i-@review.Id" name="Rating" value="@i" @(i == review.Rating ? "checked" : "") />
+                                            <label for="editRating-@i-@review.Id" class="star">&#9733;</label>
+                                        }
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm" onclick="productReviewUpdate()">Save</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('@review.Id')">Cancel</button>
+                            </form>
+                        </div>
+
+                        <div id="review-display-@review.Id">
+                            <p>@review.Content</p>
+                            <p>
+                                Rating:
+                                @for (int i = 0; i < review.Rating; i++)
+                                {
+                                    <span class="star">&#9733;</span>
+                                }
+                            </p>
+                            <button class="btn btn-warning btn-sm" onclick="editReview('@review.Id')">Edit</button>
+                            <form id="deleteForm" class="d-inline">
+                                <input type="hidden" name="id" value="@review.Id" />
+                                <button class="btn btn-danger btn-sm" onclick="deleteReview('@review.Id')">Delete</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <h4 class="text-center">No reviews yet!</h4>
+    }
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="mt-4">
+            <h3 class="text-center">Write a Product Review</h3>
+            <form asp-action="CreateProductReview" asp-controller="Review" method="post">
+                <input type="hidden" name="ProductId" value="@Model.Id" />
+                <div class="form-group">
+                    <label for="reviewContent">Your Review:</label>
+                    <textarea class="form-control" id="reviewContent" name="Content" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rating">Rating</label>
+                    <div class="star-rating">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <input type="radio" id="@i-stars" name="Rating" value="@i" />
+                            <label for="@i-stars" class="star">&#9733;</label>
+                        }
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-custom">Submit Review</button>
+            </form>
+        </div> 
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">You must be logged in to leave a review.</div>
+    }
+</div>
+<script src="/js/review/deleteReview.js" ></script>
+<script src="/js/review/updateProductReview.js"></script>

@@ -12,22 +12,30 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FarmFresh.Controllers\FarmFresh.Controllers.csproj" />
     <ProjectReference Include="..\FarmFresh.Data.Models\FarmFresh.Data.Models.csproj" />
     <ProjectReference Include="..\FarmFresh.Data\FarmFresh.Data.csproj" />
+    <ProjectReference Include="..\FarmFresh.Infrastructure\FarmFresh.Infrastructure.csproj" />
     <ProjectReference Include="..\FarmFresh.Repositories\FarmFresh.Repositories.csproj" />
+    <ProjectReference Include="..\FarmFresh.Services.Contacts\FarmFresh.Services.Contacts.csproj" />
     <ProjectReference Include="..\FarmFresh.Services\FarmFresh.Services.csproj" />
+    <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\images\farming-crops.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>

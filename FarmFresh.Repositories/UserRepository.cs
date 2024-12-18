@@ -1,36 +1,25 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories.Contacts;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
-namespace FarmFresh.Repositories
+namespace FarmFresh.Repositories;
+
+internal sealed class UserRepository(FarmFreshDbContext data) :
+    RepositoryBase<ApplicationUser>(data), IUserRepository
 {
-    public class UserRepository(FarmFreshDbContext data) :
-        RepositoryBase<ApplicationUser>(data), IUserRepository
+    public async Task<ApplicationUser> CreateUserAsync(ApplicationUser user)
     {
-        public async Task<ApplicationUser> CreateUserAsync(ApplicationUser user)
-        {
-            await AddAsync(user);
-            await data.SaveChangesAsync();
-            return user;
-        }
-
-        public async Task DeleteUserAsync(Guid id)
-        {
-            await DeleteAsync<ApplicationUser>(id);
-            await data.SaveChangesAsync();
-        }
-
-        public Task<IQueryable<ApplicationUser>> GetAllUserReadOnlyAsync() => Task.FromResult(AllReadOnly<ApplicationUser>());
-
-        public Task<IQueryable<ApplicationUser>> GetAllUsersAsync() => Task.FromResult(All<ApplicationUser>());
-
-        public async Task<ApplicationUser?> GetUserByIdAsync(Guid id) => await GetByIdAsync<ApplicationUser>(id);
-
-        public async Task UpdateUserAsync(ApplicationUser user)
-        {
-            await UpdateAsync(user);
-            await data.SaveChangesAsync();
-        }
+        await CreateAsync(user);
+        return user;
     }
+
+    public void DeleteUser(ApplicationUser user) => Delete(user);
+
+    public IQueryable<ApplicationUser> FindUsersByConditionAsync(Expression<Func<ApplicationUser, bool>> expression, bool trackChanges) =>
+           FindByCondition(expression, trackChanges);
+
+    public void UpdateUser(ApplicationUser user) => Update(user);
+
+  //  public async Task<ApplicationUser?> GetUserByIdAsync(Guid id) => await GetByIdAsync(id);
 }

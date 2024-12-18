@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static FarmFresh.Commons.EntityValidationConstants.Category;
+using static FarmFresh.Commons.EntityValidationConstants.Categories;
 
 namespace FarmFresh.Data.Models;
 

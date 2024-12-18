@@ -12,9 +12,12 @@ public static class EntityValidationConstants
 
         public const int UserUserNameMinLength = 5;
         public const int UserUserNameMaxLength = 15;
+
+        public const int PersonPhotoWidth = 300;
+        public const int PersonPhotoHeight = 500;
     }
 
-    public static class Farmer
+    public static class Farmers
     {
         public const int FarmerDescriptionMinLength = 0;
         public const int FarmerDescriptionMaxLength = 200;
@@ -24,9 +27,12 @@ public static class EntityValidationConstants
 
         public const int FarmerPhoneNumberMinLength = 7;
         public const int FarmerPhoneNumberMaxLength = 14;
+
+        public const int FarmerEgnMinLength = 10;
+        public const int FarmerEgnMaxLength = 10;
     }
 
-    public static class Category
+    public static class Categories
     {
         public const int CategoryNameMinLength = 3;
         public const int CategoryNameMaxLength = 50;
@@ -48,5 +54,17 @@ public static class EntityValidationConstants
     {
         public const int OrderAdressMinLength = 5;
         public const int OrderAdressMaxLength = 150;
+    }
+
+    public static class FarmerLocations
+    {
+        public const double LatitudeMinValue = -90.00;
+        public const double LatitudeMaxValue = 90.00;
+
+        public const double LongitudeMinValue = -180.00;
+        public const double LongitudeMaxValue =  180.00;
+
+        public const int TitleMinLength = 3;
+        public const int TitleMaxLength = 150;
     }
 }

@@ -1,0 +1,116 @@
+﻿@model UpdateProductDto
+
+<link rel="stylesheet" href="/bootstrap/css/addProduct.css" />
+<h3 class="text-dark mb-4">Update your product!</h3>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <form id="editForm" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="PhotoString" />
+                    <input type="hidden" id="ProductId" name="Id" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Origin" class="form-label"></label>
+                        <input asp-for="Origin" class="form-control" />
+                        <span asp-validation-for="Origin" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Price"></label>
+                        <input asp-for="Price" class="form-control" placeholder="Price..." />
+                        <span asp-validation-for="Price" class="small text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="StockQuantity"></label>
+                        <input asp-for="StockQuantity" class="form-control" placeholder="Stock Quantity..." />
+                        <span asp-validation-for="StockQuantity" class="small text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HarvestDate" class="form-label"></label>
+                        <input asp-for="HarvestDate" type="date" class="form-control" />
+                        <span asp-validation-for="HarvestDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ExpirationDate"></label>
+                        <input asp-for="ExpirationDate" type="date" class="form-control" />
+                        <span asp-validation-for="ExpirationDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="images">Upload Images:</label>
+
+                        <div id="drop-area" class="drop-area">
+                            <p>Drag and drop images here, or click to select files.</p>
+                            <input type="file" name="photos" id="images" multiple style="display: none;" />
+                        </div>
+                    </div>
+                    <div id="preview" class="preview"></div>
+
+                    <div id="current-images" class="current-images">
+                        @foreach (var photo in Model.CurrentPhotos)
+                        {
+                            <div class="image-container">
+                                <img src="@photo.FilePath" class="preview-image" width="30%" height="20%" alt="Current Product Image">
+                                <button type="button" class="close-button" data-photo-id="@photo.Id">X</button>
+                            </div>
+                        }
+                    </div>
+
+
+                    <div class="form-group">
+                        <label asp-for="CategoryId"></label>
+                        <select asp-for="CategoryId" class="form-control">
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="SuitableSeason"></label>
+                        <select asp-for="SuitableSeason" class="form-control">
+                            <option value="">Select Season</option>
+                            <option value="0">Spring</option>
+                            <option value="1">Summer</option>
+                            <option value="2">Autumn</option>
+                            <option value="3">Winter</option>
+                            <option value="4">AllSeasons</option>
+                        </select>
+                        <span asp-validation-for="SuitableSeason" class="small text-danger"></span>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-primary" onclick="productUpdate(event)">Update</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="/js/product/addProductPhoto.js"></script>
+    <script src="/js/productPhoto/deleteProductPhoto.js"></script>
+    <script src="/js/product/updateProduct.js"></script>
+}
+

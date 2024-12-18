@@ -1,18 +1,17 @@
 ﻿using FarmFresh.Data.Models;
+using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories.Contacts;
 
 public interface IUserRepository
 {
-    Task<IQueryable<ApplicationUser>> GetAllUsersAsync();
-
-    Task<IQueryable<ApplicationUser>> GetAllUserReadOnlyAsync();
-
     Task<ApplicationUser> CreateUserAsync(ApplicationUser user);
 
-    Task<ApplicationUser?> GetUserByIdAsync(Guid id);
+    void DeleteUser(ApplicationUser user);
 
-    Task UpdateUserAsync(ApplicationUser user);
+    void UpdateUser(ApplicationUser user);
 
-    Task DeleteUserAsync(Guid id);
+    IQueryable<ApplicationUser> FindUsersByConditionAsync(Expression<Func<ApplicationUser, bool>> expression, bool trackChanges);
+
+   // Task<ApplicationUser?> GetUserByIdAsync(Guid id);
 }

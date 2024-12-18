@@ -3,52 +3,79 @@
     ViewData["Title"] = "Register";
 }
 
-<h1 class="text-center">@ViewData["Title"]</h1>
+<h1 class="text-center my-4">@ViewData["Title"]</h1>
 
-<link rel="stylesheet" href="~/bootstrap/css/register.css" />
-<div class="row">
-    <div class="col-md-4 offset-md-4">
-        <form id="registerForm" method="post" enctype="multipart/form-data">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+<link rel="stylesheet" href="~/bootstrap/css/register.css" asp-append-version="true" />
 
-            <div class="form-floating mb-3">
-                <input asp-for="FirstName" class="form-control" autocomplete="off" aria-required="true" />
-                <label asp-for="FirstName"></label>
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="LastName" class="form-control" aria-required="true" />
-                <label asp-for="LastName"></label>
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="UserName" class="form-control" autocomplete="new-password" aria-required="true" />
-                <label asp-for="UserName"></label>
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Email" class="form-control" autocomplete="new-password" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Email"></label>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Password">Password</label>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
+<div class="container-fluid py-5 bg-light">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6 col-lg-7">
+            <form id="registerForm" method="post" enctype="multipart/form-data" class="p-7 shadow rounded bg-white">
+                <h2 class="mb-4 text-center text-primary">Create a New Account</h2>
+                <p class="text-muted mb-4 text-center">Fill in the details below to get started!</p>
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
+                <div class="form-floating mb-4">
+                    <input asp-for="FirstName" class="form-control form-control-lg" autocomplete="off" aria-required="true" placeholder="John" title="Enter your first name" />
+                    <label asp-for="FirstName">First Name</label>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="LastName" class="form-control form-control-lg" aria-required="true" placeholder="Doe" title="Enter your last name" />
+                    <label asp-for="LastName">Last Name</label>
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="UserName" class="form-control form-control-lg" autocomplete="new-password" aria-required="true" placeholder="johndoe" title="Choose a unique username" />
+                    <label asp-for="UserName">Username</label>
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="Email" class="form-control form-control-lg" autocomplete="new-password" aria-required="true" placeholder="name@example.com" title="Enter a valid email address" />
+                    <label asp-for="Email">Email</label>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="Password" class="form-control form-control-lg" type="password" id="password" autocomplete="new-password" aria-required="true" placeholder="password" title="Choose a strong password" />
+                    <label asp-for="Password">Password</label>
+                    <small id="message" class="text-muted">Password strength: <span id="strength"></span></small>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="ConfirmPassword" class="form-control form-control-lg" type="password" autocomplete="new-password" aria-required="true" placeholder="password" title="Re-enter your password" />
+                    <label asp-for="ConfirmPassword">Confirm Password</label>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="tel" class="form-control form-control-lg" id="phone" name="phone" placeholder="+123456789" title="Enter your phone number (optional)" />
+                    <label for="phone">Phone Number (Optional)</label>
+                </div>
+
+                <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">
+                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Register
+                </button>
+            </form>
+        </div>
+
+        <div class="col-md-6 col-lg-5 text-center">
+            <img src="https://thumbs.dreamstime.com/b/welcome-sign-front-red-barn-green-fields-rural-farm-setting-343930766.jpg" alt="Welcome Illustration" class="img-fluid rounded mb-4" />
+            <h4 class="text-primary">Welcome to Our Community!</h4>
+            <p class="text-muted">
+                Join us today and enjoy exclusive access to our services and community features.
+                Your journey starts here—create your account now!
+            </p>
+        </div>
     </div>
 </div>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="/js/register.js"></script>
 }

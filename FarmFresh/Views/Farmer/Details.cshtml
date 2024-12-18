@@ -1,0 +1,75 @@
+﻿@model FarmerDetailsDto
+
+@{
+    ViewBag.Title = "Farmer Details";
+}
+
+<h2 class="text-center mb-4">@ViewBag.Title</h2>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-4 text-center">
+            <div class="farmer-photo">
+                <partial name="_Photo" model="@Model.PhotoString" />
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="farmer-details card shadow p-3 mb-5 bg-white rounded">
+                <div class="card-body">
+                    <h3 class="text-primary">@Model.FullName</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Description:</strong> @Model.FarmDescription</li>
+                        <li class="list-group-item"><strong>Location:</strong> @Model.Location</li>
+                        <li class="list-group-item"><strong>Phone Number:</strong> @Model.PhoneNumber</li>
+                        <li class="list-group-item"><strong>Email:</strong> <a href="mailto:@Model.Email">@Model.Email</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="text-center text-secondary">Products by @Model.FullName</h4>
+        </div>
+    </div>
+    <div class="row">
+        @if (Model.Products != null && Model.Products.Any())
+        {
+            foreach (var product in Model.Products)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header text-center">
+                            <h5 class="card-title">@product.Name</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="product-photo">
+                                @if (product.Photos.Any())
+                                {
+                                    <img src="@product.Photos.First().FilePath" class="img-fluid img-thumbnail mb-3" alt="Product Photo" />
+                                }
+                                else
+                                {
+                                    <p class="text-muted">No photo available</p>
+                                }
+                            </div>
+                            <p><strong>Price:</strong> $@product.Price.ToString("F2")</p>
+                            <p><strong>Stock Quantity:</strong> @product.StockQuantity</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <p class="text-muted">No products available.</p>
+            </div>
+        }
+    </div>
+</div>

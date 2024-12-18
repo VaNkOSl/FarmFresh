@@ -1,10 +1,11 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Repositories.Contacts;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories;
 
-public class RepositoryBase<T> : IRepositoryBase<T>
+public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 {
     private readonly DbContext _data;
 
@@ -13,34 +14,23 @@ public class RepositoryBase<T> : IRepositoryBase<T>
         _data = data;
     }
 
-    private DbSet<T> DbSet<T>() where T : class => _data.Set<T>();
+    public async Task CreateAsync(T entity) => await _data.AddAsync(entity);
 
-    public async Task AddAsync<T>(T entity) where T : class => await DbSet<T>().AddAsync(entity);
+    public void Delete(T entity) => _data.Remove(entity);
 
-    public IQueryable<T> All<T>() where T : class => DbSet<T>();
+    public IQueryable<T> FindAll(bool trackChanges) =>
+        !trackChanges ?
+        _data.Set<T>()
+        .AsNoTracking() :
+        _data.Set<T>();
 
-    public IQueryable<T> AllReadOnly<T>() where T : class => DbSet<T>().AsNoTracking();
+    public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
+         !trackChanges ?
+        _data.Set<T>()
+        .Where(expression)
+        .AsNoTracking() :
+        _data.Set<T>()
+        .Where(expression);
 
-    public async Task DeleteAsync<T>(Guid id) where T : class
-    {
-        T? entity = await GetByIdAsync<T>(id);
-
-        if (entity != null)
-        {
-            DbSet<T>().Remove(entity);
-        }
-    }
-
-    public Task DeleteRange<T>(IEnumerable<T> entities) where T : class
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<T> GetByIdAsync<T>(Guid id) where T : class => await DbSet<T>().FindAsync(id);
-
-    public async Task UpdateAsync<T>(T entity) where T : class
-    {
-        _data.Update(entity);
-        await this._data.SaveChangesAsync();
-    }
+    public void Update(T entity) => _data.Update(entity);
 }

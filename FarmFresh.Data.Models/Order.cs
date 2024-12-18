@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static FarmFresh.Commons.EntityValidationConstants.User;
 using static FarmFresh.Commons.EntityValidationConstants.Orders;
-using static FarmFresh.Commons.EntityValidationConstants.Farmer;
+using static FarmFresh.Commons.EntityValidationConstants.Farmers;
 using FarmFresh.Data.Models.Enums;
 
 namespace FarmFresh.Data.Models;

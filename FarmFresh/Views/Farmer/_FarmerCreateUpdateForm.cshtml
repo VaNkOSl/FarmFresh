@@ -1,0 +1,89 @@
+﻿@model FarmerForCreationDto
+
+<h3 class="text-dark mb-4">Become a Farmer!</h3>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <form asp-action="Become" asp-controller="Farmer" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="PhotoString" />
+
+                    <div class="mb-3">
+                        <label asp-for="FarmDescription" class="form-label">Farm Description</label>
+                        <input asp-for="FarmDescription" class="form-control" />
+                        <span asp-validation-for="FarmDescription" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Location" class="form-label">Location</label>
+                        <input asp-for="Location" class="form-control" id="locationInput" autocomplete="off" />
+                        <div id="suggestions" class="list-group mt-1" style="position: absolute; z-index: 1000;"></div>
+                        <input type="hidden" id="Latitude" asp-for="Latitude" />
+                        <input type="hidden" id="Longitude" asp-for="Longitude" />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="BirthDate" class="form-label">Birth Date</label>
+                        <input asp-for="BirthDate" type="date" class="form-control" />
+                        <span asp-validation-for="BirthDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Egn" class="form-label">EGN</label>
+                        <input asp-for="Egn" class="form-control" />
+                        <span asp-validation-for="Egn" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="+3598888888" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhotoFile" class="form-label">Upload a Photo</label>
+                        <input asp-for="PhotoFile" type="file" class="form-control" />
+                        <span asp-validation-for="PhotoFile" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mt-3">
+                        <input type="checkbox" asp-for="PrivacyAccepted" class="form-check-input" />
+                        <label class="form-check-label" for="privacyAccepted">
+                            I agree to the <a href="/privacy-policy" target="_blank">Privacy Policy</a> and
+                            <a href="/terms-of-service" target="_blank">Terms of Service</a>.
+                        </label>
+                        <span asp-validation-for="PrivacyAccepted" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div> 
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-body text-center">
+                <img src="https://mrwallpaper.com/images/hd/farmer-hd-field-2vqbl34gxd91x4be.jpg" alt="Become a Farmer" class="img-fluid rounded mb-3" />
+                <h5><span>Why Become a Farmer?</span></h5>
+                <p class="text-muted">
+                    Joining our farming community means contributing to sustainable agriculture while connecting with local consumers. Share your fresh produce and become part of a thriving network!
+                </p>
+                <ul class="list-unstyled text-left">
+                    <li><i class="fas fa-seedling text-primary"></i> Grow your network</li>
+                    <li><i class="fas fa-tractor text-primary"></i> Access farming resources</li>
+                    <li><i class="fas fa-leaf text-primary"></i> Promote sustainability</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/farmer/Farmer.js"></script>
+@section Scripts
+{
+    <partial name="_ValidationScripts" />
+}

@@ -1,6 +1,10 @@
 using FarmFresh.Extensions;
+using FarmFresh.Infrastructure.Extensions;
 using LoggerService.Contacts;
+using Microsoft.AspNetCore.Identity;
 using NLog;
+
+using static FarmFresh.Commons.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,14 +19,36 @@ builder.Services.ConfigureValidator();
 builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
-
 builder.Services.AddHttpContextAccessor();
+builder.Services.ConfigureServicesCORS();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(1); 
+    options.Cookie.HttpOnly = true; 
+    options.Cookie.IsEssential = true; 
+});
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+{
+    opt.TokenLifespan = TimeSpan.FromMinutes(2);
+});
+
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole(AdminRoleName));
+});
 
 builder.Logging.ClearProviders();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
+app.UseSession();
+
 
 var logger = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(logger);
@@ -35,6 +61,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+if(app.Environment.IsDevelopment())
+{
+    app.SeedAdministrator(DevelopmentAdminEmail);
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -42,6 +73,14 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(config =>
+{
+    config.MapControllerRoute(
+        name: "areas",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+        );
+});
 
 app.MapDefaultControllerRoute();
 app.MapRazorPages();

@@ -3,16 +3,16 @@ using FarmFresh.Data;
 using FarmFresh.Data.Models;
 using FarmFresh.Repositories;
 using FarmFresh.Repositories.Contacts;
+using FarmFresh.Repositories.DataValidator;
 using FarmFresh.Services;
 using FarmFresh.Services.Contacts;
-using FarmFresh.Services.DataValidator;
 using LoggerService;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace FarmFresh.Extensions;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtension
 {
@@ -41,7 +41,8 @@ public static class ServiceCollectionExtension
             options.Password.RequireUppercase = false;
         })
         .AddRoles<IdentityRole<Guid>>()
-        .AddEntityFrameworkStores<FarmFreshDbContext>();
+        .AddEntityFrameworkStores<FarmFreshDbContext>()
+        .AddDefaultTokenProviders();
 
         return services;
     }
@@ -73,5 +74,23 @@ public static class ServiceCollectionExtension
                     });
 
         return services;
-    }         
+    }
+
+    public static IServiceCollection ConfigureServicesCORS(this IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+        });
+
+        services.AddControllersWithViews();
+
+        return services;
+    }
+
 }
