@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace FarmFresh.Data.Models.Econt.Nomenclatures
+﻿namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
     public class Street : Entity_1<int>
     {

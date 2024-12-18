@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace FarmFresh.Data.Models.Econt.Nomenclatures
+﻿namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
     public class Address : Entity_1<int>
     {

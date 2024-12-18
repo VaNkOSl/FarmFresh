@@ -3,12 +3,7 @@ using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories.Econt;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Repositories.Econt
 {
@@ -33,7 +28,9 @@ namespace FarmFresh.Repositories.Econt
             => await FindFirstByConditionAsync(expression, trackChanges);
 
         public IQueryable<Office> FindOfficesByCondition(Expression<Func<Office, bool>> expression, bool trackChanges)
-             => FindByCondition(expression, trackChanges);
+             => FindByCondition(expression, trackChanges)
+                .Include(o => o.Address!.City)
+                    .ThenInclude(c => c!.Country);
 
         public async Task<Office?> GetOfficeByIdAsync(int id) => await GetByIdAsync(id);
 

@@ -1,16 +1,10 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories;
-using FarmFresh.Data.Models.Repositories.Econt;
-using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Services.Econt
 {
@@ -30,5 +24,7 @@ namespace FarmFresh.Services.Econt
             var countries = _mapper.Map<List<Country>>(countriesDTOs);
             await _repositoryManager.CountryRepository.UpdateCountriesAsync(countries);
         }
+
+        private static CountryDTO MapToDTO(Country country, IMapper mapper) => mapper.Map<CountryDTO>(country);
     }
 }

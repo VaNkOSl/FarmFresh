@@ -1,10 +1,7 @@
 using FarmFresh.Data;
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
-using FarmFresh.Services.Contacts.Econt;
-using FarmFresh.Services.Contacts.Econt.APIServices;
-using FarmFresh.Services.Econt;
-using FarmFresh.Services.Econt.APIServices;
+using FarmFresh.Services.Contacts;
 using LoggerService.Contacts;
 using NLog;
 
@@ -26,13 +23,6 @@ builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
-builder.Services.AddScoped<IEcontNumenclaturesService, EcontNumenclaturesService>();
-builder.Services.AddScoped<ICountryService, CountryService>();
-builder.Services.AddScoped<ICityService, CityService>();
-builder.Services.AddScoped<IOfficeService, OfficeService>();
-builder.Services.AddScoped<IAddressService, AddressService>();
-builder.Services.AddScoped<IStreetService, StreetService>();
-builder.Services.AddScoped<IQuarterService, QuarterService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -87,29 +77,31 @@ app.MapRazorPages();
 //testing econt api calls
 using(var scope = app.Services.CreateScope())
 {
+    //var serviceManager = scope.ServiceProvider.GetRequiredService<IServiceManager>();
+
     //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     //{
-    //    var countryService = scope.ServiceProvider.GetRequiredService<ICountryService>();
+    //    var countryService = serviceManager.CountryService;
     //    await countryService.UpdateCountriesAsync();
     //});
     //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     //{
-    //    var cityService = scope.ServiceProvider.GetRequiredService<ICityService>();
+    //    var cityService = serviceManager.CityService;
     //    await cityService.UpdateCitiesAsync();
     //});
     //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     //{
-    //    var officeService = scope.ServiceProvider.GetRequiredService<IOfficeService>();
+    //    var officeService = serviceManager.OfficeService;
     //    await officeService.UpdateOfficesAsync();
     //});
     //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     //{
-    //    var streetService = scope.ServiceProvider.GetRequiredService<IStreetService>();
+    //    var streetService = serviceManager.StreetService;
     //    await streetService.UpdateStreetsAsync();
     //});
     //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     //{
-    //    var quarterService = scope.ServiceProvider.GetRequiredService<IQuarterService>();
+    //    var quarterService = serviceManager.QuarterService;
     //    await quarterService.UpdateQuartersAsync();
     //});
 }

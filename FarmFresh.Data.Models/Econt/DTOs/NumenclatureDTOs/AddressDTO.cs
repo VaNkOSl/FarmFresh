@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace FarmFresh.Data.Models.Econt.DTOs
+namespace FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs
 {
     public class AddressDTO
     {
@@ -36,5 +36,17 @@ namespace FarmFresh.Data.Models.Econt.DTOs
 
         [JsonProperty("hezid")]
         public string? Hezid { get; set; }
+
+        public AddressDTO() { }
+
+        public AddressDTO(
+            CityDTO city,
+            string streetName,
+            string streetNum)
+        {
+            City = city;
+            Street = streetName;
+            Num = streetNum;
+        }
     }
 }

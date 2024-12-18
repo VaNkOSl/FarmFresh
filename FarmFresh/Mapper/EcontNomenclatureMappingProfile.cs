@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using FarmFresh.Data.Models.Econt.DTOs;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
-using FarmFresh.Data.Models.Enums;
 
 namespace FarmFresh.Mapper
 {

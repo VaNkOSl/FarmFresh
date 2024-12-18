@@ -1,10 +1,4 @@
-﻿using FarmFresh.Data.Models.CustomConverters;
-using FarmFresh.Data.Models.Econt.DTOs;
-using FarmFresh.Data.Models.Enums;
-using Newtonsoft.Json;
-using System;
-
-namespace FarmFresh.Data.Models.Econt.Nomenclatures
+﻿namespace FarmFresh.Data.Models.Econt.Nomenclatures
 {
     public class Office : Entity_1<int>
     {

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FarmFresh.Data.Models.Econt.APIInterraction;
 
 namespace FarmFresh.Services.Contacts.Econt.APIServices
 {
     public interface IEcontAddressService
     {
-        Task<bool> ValidateAddressAsync();
+        Task<bool> ValidateAddressAsync(ValidateAddressRequest request);
     }
 }

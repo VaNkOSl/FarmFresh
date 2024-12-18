@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace FarmFresh.Data.Models.Econt.DTOs
+namespace FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs
 {
     public class CityDTO
     {
         [JsonProperty("id")]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty("country")]
         public CountryDTO? Country { get; set; }
@@ -58,7 +58,7 @@ namespace FarmFresh.Data.Models.Econt.DTOs
         [JsonProperty("serviceDays")]
         public int? ServiceDays { get; set; }
 
-        [JsonProperty("jsonProperty")]
+        [JsonProperty("zoneId")]
         public int? ZoneId { get; set; }
 
         [JsonProperty("zoneName")]
@@ -69,5 +69,38 @@ namespace FarmFresh.Data.Models.Econt.DTOs
 
         [JsonProperty("servingOffices")]
         public List<ServingOfficeElementDTO>? ServingOffices { get; set; }
+
+        public CityDTO() { }
+
+        public CityDTO(
+            CountryDTO country,
+            string cityName,
+            string cityPostCode)
+        {
+            Country = country;
+            Name = cityName;
+            PostCode = cityPostCode;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not CityDTO other) return false;
+            return Id == other.Id
+                && Country == other.Country
+                && Name == other.Name
+                && NameEn == other.NameEn
+                && RegionName == other.RegionName
+                && RegionNameEn == other.RegionNameEn
+                && PhoneCode == other.PhoneCode
+                && Location == other.Location
+                && ZoneId == other.ZoneId
+                && ZoneName == other.ZoneName
+                && ZoneNameEn == other.ZoneNameEn;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name);
+        }
     }
 }

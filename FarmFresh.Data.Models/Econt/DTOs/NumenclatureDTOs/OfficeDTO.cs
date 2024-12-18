@@ -1,9 +1,6 @@
-﻿using FarmFresh.Data.Models.CustomConverters;
-using FarmFresh.Data.Models.Enums;
-using Newtonsoft.Json;
-using System.Numerics;
+﻿using Newtonsoft.Json;
 
-namespace FarmFresh.Data.Models.Econt.DTOs
+namespace FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs
 {
     public class OfficeDTO
     {

@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Services.Econt
 {
@@ -18,11 +14,26 @@ namespace FarmFresh.Services.Econt
         IMapper mapper)
         : IStreetService
     {
+        private readonly IEcontNumenclaturesService _econtNumenclaturesService = econtNumenclaturesService;
+        private readonly IRepositoryManager _repositoryManager = repositoryManager;
+        private readonly IMapper _mapper = mapper;
+
         public async Task UpdateStreetsAsync()
         {
-            var streetDTOs = await econtNumenclaturesService.GetStreetsAsync(new GetStreetsRequest());
-            var streets = mapper.Map<List<Street>>(streetDTOs);
-            await repositoryManager.StreetRepository.UpdateStreetsAsync(streets);
+            var streetDTOs = await _econtNumenclaturesService.GetStreetsAsync(new GetStreetsRequest());
+            var streets = _mapper.Map<List<Street>>(streetDTOs);
+            await _repositoryManager.StreetRepository.UpdateStreetsAsync(streets);
         }
+
+        public IQueryable<StreetDTO> FindStreetsByCityId(int cityId)
+        {
+            var streets = _repositoryManager.StreetRepository
+            .FindStreetsByCondition(s => s.CityID == cityId, false);
+
+            var streetsDTOs = streets.Select(s => MapToDTO(s, _mapper));
+            return streetsDTOs;
+        }
+
+        private static StreetDTO MapToDTO(Street street, IMapper mapper) => mapper.Map<StreetDTO>(street);
     }
 }

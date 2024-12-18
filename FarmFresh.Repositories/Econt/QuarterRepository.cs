@@ -2,12 +2,7 @@
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories.Econt;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Repositories.Econt
 {
@@ -30,7 +25,7 @@ namespace FarmFresh.Repositories.Econt
 
         public async Task<Quarter?> FindFirstQuarterByConditionAsync(Expression<Func<Quarter, bool>> expression, bool trackChanges)
             => await FindFirstByConditionAsync(expression, trackChanges);
-
+        
         public IQueryable<Quarter> FindQuartersByCondition(Expression<Func<Quarter, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 

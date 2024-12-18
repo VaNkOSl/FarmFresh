@@ -1,6 +1,5 @@
-﻿using AutoMapper;
-using FarmFresh.Data.Models.Econt.APIInterraction;
-using FarmFresh.Data.Models.Econt.DTOs;
+﻿using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.Services.Contacts.Econt.APIServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -31,10 +30,19 @@ namespace FarmFresh.Services.Econt.APIServices
             _configuration = configuration;
             _httpClient = httpClient;
 
+            if (_configuration["Econt:Username"].IsNullOrEmpty()
+                || _configuration["Econt:Password"].IsNullOrEmpty()
+                || _configuration["Econt:TestApiUrl"].IsNullOrEmpty()
+                || _configuration["Econt:Endpoints:GetCountries"].IsNullOrEmpty()
+                || _configuration["Econt:Endpoints:GetCities"].IsNullOrEmpty()
+                || _configuration["Econt:Endpoints:GetOffices"].IsNullOrEmpty()
+                || _configuration["Econt:Endpoints:GetStreets"].IsNullOrEmpty()
+                || _configuration["Econt:Endpoints:GetQuarters"].IsNullOrEmpty())
+                throw new Exception("Econt test API authorization configuration is not properly set up.");
+
             string username = _configuration["Econt:Username"]!;
             string password = _configuration["Econt:Password"]!;
 
-            //Econt API only authorizes requests with BASIC authentication
             credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
@@ -49,7 +57,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<CountryDTO>> GetCountriesAsync(GetCountriesRequest request)
         {
-            var response = await GetResponse(request, getCountriesEndpoint);
+            var response = await GetResponseAsync(request, getCountriesEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
@@ -65,7 +73,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<CityDTO>> GetCitiesAsync(GetCitiesRequest request)
         {
-            var response = await GetResponse(request, getCitiesEndpoint);
+            var response = await GetResponseAsync(request, getCitiesEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
@@ -81,7 +89,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<OfficeDTO>> GetOfficesAsync(GetOfficesRequest request)
         {
-            var response = await GetResponse(request, getOfficesEndpoint);
+            var response = await GetResponseAsync(request, getOfficesEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
@@ -97,7 +105,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<StreetDTO>> GetStreetsAsync(GetStreetsRequest request)
         {
-            var response = await GetResponse(request, getStreetsEndpoint);
+            var response = await GetResponseAsync(request, getStreetsEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
@@ -113,7 +121,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         public async Task<List<QuarterDTO>> GetQuartersAsync(GetQuartersRequest request)
         {
-            var response = await GetResponse(request, getQuartersEndpoint);
+            var response = await GetResponseAsync(request, getQuartersEndpoint);
 
             if (response.IsSuccessStatusCode)
             {
@@ -127,7 +135,7 @@ namespace FarmFresh.Services.Econt.APIServices
             return null!;
         }
 
-        private async Task<HttpResponseMessage> GetResponse(RequestBase request, string endpoint)
+        private async Task<HttpResponseMessage> GetResponseAsync(RequestBase request, string endpoint)
         {
             var json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, requestBodyFormat);

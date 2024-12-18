@@ -1,7 +1,6 @@
 ﻿using FarmFresh.Data.Models.Repositories.Econt;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
-using FarmFresh.Services.Econt;
 
 namespace FarmFresh.Services.Contacts;
 
@@ -17,6 +16,12 @@ public interface IServiceManager
     //Econt Services
 
     IEcontNumenclaturesService EcontNumenclaturesService { get; }
+
+    IEcontAddressService EcontAddressService { get; }
+
+    IEcontLabelService EcontLabelService { get; }
+
+    IEcontShipmentService EcontShipmentService { get; }
 
     //Econt database specific
 

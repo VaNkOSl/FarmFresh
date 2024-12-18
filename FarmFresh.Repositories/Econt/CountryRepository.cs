@@ -1,13 +1,7 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories.Econt;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Repositories.Econt
 {
@@ -28,6 +22,7 @@ namespace FarmFresh.Repositories.Econt
         public async Task UpdateCountriesAsync(IEnumerable<Country> countries)
         {
             var existingCountries = _data.Countries.ToDictionary(c => c.Code2);
+            var countriesToAdd = new List<Country>();
 
             foreach (var country in countries)
             {
@@ -39,8 +34,11 @@ namespace FarmFresh.Repositories.Econt
                     existingCountries.Remove(country.Code2);
                 }
                 else
-                    _data.Countries.Add(country);
+                    countriesToAdd.Add(country);
             }
+
+            if(countriesToAdd.Count > 0)
+                await _data.Countries.AddRangeAsync(countriesToAdd);
 
             _data.Countries.RemoveRange(existingCountries.Values);
 

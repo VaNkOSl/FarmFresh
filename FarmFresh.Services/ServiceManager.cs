@@ -20,6 +20,12 @@ public sealed class ServiceManager : IServiceManager
 
     private readonly Lazy<IEcontNumenclaturesService> _econtNumenclaturesService;
 
+    private readonly Lazy<IEcontAddressService> _econtAddressService;
+
+    private readonly Lazy<IEcontLabelService> _econtLabelService;
+
+    private readonly Lazy<IEcontShipmentService> _econtShipmentService;
+
     private readonly Lazy<ICountryService> _countryService;
 
     private readonly Lazy<ICityService> _cityService;
@@ -43,10 +49,13 @@ public sealed class ServiceManager : IServiceManager
         _adminService = new Lazy<IAdminService>(() => new AdminService(repositoryManager, loggerManager, mapper));
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
         _econtNumenclaturesService = new Lazy<IEcontNumenclaturesService>(() => new EcontNumenclaturesService(configuration, httpClient));
+        _econtAddressService = new Lazy<IEcontAddressService>(() => new EcontAddressService(configuration, httpClient));
+        _econtLabelService = new Lazy<IEcontLabelService>(() => new EcontLabelService(configuration, httpClient));
+        _econtShipmentService = new Lazy<IEcontShipmentService>(() => new EcontShipmentService(configuration, httpClient));
         _countryService = new Lazy<ICountryService>(() => new CountryService(EcontNumenclaturesService, repositoryManager, mapper));
         _cityService = new Lazy<ICityService>(() => new CityService(EcontNumenclaturesService, repositoryManager, mapper));
         _officeService = new Lazy<IOfficeService>(() => new OfficeService(EcontNumenclaturesService, repositoryManager, mapper));
-        _addressService = new Lazy<IAddressService>(() => new AddressService(repositoryManager));
+        _addressService = new Lazy<IAddressService>(() => new AddressService(repositoryManager, mapper));
         _streetService = new Lazy<IStreetService>(() => new StreetService(EcontNumenclaturesService, repositoryManager, mapper));
         _quarterService = new Lazy<IQuarterService>(() => new QuarterService(EcontNumenclaturesService, repositoryManager, mapper));
     }
@@ -58,6 +67,12 @@ public sealed class ServiceManager : IServiceManager
     public ICategoryService CategoryService => _categoryService.Value;
 
     public IEcontNumenclaturesService EcontNumenclaturesService => _econtNumenclaturesService.Value;
+
+    public IEcontAddressService EcontAddressService => _econtAddressService.Value;
+
+    public IEcontLabelService EcontLabelService => _econtLabelService.Value;
+
+    public IEcontShipmentService EcontShipmentService => _econtShipmentService.Value;
 
     public ICountryService CountryService => _countryService.Value;
 

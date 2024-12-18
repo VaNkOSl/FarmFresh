@@ -1,10 +1,5 @@
 ﻿using FarmFresh.Data.Models.Econt.APIInterraction;
-using FarmFresh.Data.Models.Econt.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 
 namespace FarmFresh.Services.Contacts.Econt.APIServices
 {

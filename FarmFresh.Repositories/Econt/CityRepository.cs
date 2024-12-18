@@ -3,12 +3,7 @@ using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories.Econt;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Repositories.Econt
 {
@@ -32,6 +27,8 @@ namespace FarmFresh.Repositories.Econt
 
             var existingCountries = _data.Countries.ToDictionary(c => c.Code2);
 
+            var citiesToAdd = new List<City>();
+
             foreach (var city in cities)
             {
                 var country = existingCountries[city.Country!.Code2];
@@ -45,25 +42,34 @@ namespace FarmFresh.Repositories.Econt
                     .Where(c => c.Id == city.Id)
                     .Include(c => c.ServingOffices)
                     .FirstOrDefaultAsync();
-                
+
                 if(existingCity != null)
                 {
                     _data.Entry(existingCity).CurrentValues.SetValues(city);
 
-                    var officesToAdd = city.ServingOffices!
-                        .Where(nso => !existingCity.ServingOffices!.Any(eo => eo.OfficeCode == nso.OfficeCode))
+                    var newOffices = city.ServingOffices ?? new List<ServingOfficeElement>();
+                    var existingOffices = existingCity.ServingOffices ?? new List<ServingOfficeElement>();
+
+                    var officesToKeep = existingOffices
+                        .Where(eo => newOffices.Any(no =>
+                            no.OfficeCode == eo.OfficeCode))
                         .ToList();
 
-                    var officesToRemove = existingCity.ServingOffices!
-                        .Where(eo => !city.ServingOffices!.Any(nso => nso.OfficeCode == eo.OfficeCode))
+                    var officesToAdd = newOffices
+                        .Where(no => !existingOffices.Any(eo =>
+                            eo.OfficeCode == no.OfficeCode))
+                        .Select(no => new ServingOfficeElement { OfficeCode = no.OfficeCode, ServingType = no.ServingType})
                         .ToList();
 
-                    _data.AddRange(officesToAdd);
-                    _data.RemoveRange(officesToRemove);
+                    var updatedOffices = officesToKeep.Concat(officesToAdd).ToList();
+
+                    existingCity.ServingOffices = updatedOffices;
                 }
                 else
-                    _data.Cities.Add(city);
+                    citiesToAdd.Add(city);
             }
+
+            await _data.Cities.AddRangeAsync(citiesToAdd);
 
             await _data.SaveChangesAsync();
         }

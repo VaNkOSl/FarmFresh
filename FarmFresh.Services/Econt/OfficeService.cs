@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FarmFresh.Services.Econt
 {
@@ -36,5 +32,16 @@ namespace FarmFresh.Services.Econt
 
             await _repositoryManager.OfficeRepository.UpdateOfficesAsync(offices);
         }
+
+        public IQueryable<OfficeDTO> FindOfficesByCityId(int cityId)
+        {
+            var offices = _repositoryManager.OfficeRepository
+            .FindOfficesByCondition(o => o.Address!.CityId == cityId, false);
+
+            var officesDTOs = offices.Select(o => MapToDTO(o, _mapper));
+            return officesDTOs;
+        }
+
+        private static OfficeDTO MapToDTO(Office office, IMapper mapper) => mapper.Map<OfficeDTO>(office);
     }
 }
