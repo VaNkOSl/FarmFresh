@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace FarmFresh.Controllers;
 
 [Authorize]
-[Route("api/Cart")]
+[Route("api/cart")]
 public class CartController : BaseController
 {
     private readonly IServiceManager _serviceManager;
@@ -41,14 +41,14 @@ public class CartController : BaseController
         return RedirectToAction("Index");
     }
 
-    [HttpPost("removefromcart")]
+    [HttpPost("removefromcart/{productId}")]
     public async Task<IActionResult> RemoveFromCart(Guid productId)
     {
         await _serviceManager.CartService.RemoveFromCart(productId, trackChanges: true);
         return RedirectToAction("Index");
     }
 
-    [HttpPost("increasequantity")]
+    [HttpPost("increasequantity/{productId}")]
     public async Task<IActionResult> IncreaseQuantity(Guid productId)
     {
         var success = await _serviceManager.CartService.UpdateCartQuantityAsync(productId, 1, trackChanges: true);
@@ -61,7 +61,7 @@ public class CartController : BaseController
         return RedirectToAction("Index");
     }
 
-    [HttpPost("decreasequantity")]
+    [HttpPost("decreasequantity/{productId}")]
     public async Task<IActionResult> DecreaseQuantity(Guid productId)
     {
         var success = await _serviceManager.CartService.UpdateCartQuantityAsync(productId, -1, trackChanges: true);

@@ -1,15 +1,17 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.ViewModels.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FarmFresh.Controllers;
 
 [Authorize]
 [Route("api/order")]
-public class OrderController : Controller
+public class OrderController : BaseController
 {
     private readonly IServiceManager _serviceManager;
 
@@ -26,7 +28,7 @@ public class OrderController : Controller
         return View(orders);
     }
 
-    [HttpGet("details")]
+    [HttpGet("details/{Id}")]
     public async Task<IActionResult> Details(Guid Id)
     {
         var orderDetails = await _serviceManager.OrderService.GetOrderDetailsAsync(Id, trackChanges: false);
@@ -101,7 +103,36 @@ public class OrderController : Controller
         var userId = User.GetId();
 
         var farmerId = await _serviceManager.FarmerService.GetFarmerByUserIdAsync(Guid.Parse(userId), trackChanges: false);
-        //var model = await _serviceManager.OrderService.GetOrderConfirmationForFarmersViewModelAsync(farmerId, trackChanges: false);
+        var model = await _serviceManager.OrderService.GetOrderConfirmationForFarmersViewModelAsync(farmerId, trackChanges: false);
+        return View(model);
+    }
+
+    [HttpGet("checkout")]
+    public IActionResult Checkout()
+    {
+        var DeliveryList = Enum.GetValues(typeof(DeliveryOption))
+     .Cast<DeliveryOption>()
+     .Select(s => new SelectListItem
+     {
+         Text = s.ToString(),
+         Value = ((int)s).ToString()
+     })
+     .ToList();
+        ViewData["DeliveryOption"] = DeliveryList;
         return View();
+    }
+
+    [HttpPost("sendorder/{id}")]
+    public async Task<IActionResult> SendOrder(Guid id)
+    {
+        await _serviceManager.OrderService.SendOrderAsync(id, trackChanges: true);
+        return RedirectToAction("GetOrderBySeller", "Order");
+    }
+
+    [HttpPost("cancelorder")]
+    public async Task<IActionResult> CancelOrder(Guid id)
+    {
+        await _serviceManager.OrderService.CancelOrder(id, trackChanges: true);
+        return RedirectToAction("GetOrderBySeller", "Order");
     }
 }

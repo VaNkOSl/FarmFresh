@@ -140,6 +140,7 @@ internal class OrderService : IOrderService
 
         return _mapper.Map<List<OrderListViewModel>>(orderProducts);
     }
+
     public async Task<OrderDetailsViewModel> GetOrderDetailsAsync(Guid id, bool trackChanges)
     {
         var orderProduct = await _repositoryManager.OrderProductRepository
@@ -153,6 +154,55 @@ internal class OrderService : IOrderService
         }
 
        return _mapper.Map<OrderDetailsViewModel>(orderProduct);
+    }
+
+    public async Task<IEnumerable<FarmerOrderListViewModel>> GetOrderConfirmationForFarmersViewModelAsync(Guid farmerId, bool trackChanges)
+    {
+        var orderProducts = await _repositoryManager.OrderRepository
+          .FindAllOrders(trackChanges)
+          .GetOrderProductsByFarmerId(farmerId)
+		  .ToListAsync();
+
+	    return _mapper.Map<IEnumerable<FarmerOrderListViewModel>>(orderProducts);
+    }
+
+    public async Task<bool> SendOrderAsync(Guid orderId, bool trackChanges)
+    {
+        var order = await _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(o => o.Id == orderId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        if (order == null)
+        {
+            return false;
+        }
+
+        if (order.OrderStatus == OrderStatus.Shipped)
+        {
+            return false;
+        }
+
+        order.OrderStatus = OrderStatus.Shipped;
+        _repositoryManager.OrderRepository.UpdateOrder(order);
+        await _repositoryManager.SaveAsync();
+        return true;
+    }
+
+    public async Task<bool> CancelOrder(Guid orderId, bool trackChanges)
+    {
+        var order = await _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(o => o.Id == orderId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        if (order == null)
+        {
+            return false;
+        }
+
+        order.OrderStatus = OrderStatus.Canceled;
+        _repositoryManager.OrderRepository.UpdateOrder(order);
+        await _repositoryManager.SaveAsync();
+        return true;
     }
 }
 public static class SessionExtension

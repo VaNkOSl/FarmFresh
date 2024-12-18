@@ -19,8 +19,7 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IOrderService> _orderService;
 
     public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper,
-                          ILoggerManager loggerManager, IConfiguration configuration,
-                          IHttpContextAccessor httpContextAccessor)
+                          ILoggerManager loggerManager, IConfiguration configuration)
     {
         _farmerService = new Lazy<IFarmerService>(() => new FarmerService(repositoryManager, loggerManager, mapper));
         _adminService = new Lazy<IAdminService>(() => new AdminService(repositoryManager, loggerManager, mapper, configuration));
@@ -29,7 +28,7 @@ public sealed class ServiceManager : IServiceManager
         _productPhotoService = new Lazy<IProductPhotoService>(() => new ProductPhotoService(repositoryManager, loggerManager, mapper));
         _reviewService = new Lazy<IReviewService>(() => new ReviewService(repositoryManager, loggerManager, mapper));
         _cartService = new Lazy<ICartService>(() => new CartService(repositoryManager, loggerManager, mapper));
-        _orderService = new Lazy<IOrderService>(() => new OrderService(repositoryManager, loggerManager, mapper, httpContextAccessor));
+        _orderService = new Lazy<IOrderService>(() => new OrderService(repositoryManager, loggerManager, mapper));
     }
 
     public IFarmerService FarmerService => _farmerService.Value;

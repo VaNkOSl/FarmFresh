@@ -9,5 +9,4 @@ public record OrderListViewModel(
     string OrderStatus,
     decimal Price,
     int Quantity,
-    byte[] Picture,
     IEnumerable<ProductPhotosDto> Photos);
