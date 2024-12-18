@@ -42,9 +42,6 @@ namespace FarmFresh.Repositories.Econt
         public async Task<Address?> FindFirstAddressByConditionAsync(Expression<Func<Address, bool>> expression, bool trackChanges)
             => await FindFirstByConditionAsync(expression, trackChanges);
 
-        public async Task<Address?> GetAddressByIdAsync(int id)
-            => await GetByIdAsync(id);
-
         public void UpdateAddress(Address address)
             => Update(address);
     }

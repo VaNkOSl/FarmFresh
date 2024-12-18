@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
+using FarmFresh.Repositories.Contacts;
+using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
-using FarmFresh.ViewModels.Category;
+using FarmFresh.ViewModels.Categories;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.BadRequest;
-using LoggerService.Exceptions.InternalError;
+using LoggerService.Exceptions.InternalError.Categories;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +30,7 @@ internal sealed class CategoryService : ICategoryService
 
     public async Task CreateCategoryAsync(CategoryCreateForm model, bool trackChanges)
     {
-        if (await DoesCategoryExistsByNameAsync(model.Name, trackChanges))
+        if (await _repositoryManager.CategoryRepository.DoesCategoryExistByNameAsync(model.Name, trackChanges))
         {
             _loggerManager.LogError($"[{nameof(CreateCategoryAsync)}] Category creation failed: Name '{model.Name}' already exists.");
             throw new CategoryNameAlreadyExists();
@@ -48,18 +50,21 @@ internal sealed class CategoryService : ICategoryService
         }
     }
 
-    public async Task<bool> DeleteCategory(Guid categoryId)
+    public async Task<bool> DeleteCategory(Guid categoryId, bool trackChanges)
     {
-        var category = await _repositoryManager.CategoryRepository.GetCategoryByIdAsync(categoryId);
+        var categoryForDeleting = await _repositoryManager
+            .CategoryRepository
+            .FindCategoryByConditionAsync(c => c.Id == categoryId, trackChanges)
+            .FirstOrDefaultAsync();
 
-        if(category is null)
+        if(categoryForDeleting is null)
         {
             _loggerManager.LogError($"[{nameof(DeleteCategory)}] Category with ID {categoryId} not found.");
         }
 
         try
         {
-            _repositoryManager.CategoryRepository.DeleteCategory(category!);
+            _repositoryManager.CategoryRepository.DeleteCategory(categoryForDeleting!);
             await _repositoryManager.SaveAsync();
             _loggerManager.LogInfo($"Category with ID {categoryId} successfully deleted.");
             return true;
@@ -72,29 +77,18 @@ internal sealed class CategoryService : ICategoryService
         }
     }
 
-    public async Task<bool> DoesCategoryExistsByNameAsync(string name, bool trackChanges)
-    {
-        var categories = _repositoryManager
-                              .CategoryRepository
-                              .FindCategoryByConditionAsync(c => c.Name == name, trackChanges);
-
-        return await categories.AnyAsync();
-    }
-
-    public async Task<IEnumerable<AllCategoriesDTO>> GetAllCategoriesAsync(bool trackChanges)
-    {
-        var categories = _repositoryManager
-                         .CategoryRepository
-                         .GetAllCategories(trackChanges);
-
-        return await categories
-          .Select(category => new AllCategoriesDTO(category.Id, category.Name, category.Products.Count()))
-          .ToListAsync();
-    }
-
+    public async Task<IEnumerable<AllCategoriesDTO>> GetAllCategoriesAsync(bool trackChanges) =>
+        await
+        _repositoryManager
+        .CategoryRepository
+        .GetAllCategoriesAsync(trackChanges);
+        
     public async Task<CategoryUpdateForm> GetCategoryForUpdate(Guid categoryId, bool trackChanges)
     {
-        var currentCategory = await _repositoryManager.CategoryRepository.GetCategoryByIdAsync(categoryId);
+        var currentCategory = await _repositoryManager
+            .CategoryRepository
+            .FindCategoryByConditionAsync(c => c.Id == categoryId, trackChanges)
+            .FirstOrDefaultAsync();
 
         if(currentCategory is null)
         {
@@ -102,33 +96,26 @@ internal sealed class CategoryService : ICategoryService
             throw new CategoryIdNotFoundException(categoryId);
         }
 
-        try
-        {
-            var categoryUpdateForm = _mapper.Map<CategoryUpdateForm>(currentCategory);
-            return categoryUpdateForm;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        return _mapper.Map<CategoryUpdateForm>(currentCategory);
     }
 
     public async Task UpdateCategory(CategoryUpdateForm model, Guid categoryId, bool trackChanges)
     {
-        var category = await _repositoryManager
-                             .CategoryRepository
-                             .GetCategoryByIdAsync(categoryId);
+        var categoryForUpdate = await _repositoryManager
+            .CategoryRepository
+            .FindCategoryByConditionAsync(c => c.Id == categoryId, trackChanges)
+            .FirstOrDefaultAsync();
 
-        if (category is null)
+        if (categoryForUpdate is null)
         {
             _loggerManager.LogError($"[{nameof(DeleteCategory)}] Category with ID {categoryId} not found.");
         }
 
         try
         {
-            _mapper.Map(model, category);
-            _repositoryManager.CategoryRepository.UpdateCategory(category!);
-            await _repositoryManager.SaveAsync(category!);
+            _mapper.Map(model, categoryForUpdate);
+            _repositoryManager.CategoryRepository.UpdateCategory(categoryForUpdate!);
+            await _repositoryManager.SaveAsync(categoryForUpdate!);
             _loggerManager.LogInfo($"Category with ID {categoryId} successfully updated.");
         }
         catch (Exception ex)

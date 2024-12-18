@@ -1,0 +1,95 @@
+﻿@using FarmFresh.Commons.RequestFeatures;
+@using FarmFresh.Services.Contacts;
+@using FarmFresh.Infrastructure.Extensions;
+@inject IServiceManager _serviceManager;
+@model ProductsListViewModel
+
+@{
+    ViewBag.Title = "All Products";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">@ViewBag.Title</h2>
+
+    <form method="get" asp-controller="Product" asp-action="AllProducts" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="SearchTerm" placeholder="Search products by name!" value="@Model.SearchTerm" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="MinPrice" placeholder="Enter Min Price"
+                       value="@(Model.MinPrice.HasValue ? Model.MinPrice.ToString() : string.Empty)" />
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="MaxPrice" placeholder="Enter Max Price"
+                       value="@(Model.MaxPrice.HasValue ? Model.MaxPrice.ToString() : string.Empty)" />
+            </div>
+
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    @if (product.Photos != null && product.Photos.Any())
+                    {
+                        var firstPhoto = product.Photos.First();
+                        <img src="@firstPhoto.FilePath" class="card-img-top" alt="Farmer Photo" style="max-height: 200px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="no_photo.jpg" class="card-img-top" alt="Default Product Photo" style="max-height: 200px; object-fit: cover;" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">Price: @product.Price</p>
+                        <p class="card-text">StockQuantity: @product.StockQuantity</p>
+                        @if (await _serviceManager.FarmerService.DoesFarmerHasProductsAsync(User.GetId(), product.Id, trackChanges: false) == true)
+                        {
+                            <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-area="" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>
+                        }
+                        <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info btn-sm">Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if(!Model.Products.Any())
+    {
+        <h3 class="text-center">No products found by the given criteria!</h3>
+    }
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            @if (Model.MetaData.HasPrevious)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("AllProducts", new { PageNumber = Model.MetaData.CurrentPage - 1, MinPrice = Model.MinPrice, MaxPrice = Model.MaxPrice })">Previous</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.MetaData.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.MetaData.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("AllProducts", new { PageNumber = i, MinPrice = Model.MinPrice, MaxPrice = Model.MaxPrice })">@i</a>
+                </li>
+            }
+
+            @if (Model.MetaData.HasNext)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("AllProducts", new { PageNumber = Model.MetaData.CurrentPage + 1, MinPrice = Model.MinPrice, MaxPrice = Model.MaxPrice })">Next</a>
+                </li>
+            }
+        </ul>
+    </nav> 
+</div>

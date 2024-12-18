@@ -80,8 +80,6 @@ namespace FarmFresh.Repositories.Econt
         public IQueryable<City> FindCitiesByCondition(Expression<Func<City, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
-        public async Task<City?> GetCityByIdAsync(int id) => await GetByIdAsync(id);
-
         public City? FindFirstCityByCondition(Expression<Func<City, bool>> expression, bool trackChanges)
             => FindFirstByCondition(expression, trackChanges);
 

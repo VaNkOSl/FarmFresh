@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Repositories.Econt
     public interface IAddressRespository
     {
         Task<Address> CreateAddressAsync(Address address);
-        Task<Address?> GetAddressByIdAsync(int id);
         void DeleteAddress(Address address);
         void UpdateAddress(Address address);
         IQueryable<Address> FindAllAddresses(bool trackChanges);

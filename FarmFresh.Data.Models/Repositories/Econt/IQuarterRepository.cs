@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Repositories.Econt
     public interface IQuarterRepository
     {
         Task<Quarter> CreateQuarterAsync(Quarter quarter);
-        Task<Quarter?> GetQuarterByIdAsync(int id);
         void DeleteQuarter(Quarter quarter);
         void UpdateQuarter(Quarter quarter);
         Task UpdateQuartersAsync(IEnumerable<Quarter> quarters);

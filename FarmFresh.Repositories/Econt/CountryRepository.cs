@@ -51,9 +51,6 @@ namespace FarmFresh.Repositories.Econt
         public IQueryable<Country> FindCountriesByCondition(Expression<Func<Country, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
-        public async Task<Country?> GetCountryByIdAsync(int id)
-            => await GetByIdAsync(id);
-
         public Country? FindFirstCountryByCondition(Expression<Func<Country, bool>> expression, bool trackChanges)
             => FindFirstByCondition(expression, trackChanges);
 

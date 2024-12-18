@@ -1,0 +1,47 @@
+﻿@model UserForUpdateDto
+@{
+    ViewBag.Title = "Update User!";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <form id="editForm" method="post">
+            <h2>Edit your Account.</h2>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <input type="hidden" id="UserId" name="Id" value="@Model.Id" />
+
+            <div class="form-floating mb-3">
+                <input asp-for="FirstName" class="form-control" autocomplete="off" aria-required="true" />
+                <label asp-for="FirstName"></label>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="LastName" class="form-control" aria-required="true" />
+                <label asp-for="LastName"></label>
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="UserName" class="form-control" autocomplete="new-password" aria-required="true" />
+                <label asp-for="UserName"></label>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Email" class="form-control" autocomplete="new-password" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Email"></label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary" onclick="updateUserProfile()">Update</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="/js/user/userProfileUpdater.js"></script>
+
+}

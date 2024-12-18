@@ -1,0 +1,21 @@
+﻿.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.image-display {
+    height: 300px;
+    width: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .image-display:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+    }

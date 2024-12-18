@@ -32,8 +32,6 @@ namespace FarmFresh.Repositories.Econt
                 .Include(o => o.Address!.City)
                     .ThenInclude(c => c!.Country);
 
-        public async Task<Office?> GetOfficeByIdAsync(int id) => await GetByIdAsync(id);
-
         public void UpdateOffice(Office office) => Update(office);
 
         public async Task UpdateOfficesAsync(IEnumerable<Office> offices)

@@ -29,9 +29,6 @@ namespace FarmFresh.Repositories.Econt
         public IQueryable<Quarter> FindQuartersByCondition(Expression<Func<Quarter, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
-        public Task<Quarter?> GetQuarterByIdAsync(int id)
-            => GetByIdAsync(id);
-
         public void UpdateQuarter(Quarter quarter)
             => Update(quarter);
 

@@ -2,15 +2,19 @@
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.User;
 using LoggerService.Contacts;
+using LoggerService.Exceptions.InternalError.Users;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
+using System.Web;
 
 namespace FarmFresh.Services;
 
@@ -23,13 +27,14 @@ public sealed class AccountService : IAccountService
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-
+    private readonly string _sendGridApiKey;
     public AccountService(IRepositoryManager repositoryManager,
                           IMapper mapper,
                           ILoggerManager loggerManager,
                           IPasswordHasher<ApplicationUser> passwordHasher, 
                           IHttpContextAccessor httpContextAccessor,
-                          UserManager<ApplicationUser> userManager)
+                          UserManager<ApplicationUser> userManager,
+                          IConfiguration configuration)
     {
         _repositoryManager = repositoryManager;
         _mapper = mapper;
@@ -37,67 +42,40 @@ public sealed class AccountService : IAccountService
         _passwordHasher = passwordHasher;
         _httpContextAccessor = httpContextAccessor;
         _userManager = userManager;
-    }
-
-    public async Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges)
-    {
-        var users = _repositoryManager.UserRepository
-             .FindUsersByConditionAsync(u => u.UserName == userName 
-                                        || u.Email == email, trackChanges);
-
-        Console.WriteLine();
-
-
-        return await users.AnyAsync();
-    }
-
-    public async Task<ProfileViewModel> GetUserProfileAsync(string userId)
-    {
-        var user = await _repositoryManager.UserRepository.GetUserByIdAsync(Guid.Parse(userId));
-
-        if (user is null)
-        {
-            _loggerManager.LogWarning($"User with ID {userId} was not found.");
-            throw new UserIdNotFoundException();
-        }
-
-        var userProfile = _mapper.Map<ProfileViewModel>(user);
-
-        return userProfile;
+        _sendGridApiKey = configuration["SendGrid:ApiKey"];
     }
 
     public async Task<bool> Login(LoginViewModel model, bool trackChanges)
     {
-        var users = _repositoryManager.UserRepository
-                             .FindUsersByConditionAsync(u => u.UserName == model.UserNameOrEmail
-                                                        || u.Email == model.UserNameOrEmail, trackChanges);
+        var user = await _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.UserName == model.UserNameOrEmail || 
+            u.Email == model.UserNameOrEmail, 
+            trackChanges).FirstOrDefaultAsync();
 
-        var user = await users.FirstOrDefaultAsync();
+        AccountHelper.ChekIfUserIsNull(user, user.Id, nameof(Login), _loggerManager);
 
-        if (user is null)
+        try
         {
-            _loggerManager.LogError("Login attempt failed. User not found.");
-            throw new UserNotFounException();
+            var verificationResult = _passwordHasher
+                .VerifyHashedPassword(user, user.PasswordHash!, model.Password);
+
+            if (verificationResult is PasswordVerificationResult.Failed)
+            {
+                _loggerManager.LogWarning($"Password verification failed for user {model.UserNameOrEmail}.");
+                return false;
+            }
+
+            await SignInUserAsync(user);
+            _loggerManager.LogInfo($"User {model.UserNameOrEmail} successfully logged in at Date: {DateTime.UtcNow}.");
+
+            return true;
         }
-
-        var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, model.Password);
-
-        if(verificationResult is PasswordVerificationResult.Failed)
+        catch (Exception ex)
         {
-            _loggerManager.LogWarning($"Password verification failed for user {model.UserNameOrEmail}.");
-            return false;
+            _loggerManager.LogError($"[{nameof(Login)}] Error occurred during login attempt for {model.UserNameOrEmail}: {ex.Message}");
+            throw new LoginFailedException();
         }
-
-        await SignInUserAsync(user);
-        _loggerManager.LogInfo($"User {model.UserNameOrEmail} successfully logged in.");
-
-        return true;
-    }
-
-    public async Task Logout()
-    {
-        await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        _loggerManager.LogInfo("User successfully logged out.");
     }
 
     public async Task<bool> Register(RegisterViewModel model, bool trackChanges)
@@ -108,15 +86,174 @@ public sealed class AccountService : IAccountService
             return false;
         }
 
-        var user = _mapper.Map<ApplicationUser>(model);
+        try
+        {
+            var user = _mapper.Map<ApplicationUser>(model);
 
-        user.PasswordHash = _passwordHasher.HashPassword(user, model.Password);
+            user.PasswordHash = _passwordHasher
+                .HashPassword(user, model.Password);
 
-        await _repositoryManager.UserRepository.CreateUserAsync(user);
+            await _repositoryManager.UserRepository.CreateUserAsync(user);
+            await _repositoryManager.SaveAsync();
+
+            _loggerManager.LogInfo($"New user registered successfully with username {model.UserName} at Date: {DateTime.UtcNow}.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _loggerManager.LogError($"[{nameof(Register)}] Error occurred during registration for username {model.UserName}: {ex.Message}");
+            throw new RegistrationFailedException();
+        }
+    }
+
+    public async Task<bool> DoesUserExistAsync(string userName, string email, bool trackChanges) =>
+        await _repositoryManager
+        .UserRepository
+        .FindUsersByConditionAsync(u => u.UserName == userName ||
+        u.Email == email, trackChanges)
+        .AnyAsync();
+
+    public async Task<ProfileViewModel> GetUserProfileAsync(string userId, bool trackChanges)
+    {
+        var user = await _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.Id.ToString() == userId,
+            trackChanges)
+            .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(user, Guid.Parse(userId), nameof(GetUserProfileAsync), _loggerManager);
+
+        return _mapper.Map<ProfileViewModel>(user);
+    }
+
+    public async Task DeleteUserAsync(Guid userId, bool trackChanges)
+    {
+        var userForDeleting = await
+            _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        await DeleteFarmerAsync(userId, trackChanges);
+        AccountHelper.ChekIfUserIsNull(userForDeleting, userId, nameof(DeleteUserAsync), _loggerManager);
+
+        try
+        {
+            _repositoryManager.UserRepository.DeleteUser(userForDeleting);
+            await _repositoryManager.SaveAsync();
+            _loggerManager.LogInfo($"User with ID {userId} successfully deleted at Date: {DateTime.UtcNow}.");
+            await Logout();
+        }
+        catch (Exception ex)
+        {
+            _loggerManager.LogError($"[{nameof(DeleteUserAsync)}] Error while deleting user with ID {userId}: {ex.Message}");
+            throw new DeleteUserSomethingWentWrong();
+        }
+    }
+
+    private async Task DeleteFarmerAsync(Guid userId, bool trackChanges)
+    {
+        var farmerForDeleting = await 
+            _repositoryManager
+            .FarmerRepository
+            .FindFarmersByConditionAsync(f => f.UserId == userId, trackChanges)
+            .SingleOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(farmerForDeleting, userId, nameof(DeleteFarmerAsync), _loggerManager);
+
+        _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
         await _repositoryManager.SaveAsync();
+    }
 
-        _loggerManager.LogInfo($"New user registered successfully with username {model.UserName}.");
-        return true;
+    public async Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges)
+    {
+        var userForUpdate = await
+            _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(userForUpdate, userId, nameof(GetUserForUpdateAsync), _loggerManager);
+
+        return _mapper.Map<UserForUpdateDto>(userForUpdate);
+    }
+
+    public async Task UpdateUserAsync(UserForUpdateDto model, bool trackChanges)
+    {
+        var currentUserForUpdate = await
+          _repositoryManager
+          .UserRepository
+          .FindUsersByConditionAsync(u => u.Id == model.Id, trackChanges)
+          .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(currentUserForUpdate, model.Id, nameof(UpdateUserAsync), _loggerManager);
+
+        try
+        {
+            _mapper.Map(model, currentUserForUpdate);
+            _repositoryManager.UserRepository.UpdateUser(currentUserForUpdate);
+            await _repositoryManager.SaveAsync();
+            _loggerManager.LogInfo($"[{nameof(UpdateUserAsync)}] Successfully updated user with Id {currentUserForUpdate.Id} at Date: {DateTime.UtcNow}");
+        }
+        catch (Exception ex)
+        {
+            _loggerManager.LogError($"[{nameof(UpdateUserAsync)}] Error while updating user with ID {model.Id}: {ex.Message}");
+            throw new UpdateUserException();
+        }
+    }
+
+    public async Task Logout()
+    {
+        await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        _loggerManager.LogInfo("User successfully logged out.");
+    }
+
+    public async Task ForgotPasswordAsync(string email, bool trackChanges)
+    {
+        var user = await
+            _repositoryManager
+            .UserRepository
+            .FindUsersByConditionAsync(u => u.Email == email, trackChanges)
+            .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync), _loggerManager);
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var request = _httpContextAccessor.HttpContext.Request;
+        var resetLink = $"{request.Scheme}://{request.Host}/api/account/resetpassword?token={HttpUtility.UrlEncode(token)}&email={email}";
+
+        _loggerManager.LogInfo($"Reset Password Link: {resetLink}");
+
+        var model = new PasswordResetEmailModel
+        {
+          EmailFrom = "contactfarmfresh2024@abv.bg",
+          EmailTo = email,
+          EmailSubject = "Password Reset",
+          EmailBody = $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>"
+        };
+
+        await AdminHelper.SendRejectEmailAsync(model, _sendGridApiKey, _loggerManager);
+    }
+
+    public async Task<bool> ResetPasswordAsync(string email, string token, string newPassword, bool trackChanges)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        AccountHelper.ChekIfUserIsNull(user, user.Id, nameof(ForgotPasswordAsync), _loggerManager);
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+        if (result.Succeeded)
+        {
+            return true;
+        }
+
+        foreach (var error in result.Errors)
+        {
+            _loggerManager.LogError($"Password reset failed for {email}: {error.Description}");
+        }
+
+        return false;
     }
 
     private async Task SignInUserAsync(ApplicationUser user)

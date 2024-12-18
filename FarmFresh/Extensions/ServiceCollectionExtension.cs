@@ -46,7 +46,8 @@ public static class ServiceCollectionExtension
             options.Password.RequireUppercase = false;
         })
         .AddRoles<IdentityRole<Guid>>()
-        .AddEntityFrameworkStores<FarmFreshDbContext>();
+        .AddEntityFrameworkStores<FarmFreshDbContext>()
+        .AddDefaultTokenProviders();
 
         return services;
     }

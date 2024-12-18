@@ -19,21 +19,27 @@ internal sealed class FarmerValidator : IValidateEntity
     private bool ValidateProperties(Farmer farmer) =>
         ValidateDescriptionLength(farmer.FarmDescription) &&
         ValidateLocationLength(farmer.Location) &&
-        ValidatePhoneNumber(farmer.PhoneNumber);
+        ValidatePhoneNumber(farmer.PhoneNumber) &&
+        ValidateEgn(farmer.Egn);
 
 
     private bool ValidateDescriptionLength(string description) =>
         !string.IsNullOrWhiteSpace(description) 
         && description.Length < FarmerDescriptionMaxLength 
-        && description.Length > FarmerDescriptionMinLength;
+        && description.Length >= FarmerDescriptionMinLength;
 
     private bool ValidateLocationLength(string location) =>
         !string.IsNullOrWhiteSpace(location)
         && location.Length < FarmerLocationMaxLegth
-        && location.Length > FarmerLocationMinLegth;
+        && location.Length >= FarmerLocationMinLegth;
 
     private bool ValidatePhoneNumber(string phoneNumber) =>
         !string.IsNullOrWhiteSpace(phoneNumber)
         && phoneNumber.Length < FarmerPhoneNumberMaxLength
-        && phoneNumber.Length > FarmerPhoneNumberMinLength;
+        && phoneNumber.Length >= FarmerPhoneNumberMinLength;
+
+    private bool ValidateEgn(string egn) =>
+        !string.IsNullOrEmpty(egn)
+        && egn.Length <= FarmerEgnMaxLength
+        && egn.Length >= FarmerEgnMinLength;
 }

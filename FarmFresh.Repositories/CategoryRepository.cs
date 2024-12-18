@@ -19,8 +19,6 @@ internal sealed class CategoryRepository(FarmFreshDbContext data, IValidateEntit
 
     public void UpdateCategory(Category category) => Update(category);
 
-    public async Task<Category?> GetCategoryByIdAsync(Guid id) => await GetByIdAsync(id);
-
     public IQueryable<Category> FindCategoryByConditionAsync(Expression<Func<Category, bool>> expression, bool trackChanges) =>
            FindByCondition(expression, trackChanges);
 

@@ -26,6 +26,9 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public bool IsBlocked { get; set; }
 
+    public bool IsAdmin { get; set; }
+
     public virtual ICollection<Order> Orders { get; set; }
+
     public virtual ICollection<Review> Reviews { get; set; }
 }

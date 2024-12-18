@@ -29,9 +29,6 @@ namespace FarmFresh.Repositories.Econt
         public IQueryable<Street> FindStreetsByCondition(Expression<Func<Street, bool>> expression, bool trackChanges)
             => FindByCondition(expression, trackChanges);
 
-        public async Task<Street?> GetStreetByIdAsync(int id)
-            => await GetByIdAsync(id);
-
         public void UpdateStreet(Street street)
             => Update(street);
 

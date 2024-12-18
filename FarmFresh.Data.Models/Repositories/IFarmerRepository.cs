@@ -7,8 +7,6 @@ public interface IFarmerRepository
 {
     Task<Farmer> CreateFarmerAsync(Farmer farmer);
 
-    Task<Farmer?> GetFarmerByIdAsync(Guid id);
-
     void DeleteFarmer(Farmer farmer);
 
     void UpdateFarmer(Farmer farmer);
@@ -18,4 +16,6 @@ public interface IFarmerRepository
     IQueryable<Farmer> FindAllFarmers(bool trackChanges); 
 
     Task<PagedList<Farmer>> GetFarmersAsync(FarmerParameters farmerParameters, bool trackChanges);
+
+    Task<PagedList<Farmer>> GetUnapprovedFarmersAsync(FarmerParameters farmerParameters, bool trackChanges);
 }

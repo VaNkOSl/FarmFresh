@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Repositories.Econt
     public interface ICityRepository
     {
         Task<City> CreateCityAsync(City city);
-        Task<City?> GetCityByIdAsync(int id);
         void DeleteCity(City city);
         void UpdateCity(City city);
         Task UpdateCitiesAsync(IEnumerable<City> cities);

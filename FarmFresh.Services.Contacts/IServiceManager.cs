@@ -12,9 +12,6 @@ public interface IServiceManager
 
     ICategoryService CategoryService { get; }
 
-
-    //Econt Services
-
     IEcontNumenclaturesService EcontNumenclaturesService { get; }
 
     IEcontAddressService EcontAddressService { get; }
@@ -22,8 +19,6 @@ public interface IServiceManager
     IEcontLabelService EcontLabelService { get; }
 
     IEcontShipmentService EcontShipmentService { get; }
-
-    //Econt database specific
 
     ICountryService CountryService { get; }
 
@@ -36,4 +31,14 @@ public interface IServiceManager
     IStreetService StreetService { get; }
 
     IQuarterService QuarterService { get; }
+
+    IProductService ProductService { get; }
+
+    IProductPhotoService ProductPhotoService { get; }
+
+    IReviewService ReviewService { get; }
+
+    IOrderService OrderService { get; }
+
+    ICartService CartService { get; }
 }

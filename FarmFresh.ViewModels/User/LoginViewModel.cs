@@ -6,10 +6,10 @@ public class LoginViewModel
 {
     [Required]
     [Display(Name = "Username or Email")]
-    public string UserNameOrEmail { get; set; } = string.Empty;
+    public string UserNameOrEmail { get; init; } = string.Empty;
 
     [Required]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
-    public string Password { get; set; } = string.Empty;
+    public string Password { get; init; } = string.Empty;
 }

@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Repositories.Econt
     public interface ICountryRepository
     {
         Task<Country> CreateCountryAsync(Country country);
-        Task<Country?> GetCountryByIdAsync(int id);
         void DeleteCountry(Country country);
         void UpdateCountry(Country country);
         Task UpdateCountriesAsync(IEnumerable<Country> countries);

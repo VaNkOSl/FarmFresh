@@ -1,5 +1,9 @@
-﻿@{
+﻿@using FarmFresh.Services.Contacts;
+@using FarmFresh.Infrastructure.Extensions;
+@inject IServiceManager _serviceManager;
+@{
     Layout = "_MasterLayout";
+    bool userIsAFarmer = await _serviceManager.FarmerService.DoesFarmerExistsByuserId(User.GetId()!, trackChanges: false);
 }
 
 <div id="wrapper">
@@ -7,7 +11,6 @@
         <div class="container-fluid d-flex flex-column p-0">
             <a asp-action="List" asp-area="" asp-controller="Course" class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    @*  <i class="fas fa-laugh-wink"></i> *@
                     <i class="fas fa-leaf"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">
@@ -18,7 +21,7 @@
                 <li><hr class="sidebar-divider" /></li>
 
                 <li class="nav-item">
-                    <a asp-action="List" asp-area="Admin" asp-controller="Product" class="nav-link">
+                    <a asp-action="AllProducts" asp-controller="Product" class="nav-link">
                         <i class="fas fa-seedling"></i>
                         <span>Products</span>
                     </a>
@@ -32,9 +35,9 @@
                 </li>
 
                 <li class="nav-item">
-                    <a asp-action="List" asp-area="Admin" asp-controller="Order" class="nav-link">
+                    <a asp-action="Index" asp-area="" asp-controller="Order" class="nav-link">
                         <i class="fas fa-shopping-basket"></i>
-                        <span>Orders</span>
+                        <span>My Orders</span>
                     </a>
                 </li>
 
@@ -61,11 +64,27 @@
         <div id="content">
             <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar">
                 <div class="container-fluid" id="contentId">
-                    <ul class="navbar-nav flex-nowrap">
+                    <ul  class="navbar-nav flex-nowrap d-flex align-items-center gap-3">
+                            @if (userIsAFarmer is true)
+                            {
+                                <a asp-action="Add" asp-controller="Product" class="nav-link">
+                                    <i class="fas fa-seedling"></i>
+                                    <span>Add Product!</span>
+                                </a>
+                            }
+                            else
+                            {
+                                @if (User.Identity.IsAuthenticated == true)
+                                {
+                                    <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">
+                                        <i class="fas fa-user-farmer fa-fw"></i> Become a Farmer
+                                    </a>
+                                }
+                            }
                         <li class="nav-item">
-                            <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">
-                             <i class="fas fa-some-icon fa-fw"></i> Become a Farmer
-                        </a>
+                            <a asp-action="Index" asp-controller="Cart" class="btn btn-link text-gray-600">
+                                <i class="fas fa-shopping-cart fa-fw"></i> Cart
+                            </a>
                         </li>
                     </ul>
                     @if (User.Identity!.IsAuthenticated == false)

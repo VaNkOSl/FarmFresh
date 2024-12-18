@@ -1,6 +1,7 @@
 ﻿using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data;
 using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.DataValidator;
 using FarmFresh.Repositories.Extensions;
@@ -26,13 +27,26 @@ internal sealed class FarmerRepository(FarmFreshDbContext data, IValidateEntity 
     public IQueryable<Farmer> FindFarmersByConditionAsync(Expression<Func<Farmer, bool>> expression, bool trackChanges) =>
              FindByCondition(expression, trackChanges);
 
-    public async Task<Farmer?> GetFarmerByIdAsync(Guid id) => await GetByIdAsync(id);
-
     public async Task<PagedList<Farmer>> GetFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
     {
         var farmers = await
             FindAllFarmers(trackChanges)
             .Include(f => f.User)
+            .Include(ow => ow.OwnedProducts)
+            .Search(farmerParameters.SearchTerm)
+            .ToListAsync();
+
+        return PagedList<Farmer>
+            .ToPagedList(farmers, farmerParameters.PageNumber, farmerParameters.PageSize);
+    }
+
+    public async Task<PagedList<Farmer>> GetUnapprovedFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
+    {
+        var farmers = await
+            FindAllFarmers(trackChanges)
+            .Include(f => f.User)
+            .Where(f => f.FarmerStatus == Status.PendingApproval)
+            .Include(ow => ow.OwnedProducts)
             .Search(farmerParameters.SearchTerm)
             .ToListAsync();
 

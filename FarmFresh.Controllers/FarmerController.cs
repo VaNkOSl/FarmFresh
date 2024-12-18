@@ -23,7 +23,8 @@ public class FarmerController : BaseController
        View();
 
     [HttpPost("become")]
-    public async Task<IActionResult> Become(FarmerCreateForm model)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Become(FarmerForCreationDto model)
     {
         var userId = User.GetId()!;
 
@@ -45,6 +46,47 @@ public class FarmerController : BaseController
 
         var model = await _serviceManager.FarmerService.CreateFarmersListViewModelAsync(farmers, metaData, farmerParameters.SearchTerm);
 
+        return View(model);
+    }
+
+    [HttpGet("edit/{id}")]
+
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        var editView =  await _serviceManager.FarmerService.GetFarmerForEditAsync(id, trackChanges: false);
+        return View(editView);
+    }
+
+    [HttpPatch("edit/{farmerId}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid farmerId, FarmerForUpdatingDto model)
+    {
+        if (ModelState.IsValid)
+        {
+            await _serviceManager.FarmerService.EditFarmerAsync(model, farmerId, trackChanges: true);
+        }
+        return Ok(new { success = true });
+    }
+
+    [HttpGet("profile/{id}")]
+    public async Task<IActionResult> Profile(Guid id)
+    {
+        var farmerProfile = await _serviceManager.FarmerService.GetFarmerProfileAsync(id.ToString());
+        return View(farmerProfile);
+    }
+
+    [HttpDelete("delete/{id}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete([FromBody] FarmerProfileViewModel model)
+    {
+        await _serviceManager.FarmerService.DeleteFarmerAsync(model.Id, trackChanges: true);
+        return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    [HttpGet("details/{id}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var model = await _serviceManager.FarmerService.GetFarmersDetailsByIdAsync(id, trackChanges: false);
         return View(model);
     }
 }

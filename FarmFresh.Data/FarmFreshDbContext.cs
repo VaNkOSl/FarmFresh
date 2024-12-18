@@ -35,9 +35,6 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
 
     public virtual DbSet<FarmerLocation> FarmerLocations { get; set; }
 
-    //Econt DbSets
-    //** SUBJECT TO CHANGE ** (if changed, don't forget the configurations as well)
-
     public virtual DbSet<Address> Addresses { get; set; }
 
     public virtual DbSet<City> Cities { get; set; }
@@ -50,6 +47,8 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
 
     public virtual DbSet<Street> Streets { get; set; }
 
+    public virtual DbSet<CartItem> CartItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -59,7 +58,6 @@ public class FarmFreshDbContext : IdentityDbContext<ApplicationUser, IdentityRol
         builder.ApplyConfiguration(new ReviewConfiguration());
         builder.ApplyConfiguration(new ProductPhotoConfiguration());
         builder.ApplyConfiguration(new CategoryConfiguration());
-
         builder.ApplyConfiguration(new AddressConfiguration());
         builder.ApplyConfiguration(new CityConfiguration());
         builder.ApplyConfiguration(new CountryConfiguration());

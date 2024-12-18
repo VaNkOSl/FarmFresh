@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Repositories.Econt
     public interface IStreetRepository
     {
         Task<Street> CreateStreetAsync(Street street);
-        Task<Street?> GetStreetByIdAsync(int id);
         void DeleteStreet(Street street);
         void UpdateStreet(Street street);
         Task UpdateStreetsAsync(IEnumerable<Street> streets);

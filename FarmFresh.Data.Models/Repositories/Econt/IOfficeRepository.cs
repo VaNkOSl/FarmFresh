@@ -6,7 +6,6 @@ namespace FarmFresh.Data.Models.Repositories.Econt
     public interface IOfficeRepository
     {
         Task<Office> CreateOfficeAsync(Office office);
-        Task<Office?> GetOfficeByIdAsync(int id);
         void DeleteOffice(Office office);
         void UpdateOffice(Office office);
         Task UpdateOfficesAsync(IEnumerable<Office> offices);
