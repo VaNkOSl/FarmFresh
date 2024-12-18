@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
+using static FarmFresh.Commons.MessagesConstants.Cars;
+using static FarmFresh.Commons.NotificationMessagesConstants;
 
 namespace FarmFresh.Controllers;
 
@@ -37,14 +39,15 @@ public class CartController : BaseController
         {
             return BadRequest("Product not found or insufficient stock.");
         }
-
-        return RedirectToAction("Index");
+        TempData[SuccessMessage] = SuccessfullyAddProductToCart;
+        return RedirectToAction(nameof(ProductController.Details), "Product", new { id = Id });
     }
 
     [HttpPost("removefromcart/{productId}")]
     public async Task<IActionResult> RemoveFromCart(Guid productId)
     {
         await _serviceManager.CartService.RemoveFromCart(productId, trackChanges: true);
+        TempData[WarningMessage] = SuccessfullyRemoveProductFromCart;
         return RedirectToAction("Index");
     }
 
