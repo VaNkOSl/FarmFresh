@@ -249,7 +249,10 @@ internal sealed class FarmerService : IFarmerService
             .FindFarmersByConditionAsync(f => f.UserId == userId && f.FarmerStatus == Status.Approved, trackChanges)
             .FirstOrDefaultAsync();
 
-        FarmerHelper.ChekFarmerNotFound(farmer, userId, nameof(GetFarmerByUserIdAsync), _loggerManager);
+        if(farmer is null)
+        {
+            return Guid.Empty;
+        }
 
         return farmer.Id;
     }

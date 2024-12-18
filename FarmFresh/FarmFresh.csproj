@@ -22,7 +22,9 @@
     <ProjectReference Include="..\FarmFresh.Controllers\FarmFresh.Controllers.csproj" />
     <ProjectReference Include="..\FarmFresh.Data.Models\FarmFresh.Data.Models.csproj" />
     <ProjectReference Include="..\FarmFresh.Data\FarmFresh.Data.csproj" />
+    <ProjectReference Include="..\FarmFresh.Infrastructure\FarmFresh.Infrastructure.csproj" />
     <ProjectReference Include="..\FarmFresh.Repositories\FarmFresh.Repositories.csproj" />
+    <ProjectReference Include="..\FarmFresh.Services.Contacts\FarmFresh.Services.Contacts.csproj" />
     <ProjectReference Include="..\FarmFresh.Services\FarmFresh.Services.csproj" />
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     <ProjectReference Include="..\LoggerService\LoggerService.csproj" />

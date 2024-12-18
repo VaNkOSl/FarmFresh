@@ -1,4 +1,5 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Repositories.Extensions;
@@ -28,6 +29,20 @@ public static class OrderRepositoryExtensions
             .Include(o => o.Order)
             .ThenInclude(ph => ph.ProductPhotos)
             .Where(o => o.Id == id);
+    }
+
+    public static IQueryable<OrderProduct> GetOrderProductsByFarmerId(this IQueryable<Order> orders, Guid farmerId)
+    {
+        return orders
+            .SelectMany(o => o.OrderProducts)
+            .Where(op => op.Product.FarmerId == farmerId &&
+            op.Order.OrderStatus != OrderStatus.Shipped 
+            && op.Order.OrderStatus != OrderStatus.ReadyForPickup)
+            .Include(o => o.Order)
+            .ThenInclude(ph => ph.ProductPhotos)
+            .Include(ph => ph.Product)
+            .ThenInclude(f => f.Farmer)
+            .ThenInclude(u => u.User);
     }
 }
 

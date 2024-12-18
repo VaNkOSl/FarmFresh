@@ -16,7 +16,6 @@ public class OrderMappingProfile : Profile
             .ForCtorParam("OrderStatus", opt => opt.MapFrom(src => src.Order.OrderStatus.ToString()))
             .ForCtorParam("Price", opt => opt.MapFrom(src => src.Price))
             .ForCtorParam("Quantity", opt => opt.MapFrom(src => src.Quantity))
-            .ForCtorParam("Picture", opt => opt.MapFrom(src => src.Product.Photo))
             .ForCtorParam("Photos", opt => opt.MapFrom(src =>
         src.Product.ProductPhotos.Select(photo => new ProductPhotosDto(
             photo.Id,
@@ -53,5 +52,22 @@ public class OrderMappingProfile : Profile
                     photo.Photo,
                     photo.ProductId
                 )).ToList()));
-    }
+
+        CreateMap<OrderProduct, FarmerOrderListViewModel>()
+            .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+            .ForCtorParam("ProductName", opt => opt.MapFrom(src => src.Product.Name))
+            .ForCtorParam("UserFullName", opt => opt.MapFrom(src => src.Product.Farmer.User.FirstName + " " + src.Product.Farmer.User.LastName))
+			.ForCtorParam("Price", opt => opt.MapFrom(src => src.Price))
+			.ForCtorParam("Quantity", opt => opt.MapFrom(src => src.Quantity))
+			.ForCtorParam("Photos", opt => opt.MapFrom(src =>
+				src.Order.ProductPhotos.Select(photo => new ProductPhotosDto(
+					photo.Id,
+					"/uploads/" + Path.GetFileName(photo.FilePath),
+					photo.Photo,
+					photo.ProductId
+				)).ToList()));
+
+
+
+	}
 }

@@ -13,4 +13,10 @@ public interface IOrderService
     Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId, bool trackChanges);
 
     Task<OrderDetailsViewModel> GetOrderDetailsAsync(Guid id, bool trackChanges);
+
+    Task<IEnumerable<FarmerOrderListViewModel>> GetOrderConfirmationForFarmersViewModelAsync(Guid farmerId, bool trackChanges);
+
+    Task<bool> SendOrderAsync(Guid orderId, bool trackChanges);
+
+    Task<bool> CancelOrder(Guid orderId, bool trackChanges);
 }
