@@ -7,7 +7,6 @@ using FarmFresh.Services.Contacts;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Identity;
 using NLog;
-
 using static FarmFresh.Commons.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
