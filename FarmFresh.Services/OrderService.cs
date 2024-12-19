@@ -7,6 +7,7 @@ using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Order;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
+using LoggerService.Exceptions.InternalError.Order;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Services;
@@ -36,28 +37,30 @@ internal class OrderService : IOrderService
 
         OrderHelper.ChekOrderNotFound(order, order.Id, "CheckoutAsync", _loggerManager);
 
-        _mapper.Map(model, order);
-
-        foreach (var item in order.OrderProducts)
-        {
-            var product = item.Product;
-
-            foreach(var photo in product.ProductPhotos)
-            {
-                order.ProductPhotos.Add(photo);
-            }
-        }
-
         try
         {
+            _mapper.Map(model, order);
+            _loggerManager.LogInfo($"[{CheckoutAsync}] Successfully mapped order data from CreateOrderDto to Order entity");
+
+            foreach (var item in order.OrderProducts)
+            {
+                var product = item.Product;
+
+                foreach (var photo in product.ProductPhotos)
+                {
+                    order.ProductPhotos.Add(photo);
+                    _loggerManager.LogInfo($"[{CheckoutAsync}] Added photo with ID {photo.Id} to order {order.Id}");
+                }
+            }
             _repositoryManager.OrderRepository.UpdateOrder(order);
             await _repositoryManager.SaveAsync(order);
+            _loggerManager.LogInfo($"[{CheckoutAsync}] Successfully updated order with ID {order.Id}");
             return order.Id;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            _loggerManager.LogError($"[{CheckoutAsync}] An error occurred while processing order for user {userId}: {ex.Message}");
+            throw new OrderCheckoutInternalServiceError();
         }
 
     }
@@ -74,16 +77,18 @@ internal class OrderService : IOrderService
             .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
             .ToListAsync();
 
-        foreach(var cart in cartItemToRemove)
+        _loggerManager.LogInfo($"[{CompleteOrderAsync}] Found {cartItemToRemove.Count} cart items to remove for user {order.UserId}");
+
+        foreach (var cart in cartItemToRemove)
         {
             _repositoryManager.CartItemRepository.DeleteItem(cart);
+            _loggerManager.LogInfo($"[{CompleteOrderAsync}] Removed cart item with ID {cart.Id} for user {order.UserId}");
         }
-
-        //CartHelper.CheckCartItemNotFound(cartItemToRemove, cartItemToRemove.Id, "CompleteOrderAsync", _loggerManager);
 
         order.OrderStatus = OrderStatus.Completed;
         _repositoryManager.OrderRepository.UpdateOrder(order);
         await _repositoryManager.SaveAsync();
+        _loggerManager.LogInfo($"[{CompleteOrderAsync}] Successfully updated the order with ID {orderId} to status 'Completed'.");
     }
     public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId, bool trackChanges)
     {
@@ -123,10 +128,10 @@ internal class OrderService : IOrderService
       Products: order.OrderProducts.ToList(),
       CartItems: cartItemViewModels,
       Photos: order.OrderProducts
-          .SelectMany(op => op.Product.ProductPhotos) // Събираме всички снимки на продуктите
+          .SelectMany(op => op.Product.ProductPhotos) 
           .Select(pp => new ProductPhotosDto(
               pp.Id,
-              "/uploads/" + Path.GetFileName(pp.FilePath), // Връщаме пътя до снимката
+              "/uploads/" + Path.GetFileName(pp.FilePath),
               pp.Photo,
               pp.ProductId
           ))
@@ -187,6 +192,7 @@ internal class OrderService : IOrderService
         order.OrderStatus = OrderStatus.Shipped;
         _repositoryManager.OrderRepository.UpdateOrder(order);
         await _repositoryManager.SaveAsync();
+        _loggerManager.LogInfo($"[{SendOrderAsync}] Successfully send order with ID {order.Id}");
         return true;
     }
 
@@ -201,6 +207,7 @@ internal class OrderService : IOrderService
         order.OrderStatus = OrderStatus.Canceled;
         _repositoryManager.OrderRepository.UpdateOrder(order);
         await _repositoryManager.SaveAsync();
+        _loggerManager.LogInfo($"[{SendOrderAsync}] Successfully cancel order with ID {order.Id}");
         return true;
     }
 }
