@@ -1,11 +1,9 @@
-using AutoMapper;
-using FarmFresh.Mapper;
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
+using FarmFresh.Mapper;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Identity;
 using NLog;
-
 using static FarmFresh.Commons.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
