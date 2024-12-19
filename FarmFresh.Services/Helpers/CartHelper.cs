@@ -87,6 +87,13 @@ public static class CartHelper
             orderItem.Quantity += quantity;
         }
 
+        product.StockQuantity -= orderItem.Quantity;
+        if (product.StockQuantity <= 0)
+        {
+            product.ProductStatus = Status.OutOfStock;
+        }
+
+
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{nameof(AddOrUpdateOrderProductAsync)}] Successfully created orderItem with Id {orderItem.Id}.");
         return orderItem;
