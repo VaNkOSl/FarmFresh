@@ -8,4 +8,4 @@ public record FarmerOrderListViewModel(
 	string UserFullName,
 	decimal Price,
 	int Quantity,
-	IEnumerable<ProductPhotosDto> Photos);
+	ProductPhotosDto Photos);
