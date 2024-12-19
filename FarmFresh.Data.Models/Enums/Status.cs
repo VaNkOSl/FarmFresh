@@ -7,5 +7,6 @@ public enum Status
     Unapproved = 2,        
     Rejected = 3,          
     UnderReview = 4,       
-    Archived = 5
+    Archived = 5,
+    OutOfStock = 6,
 }
