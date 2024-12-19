@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Services;
 
-internal sealed class ProductPhotoService : IProductPhotoService
+public sealed class ProductPhotoService : IProductPhotoService
 {
     private readonly IRepositoryManager _repositoryManager;
     private readonly ILoggerManager _loggerManager;

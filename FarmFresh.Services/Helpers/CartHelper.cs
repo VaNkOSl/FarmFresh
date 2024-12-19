@@ -3,7 +3,6 @@ using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories;
 using FarmFresh.Repositories.Contacts;
-using LoggerService;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.NotFound;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +23,6 @@ public static class CartHelper
             {
                 UserId = userId,
                 OrderStatus = OrderStatus.Cart,
-                CreateOrderdDate = DateTime.Now,
             };
             await _repositoryManager.OrderRepository.AddOrderAsync(order);
             await _repositoryManager.SaveAsync();
