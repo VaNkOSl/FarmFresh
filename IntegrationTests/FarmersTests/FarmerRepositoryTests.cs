@@ -1,6 +1,7 @@
 ﻿using EntityDataGenerator;
 using FarmFresh.Data;
 using FarmFresh.Data.Models.Enums;
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.DataValidator;

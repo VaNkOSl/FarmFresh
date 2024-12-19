@@ -147,6 +147,275 @@ namespace FarmFresh.Data.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FullAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullAddressEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Hezid")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Num")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Other")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Quarter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Zip")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("ExpressCityDeliveries")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Friday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Monday")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RegionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RegionNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Saturday")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ServiceDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("Sunday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Thursday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Tuesday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Wednesday")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ZoneId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ZoneName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZoneNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Cities");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code2")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<string>("Code3")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<bool?>("IsEU")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code2")
+                        .IsUnique();
+
+                    b.HasIndex("Code3")
+                        .IsUnique();
+
+                    b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Office", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Emails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("HalfDayBusinessHoursFrom")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("HalfDayBusinessHoursTo")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("HubCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HubName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HubNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Info")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsAPS")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDrive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsMPS")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("NormalBusinessHoursFrom")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("NormalBusinessHoursTo")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PartnerCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phones")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShipmentTypes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("SundayBusinessHoursFrom")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SundayBusinessHoursTo")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("Offices");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Quarter", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CityID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityID");
+
+                    b.ToTable("Quarters");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Street", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CityID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityID");
+
+                    b.ToTable("Streets");
+                });
+
             modelBuilder.Entity("FarmFresh.Data.Models.Farmer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -582,6 +851,137 @@ namespace FarmFresh.Data.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Address", b =>
+                {
+                    b.HasOne("FarmFresh.Data.Models.Econt.Nomenclatures.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsOne("FarmFresh.Data.Models.Econt.Nomenclatures.GeoLocation", "Location", b1 =>
+                        {
+                            b1.Property<int>("AddressId")
+                                .HasColumnType("int");
+
+                            b1.Property<int?>("Confidence")
+                                .HasColumnType("int")
+                                .HasColumnName("Confidence");
+
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Latitude");
+
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Longitude");
+
+                            b1.HasKey("AddressId");
+
+                            b1.ToTable("Addresses");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AddressId");
+                        });
+
+                    b.Navigation("City");
+
+                    b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.City", b =>
+                {
+                    b.HasOne("FarmFresh.Data.Models.Econt.Nomenclatures.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsOne("FarmFresh.Data.Models.Econt.Nomenclatures.GeoLocation", "Location", b1 =>
+                        {
+                            b1.Property<int>("CityId")
+                                .HasColumnType("int");
+
+                            b1.Property<int?>("Confidence")
+                                .HasColumnType("int")
+                                .HasColumnName("Confidence");
+
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Latitude");
+
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Longitude");
+
+                            b1.HasKey("CityId");
+
+                            b1.ToTable("Cities");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CityId");
+                        });
+
+                    b.OwnsMany("FarmFresh.Data.Models.Econt.Nomenclatures.ServingOfficeElement", "ServingOffices", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<int>("CityId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("OfficeCode")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("OfficeCode");
+
+                            b1.Property<string>("ServingType")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("ServingType");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("CityId");
+
+                            b1.ToTable("ServingOffices", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("CityId");
+                        });
+
+                    b.Navigation("Country");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("ServingOffices");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Office", b =>
+                {
+                    b.HasOne("FarmFresh.Data.Models.Econt.Nomenclatures.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Quarter", b =>
+                {
+                    b.HasOne("FarmFresh.Data.Models.Econt.Nomenclatures.City", null)
+                        .WithMany()
+                        .HasForeignKey("CityID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("FarmFresh.Data.Models.Econt.Nomenclatures.Street", b =>
+                {
+                    b.HasOne("FarmFresh.Data.Models.Econt.Nomenclatures.City", null)
+                        .WithMany()
+                        .HasForeignKey("CityID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("FarmFresh.Data.Models.Farmer", b =>

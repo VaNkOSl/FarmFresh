@@ -67,4 +67,13 @@ public static class EntityValidationConstants
         public const int TitleMinLength = 3;
         public const int TitleMaxLength = 150;
     }
+
+    public static class Country
+    {
+        public const int Code2MinLength = 0;
+        public const int Code2MaxLength = 2;
+
+        public const int Code3MinLength = 0;
+        public const int Code3MaxLength = 3;
+    }
 }

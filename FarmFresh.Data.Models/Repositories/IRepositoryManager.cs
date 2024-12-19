@@ -1,8 +1,10 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Repositories.Econt;
+using FarmFresh.Repositories.Contacts;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 
-namespace FarmFresh.Repositories.Contacts;
+namespace FarmFresh.Data.Models.Repositories;
 
 public interface IRepositoryManager
 {
@@ -13,6 +15,18 @@ public interface IRepositoryManager
     IFarmerLocationRepository FarmerLocationRepository { get; }
 
     ICategoryRepository CategoryRepository { get; }
+
+    ICountryRepository CountryRepository { get; }
+
+    ICityRepository CityRepository { get; }
+
+    IOfficeRepository OfficeRepository { get; }
+
+    IAddressRespository AddressRepository { get; }
+
+    IStreetRepository StreetRepository { get; }
+
+    IQuarterRepository QuarterRepository { get; }
 
     IProductRepository ProductRepository { get; }
 

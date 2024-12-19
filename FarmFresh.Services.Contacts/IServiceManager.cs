@@ -1,4 +1,8 @@
-﻿namespace FarmFresh.Services.Contacts;
+﻿using FarmFresh.Data.Models.Repositories.Econt;
+using FarmFresh.Services.Contacts.Econt;
+using FarmFresh.Services.Contacts.Econt.APIServices;
+
+namespace FarmFresh.Services.Contacts;
 
 public interface IServiceManager
 {
@@ -7,6 +11,26 @@ public interface IServiceManager
     IAdminService AdminService { get; }
 
     ICategoryService CategoryService { get; }
+
+    IEcontNumenclaturesService EcontNumenclaturesService { get; }
+
+    IEcontAddressService EcontAddressService { get; }
+
+    IEcontLabelService EcontLabelService { get; }
+
+    IEcontShipmentService EcontShipmentService { get; }
+
+    ICountryService CountryService { get; }
+
+    ICityService CityService { get; }
+
+    IOfficeService OfficeService { get; }
+
+    IAddressService AddressService { get; }
+
+    IStreetService StreetService { get; }
+
+    IQuarterService QuarterService { get; }
 
     IProductService ProductService { get; }
 

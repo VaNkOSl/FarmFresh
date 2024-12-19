@@ -1,0 +1,48 @@
+﻿using FarmFresh.Data;
+using FarmFresh.Data.Models.Econt.Nomenclatures;
+using FarmFresh.Data.Models.Repositories.Econt;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace FarmFresh.Repositories.Econt
+{
+    public class AddressRepository(FarmFreshDbContext data) : RepositoryBase<Address>(data), IAddressRespository
+    {
+        public async Task<Address> CreateAddressAsync(Address address)
+        {
+            await CreateAsync(address);
+            return address;
+        }
+
+        public void DeleteAddress(Address address)
+            => Delete(address);
+
+        public async Task DeleteOrphanedAddressesAsync()
+        {
+            //Where clause to be updated when a new entity is made
+            //that contains Address as a field (ShippingLabel in the future)
+
+            var orphanedAddresses = await _data.Addresses
+                .Where(a => !_data.Offices.Any(o => o.AddressId == a.Id))
+                .ToListAsync();
+
+            _data.Addresses.RemoveRange(orphanedAddresses);
+            await _data.SaveChangesAsync();
+        }
+
+        public IQueryable<Address> FindAddressesByCondition(Expression<Func<Address, bool>> expression, bool trackChanges)
+            => FindByCondition(expression, trackChanges);
+
+        public IQueryable<Address> FindAllAddresses(bool trackChanges)
+            => FindAll(trackChanges);
+
+        public Address? FindFirstAddressByCondition(Expression<Func<Address, bool>> expression, bool trackChanges)
+            => FindFirstByCondition(expression, trackChanges);
+
+        public async Task<Address?> FindFirstAddressByConditionAsync(Expression<Func<Address, bool>> expression, bool trackChanges)
+            => await FindFirstByConditionAsync(expression, trackChanges);
+
+        public void UpdateAddress(Address address)
+            => Update(address);
+    }
+}

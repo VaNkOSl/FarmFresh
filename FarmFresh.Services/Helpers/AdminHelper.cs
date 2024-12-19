@@ -1,4 +1,5 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.ViewModels.Email;
 using LoggerService;
