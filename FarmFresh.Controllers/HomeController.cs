@@ -1,6 +1,6 @@
 ﻿using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Infrastructure.Extensions;
+using FarmFresh.Repositories.Contacts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;

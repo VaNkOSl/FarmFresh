@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Repositories.Contacts;

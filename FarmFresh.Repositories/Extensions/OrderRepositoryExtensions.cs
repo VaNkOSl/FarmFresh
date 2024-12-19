@@ -8,16 +8,14 @@ public static class OrderRepositoryExtensions
 {
     public static IQueryable<Order> GetOrderWithDetails(this IQueryable<Order> order) =>
            order.Include(o => o.OrderProducts)
-                .ThenInclude(op => op.Product)
-                .ThenInclude(ph => ph.ProductPhotos);
+                .ThenInclude(op => op.Product);
 
     public static IQueryable<OrderProduct> GetOrderProductsByUserId(this IQueryable<Order> orders, Guid userId)
     {
         return orders
             .Where(o => o.UserId == userId)
             .SelectMany(o => o.OrderProducts) 
-            .Include(op => op.Product)
-            .ThenInclude(ph => ph.ProductPhotos)
+            .Include(op => op.Product) 
             .Include(op => op.Order) 
             .ThenInclude(o => o.User); 
     }

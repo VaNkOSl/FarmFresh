@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Helpers;

@@ -1,7 +1,6 @@
 ﻿using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.ViewModels.Product;
-using System.ComponentModel.DataAnnotations;
 
 namespace FarmFresh.ViewModels.Order;
 
@@ -22,7 +21,6 @@ public class CreateOrderDto
 
     public string PhoneNumber { get; set; } = string.Empty;
 
-    [EmailAddress]
     public string Email { get; set; } = string.Empty;
 
     public DateTime CreateOrderdDate { get; set; }

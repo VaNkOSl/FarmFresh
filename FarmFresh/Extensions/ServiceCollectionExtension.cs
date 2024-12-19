@@ -1,8 +1,8 @@
 ﻿using FarmFresh.Controllers;
 using FarmFresh.Data;
 using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories;
+using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.DataValidator;
 using FarmFresh.Services;
 using FarmFresh.Services.Contacts;
@@ -20,12 +20,7 @@ public static class ServiceCollectionExtension
     {
         var connectionString = config.GetConnectionString("DefaultConnection");
         services.AddDbContext<FarmFreshDbContext>(options =>
-        {
-            options.UseSqlServer(connectionString);
-
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-                options.EnableSensitiveDataLogging();
-        });
+            options.UseSqlServer(connectionString));
 
         services.AddControllersWithViews()
        .AddApplicationPart(typeof(HomeController).Assembly);
