@@ -23,7 +23,6 @@
     <ProjectReference Include="..\EntityDataGenerator\EntityDataGenerator.csproj" />
     <ProjectReference Include="..\FarmFresh.Repositories\FarmFresh.Repositories.csproj" />
     <ProjectReference Include="..\FarmFresh.Services.Contacts\FarmFresh.Services.Contacts.csproj" />
-    <ProjectReference Include="..\FarmFresh.Services\FarmFresh.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

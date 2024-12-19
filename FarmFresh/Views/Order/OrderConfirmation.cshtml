@@ -5,75 +5,77 @@
         <div class="card-header bg-primary text-white text-center">
             <h2>Order Confirmation</h2>
         </div>
-        <form class="needs-validation" asp-action="OrderConfirmation">
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h4>Customer Information</h4>
-                        <ul class="list-group list-group-flush">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <li class="list-group-item"><strong>Name:</strong> @Model.FirstName @Model.LastName</li>
-                            <li class="list-group-item"><strong>Address:</strong> @Model.Adress</li>
-                            <li class="list-group-item"><strong>Phone:</strong> @Model.PhoneNumber</li>
-                            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h4>Order Summary</h4>
-                        <div class="card border-light mb-3">
-                            <div class="card-body">
-                                <p><strong>Order ID:</strong> @Model.Id</p>
-                                <p><strong>Total Quantity:</strong> @Model.CartItems.Sum(q => q.Quantity)</p>
-                                <p><strong>Total Price:</strong> <span class="text-success">@Model.CartItems.Sum(p => p.Quantity * p.Price) лв.</span></p>
-                            </div>
+                    <form class="needs-validation" asp-action="OrderConfirmation">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4>Customer Information</h4>
+                    <ul class="list-group list-group-flush">
+                        <input type="hidden" name="id" value="@Model.Id"/>
+                        <li class="list-group-item"><strong>Name:</strong> @Model.FirstName @Model.LastName</li>
+                        <li class="list-group-item"><strong>Address:</strong> @Model.Adress</li>
+                        <li class="list-group-item"><strong>Phone:</strong> @Model.PhoneNumber</li>
+                        <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                    </ul>
+                </div>
+                <div class="col-md-6 text-center">
+                    @if (Model.Photos != null && Model.Photos.Any())
+                    {
+                            @foreach (var photo in Model.Photos)
+                            {
+                                <img src="@photo.FilePath" class="product-photo" alt="Product Photo" />
+                            }
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/150" class="img-fluid rounded" alt="No Picture Available" />
+                    }
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h4>Order Summary</h4>
+                    <div class="card border-light mb-3">
+                        <div class="card-body">
+                            <p><strong>Order ID:</strong> @Model.Id</p>
+                            <p><strong>Total Quantity:</strong> @Model.CartItems.Sum(q=> q.Quantity)</p>
+                            <p><strong>Total Price:</strong> <span class="text-success">@Model.CartItems.Sum(p=>p.Quantity*p.Price) лв.</span></p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <h4>Products</h4>
-                        <table class="table table-bordered table-hover table-striped">
-                            <thead class="thead-dark">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Products</h4>
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model.CartItems)
+                            {
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
+                                    <td>@product.ProductName</td>
+                                    <td>@product.Quantity</td>
+                                    <td>@product.Price.ToString("C")</td>
+                                    <td>@(product.Price * product.Quantity) лв.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var product in Model.CartItems)
-                                {
-                                    <tr>
-                                        <td>
-                                            @if (product.Photos != null && product.Photos.Any())
-                                            {
-                                                @foreach (var photo in product.Photos)
-                                                {
-                                                    <img src="@photo.FilePath" class="img-thumbnail" alt="Product Image" style="max-width: 100px; max-height: 100px;" />
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <img src="https://via.placeholder.com/100" class="img-thumbnail" alt="No Image Available" />
-                                            }
-                                        </td>
-                                        <td>@product.ProductName</td>
-                                        <td>@product.Quantity</td>
-                                        <td>@product.Price.ToString("C")</td>
-                                        <td>@(product.Price * product.Quantity) лв.</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="card-footer text-center">
-                <button type="submit" class="btn btn-secondary">Confirm Order</button>
-            </div>
-        </form>
+        </div>
+        <div class="card-footer text-center">
+            <button type="submit" class="btn btn-secondary">Confirm Order</button>
+        </div>
+         </form>
     </div>
 </div>

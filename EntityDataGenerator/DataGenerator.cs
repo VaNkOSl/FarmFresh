@@ -1,6 +1,5 @@
 ﻿using EntityDataGenerator.Interfaces;
 using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 
 namespace EntityDataGenerator;

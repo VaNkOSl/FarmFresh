@@ -1,5 +1,4 @@
 ﻿using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
 using LoggerService.Contacts;

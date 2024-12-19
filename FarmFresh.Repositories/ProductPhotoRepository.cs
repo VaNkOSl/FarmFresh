@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace FarmFresh.Repositories;
 
-public sealed class ProductPhotoRepository(FarmFreshDbContext data, IValidateEntity validateEntity)
+internal sealed class ProductPhotoRepository(FarmFreshDbContext data, IValidateEntity validateEntity)
     : RepositoryBase<ProductPhoto>(data), IProductPhotoRepository
 {
     public async Task<ProductPhoto> CreateProductPhotoAsync(ProductPhoto productPhoto)

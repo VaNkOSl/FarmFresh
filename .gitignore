@@ -361,5 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-FarmFresh/internal_logs/internallog.txt
-/FarmFresh/internal_logs

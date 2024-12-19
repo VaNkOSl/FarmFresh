@@ -37,23 +37,12 @@ else
 						<td>@order.Quantity</td>
 						<td>@(order.Price * order.Quantity)</td>
 						<td>
-							@if (order.Photos != null)
-							{
-								<img src="@order.Photos.FilePath" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" alt="Product Photo" />
-							}
-							else
-							{
-								<img src="https://via.placeholder.com/100" class="img-thumbnail" alt="No Product Photo" />
-							}
-						</td>
-
-						@* <td>
 							@foreach (var photo in order.Photos)
 							{
 								<img src="@photo.FilePath" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" alt="Product Photo" />
 							}
 
-						</td> *@
+						</td>
 						<td>
 							<a asp-action="Details" asp-route-id="@order.Id" class="btn btn-outline-primary btn-sm">
 								<i class="bi bi-eye"></i> View Details
