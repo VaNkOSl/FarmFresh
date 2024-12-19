@@ -132,34 +132,6 @@ internal class OrderService : IOrderService
           ))
           .ToList()
   );
-        //  return new OrderConfirmationViewModel(
-        //    Id: order.Id,
-        //    Price: order.OrderProducts != null && order.OrderProducts.Any()
-        //        ? order.OrderProducts.Sum(p => p.Price)
-        //        : 0,
-        //    Quantity: order.OrderProducts != null && order.OrderProducts.Any()
-        //        ? order.OrderProducts.Sum(p => p.Quantity)
-        //        : 0,
-        //    TotalPrice: order.OrderProducts != null && order.OrderProducts.Any()
-        //        ? order.OrderProducts.Sum(p => p.Price * p.Quantity)
-        //        : 0,
-        //    FirstName: order.FirstName,
-        //    LastName: order.LastName,
-        //    Adress: order.Adress,
-        //    PhoneNumber: order.PhoneNumber,
-        //    Email: order.Email,
-        //    Products: order.OrderProducts.ToList(),
-        //    CartItems: cartItemViewModels,
-        //    Photos: order.OrderProducts
-        //        .SelectMany(op => op.Product.ProductPhotos)
-        //        .Select(pp => new ProductPhotosDto(
-        //            pp.Id,
-        //            "/uploads/" + Path.GetFileName(pp.FilePath),
-        //            pp.Photo,
-        //            pp.ProductId
-        //        ))
-        //        .ToList()
-        //);
     }
 
     public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId, bool trackChanges)
@@ -179,6 +151,8 @@ internal class OrderService : IOrderService
         var orderProduct = await _repositoryManager.OrderProductRepository
                   .FindAllOrderProducts(trackChanges)
                   .GetOrderProductDetailsById(id)
+                  .Include(p => p.Product)
+                  .ThenInclude(ph => ph.ProductPhotos)
                   .FirstOrDefaultAsync();
 
        OrderProductHelper.CheckOrderProductNotFound(orderProduct, orderProduct.Id, "GetOrderDetailsAsync", _loggerManager);
