@@ -17,6 +17,7 @@ namespace FarmFresh.Services.Econt.APIServices
 
         private readonly string testApiUrl;
         private readonly string createLabelEndpoint;
+        private readonly string deleteLabelEndpoint;
 
         private const string requestBodyFormat = "application/json";
 
@@ -28,7 +29,8 @@ namespace FarmFresh.Services.Econt.APIServices
             if (_configuration["Econt:Username"].IsNullOrEmpty()
                 || _configuration["Econt:Password"].IsNullOrEmpty()
                 || _configuration["Econt:TestApiUrl"].IsNullOrEmpty()
-                || _configuration["Econt:Endpoints:CreateLabel"].IsNullOrEmpty())
+                || _configuration["Econt:Endpoints:CreateLabel"].IsNullOrEmpty()
+                || _configuration["Econt:Endpoints:DeleteLabels"].IsNullOrEmpty())
                 throw new Exception("Econt test API authorization configuration is not properly set up.");
 
             string username = _configuration["Econt:Username"]!;
@@ -40,9 +42,10 @@ namespace FarmFresh.Services.Econt.APIServices
 
             testApiUrl = _configuration["Econt:TestApiUrl"]!;
             createLabelEndpoint = _configuration["Econt:Endpoints:CreateLabel"]!;
+            deleteLabelEndpoint = _configuration["Econt:Endpoints:DeleteLabels"]!;
         }
 
-        public async Task<CreateLabelResponse> CreateLabel(CreateLabelRequest request)
+        public async Task<CreateLabelResponse> CreateLabelAsync(CreateLabelRequest request)
         {
             var response = await GetResponseAsync(request, createLabelEndpoint);
 
@@ -58,12 +61,23 @@ namespace FarmFresh.Services.Econt.APIServices
             return null!;
         }
 
-        public async Task DeleteLabel()
+        public async Task<DeleteLabelsResponse> DeleteLabelAsync(DeleteLabelsRequest request)
         {
-            //WIP
+            var response = await GetResponseAsync(request, deleteLabelEndpoint);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var deletionResponse = JsonConvert.DeserializeObject<DeleteLabelsResponse>(responseContent);
+
+                if(deletionResponse != null)
+                    return deletionResponse;
+            }
+
+            return null!;
         }
 
-        public async Task<double?> CalculateShipment(CalculateShipmentPriceRequest request)
+        public async Task<double?> CalculateShipmentAsync(CalculateShipmentPriceRequest request)
         {
             var response = await GetResponseAsync(request, createLabelEndpoint);
 
@@ -72,7 +86,7 @@ namespace FarmFresh.Services.Econt.APIServices
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var labelResponse = JsonConvert.DeserializeObject<CalculateShipmentPriceResponse>(responseContent);
 
-                if(labelResponse != null)
+                if(labelResponse != null && labelResponse.Label!.TotalPrice != null)
                     return labelResponse.Label!.TotalPrice;
             }
 

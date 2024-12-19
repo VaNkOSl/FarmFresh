@@ -51,4 +51,6 @@ public class Order : Entity_1<Guid>
     public virtual ICollection<OrderProduct> OrderProducts { get; set; }
 
     public virtual ICollection<ProductPhoto> ProductPhotos { get; set; }
+
+    public string? ShipmentNumber { get; set; }
 }

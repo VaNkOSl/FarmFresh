@@ -93,7 +93,7 @@ app.MapRazorPages();
 //testing econt api calls
 using(var scope = app.Services.CreateScope())
 {
-    //var serviceManager = scope.ServiceProvider.GetRequiredService<IServiceManager>();
+    var serviceManager = scope.ServiceProvider.GetRequiredService<IServiceManager>();
 
     //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
     //{
