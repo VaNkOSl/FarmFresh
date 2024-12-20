@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Text.RegularExpressions;
+using AutoMapper;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
@@ -40,6 +41,9 @@ internal class OrderService : IOrderService
 
         try
         {
+            model.Adress = $"{model.City}, {model.EcontOfficeAddress}";
+            _loggerManager.LogInfo($"[{nameof(CheckoutAsync)}] Combined City and Econt Office Address into Address: {model.Adress}");
+
             _mapper.Map(model, order);
             _loggerManager.LogInfo($"[{CheckoutAsync}] Successfully mapped order data from CreateOrderDto to Order entity");
 
@@ -210,5 +214,31 @@ internal class OrderService : IOrderService
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{SendOrderAsync}] Successfully cancel order with ID {order.Id}");
         return true;
+    }
+    public async Task<IEnumerable<string>> GetCitiesAsync(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return Enumerable.Empty<string>();
+
+        var cities = await _repositoryManager.CityRepository
+            .FindCitiesByCondition(c => c.Name.StartsWith(searchTerm), trackChanges: true)
+             .Select(c => c.Name)
+            .Take(10) 
+            .ToListAsync();
+
+        return cities;
+    }
+    public async Task<IEnumerable<string>> GetEcontOfficesAsync(string cityName)
+    {
+        if (string.IsNullOrWhiteSpace(cityName))
+            return Enumerable.Empty<string>();       
+
+        // Fetch the offices based on the HubName prefix (i.e., city name)
+        var offices = await _repositoryManager.OfficeRepository
+            .FindOfficesByCondition(o =>o.Address.City.ToString()==cityName, trackChanges: true)
+            .Select(o => o.Address.FullAddress)
+            .ToListAsync();
+
+        return offices;
     }
 }

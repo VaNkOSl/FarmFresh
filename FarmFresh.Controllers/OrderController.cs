@@ -6,6 +6,7 @@ using FarmFresh.ViewModels.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Controllers;
 
@@ -48,13 +49,14 @@ public class OrderController : BaseController
     {
 
         var userId = Guid.Parse(User.GetId());
+        model.Adress = $"{model.City}, {model.EcontOfficeAddress}";
 
         try
         {
             var orderId = await _serviceManager.OrderService.CheckoutAsync(model, userId, trackChanges: true);
             return RedirectToAction("OrderConfirmation", new { id = orderId });
 
-        }
+    }
         catch (Exception ex)
         {
             ModelState.AddModelError("", "An error occurred while processing your order. Please try again.");
@@ -134,5 +136,31 @@ public class OrderController : BaseController
     {
         await _serviceManager.OrderService.CancelOrder(id, trackChanges: true);
         return RedirectToAction("GetOrderBySeller", "Order");
+    }
+    [HttpGet("get-cities")]
+    public async Task<IActionResult> GetCities(string search)
+    {
+        try
+        {
+            var cities = await _serviceManager.OrderService.GetCitiesAsync(search);
+            return Ok(cities);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "An error occurred while fetching cities.");
+        }
+    }
+    [HttpGet("get-econt-offices")]
+    public async Task<IActionResult> GetEcontOffices([FromQuery] string city)
+    {
+        try
+        {
+            var offices = await _serviceManager.OrderService.GetEcontOfficesAsync(city);
+            return Ok(offices);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "An error occurred while fetching Econt offices.");
+        }
     }
 }

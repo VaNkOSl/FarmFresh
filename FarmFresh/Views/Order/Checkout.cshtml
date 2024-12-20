@@ -35,13 +35,20 @@
               <input asp-for="Email" type="email" class="form-control" id="email" placeholder="you@example.com">
             </div>
 
-            <div class="col-12">
-              <label asp-for="Adress" class="form-label">Address</label>
-                <input asp-for ="Adress" type="text" class="form-control" id="address" placeholder="1234 Main St" required="">
-              <div class="invalid-feedback">
-                Please enter your shipping address.
-              </div>
+            <div class="col-6">
+                <label asp-for="City" class="form-label">City</label>
+                <input asp-for="City" type="text" class="form-control" id="city" placeholder="Start typing your city..." required>
+                <ul id="citySuggestions" class="list-group position-absolute d-none" style="z-index: 10;">
+                </ul>
             </div>
+
+            <div class="col-6">
+                <label asp-for="EcontOfficeAddress" class="form-label">Econt Office Address</label>
+                <select asp-for="EcontOfficeAddress" class="form-control" id="econtOfficeAddress" disabled>
+                    <option value="">Select an office address</option>
+                </select>
+            </div>
+
 
 
 
@@ -62,3 +69,84 @@
           <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to Order Confirmation</button>
         </form>
       </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Your custom JavaScript -->
+<script>
+    $(document).ready(function () {
+        // Fetch cities based on user input
+        $("#city").on("input", function () {
+            const city = $(this).val();
+            if (city.length >= 2) {
+                $.ajax({
+                    url: '/api/order/get-cities',
+                    method: 'GET',
+                    data: { search: city },
+                    success: function (data) {
+                        const suggestions = $("#citySuggestions");
+                        suggestions.empty().removeClass('d-none'); // Show suggestions list
+                        if (data.length === 0) {
+                            suggestions.append('<li class="list-group-item text-muted">No results found</li>');
+                        } else {
+                            data.forEach(city => {
+                                suggestions.append(`<li class="list-group-item" style="cursor:pointer;">${city}</li>`);
+                            });
+                        }
+                    },
+                    error: function () {
+                        console.error("Error fetching cities");
+                    }
+                });
+            } else {
+                $("#citySuggestions").addClass('d-none'); // Hide suggestions list
+            }
+        });
+
+        // Handle city selection from suggestions
+        $(document).on("click", "#citySuggestions li", function () {
+            const selectedCity = $(this).text();
+            $("#city").val(selectedCity); // Set the selected city
+            $("#citySuggestions").addClass('d-none'); // Hide suggestions
+
+            if (selectedCity !== "No results found") {
+                // Enable Econt Office Address field and fetch addresses
+                $("#econtOfficeAddress").prop('disabled', false);
+                $.ajax({
+                    url: '/api/order/get-econt-offices',
+                    method: 'GET',
+                    data: { city: selectedCity },
+                    success: function (data) {
+                        const officeSelect = $("#econtOfficeAddress");
+                        officeSelect.empty().append('<option value="">Select an office address</option>');
+                        if (data.length === 0) {
+                            officeSelect.append('<option value="">No offices available</option>');
+                        } else {
+                            data.forEach(office => {
+                                officeSelect.append(`<option value="${office}">${office}</option>`);
+                            });
+                        }
+                    },
+                    error: function () {
+                        console.error("Error fetching office addresses");
+                    }
+                });
+            }
+        });
+
+        // Hide city suggestions when clicking outside
+        $(document).on("click", function (e) {
+            if (!$(e.target).closest("#citySuggestions, #city").length) {
+                $("#citySuggestions").addClass('d-none');
+            }
+        });
+
+        // Prevent form submission if office address is not selected
+        $("form").on("submit", function (e) {
+            if ($("#econtOfficeAddress").val() === "") {
+                alert("Please select an Econt Office Address.");
+                e.preventDefault();
+            }
+        });
+    });
+</script>
