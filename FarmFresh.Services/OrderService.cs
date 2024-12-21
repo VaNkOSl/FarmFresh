@@ -231,13 +231,17 @@ internal class OrderService : IOrderService
     public async Task<IEnumerable<string>> GetEcontOfficesAsync(string cityName)
     {
         if (string.IsNullOrWhiteSpace(cityName))
-            return Enumerable.Empty<string>();       
+            return Enumerable.Empty<string>();
 
         // Fetch the offices based on the HubName prefix (i.e., city name)
         var offices = await _repositoryManager.OfficeRepository
-            .FindOfficesByCondition(o =>o.Address.City.ToString()==cityName, trackChanges: true)
-            .Select(o => o.Address.FullAddress)
-            .ToListAsync();
+     .FindOfficesByCondition(o =>
+         o.Address != null &&
+         o.Address.City != null &&
+         o.Address.City.Name.ToLower() == cityName.ToLower(),
+         trackChanges: true)
+     .Select(o => o.Address.FullAddress)
+     .ToListAsync();
 
         return offices;
     }
