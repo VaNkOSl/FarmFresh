@@ -1,4 +1,7 @@
 ﻿using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
+using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
@@ -50,6 +53,12 @@ public class OrderController : BaseController
 
         var userId = Guid.Parse(User.GetId());
         model.Adress = $"{model.City}, {model.EcontOfficeAddress}";
+        bool isValidAddress = await ValidateAddressAsync(model);
+        if (!isValidAddress)
+        {
+            ModelState.AddModelError("", "Invalid address. Please check the address and try again.");
+            return View(model);
+        }
 
         try
         {
@@ -162,5 +171,32 @@ public class OrderController : BaseController
         {
             return StatusCode(500, "An error occurred while fetching Econt offices.");
         }
+    }
+    public async Task<bool> ValidateAddressAsync(CreateOrderDto model)
+    {
+        var EcontAddress = new Address
+        {
+            Street= model.Street,
+            Num=model.Num
+        };
+        var cityDto = new CityDTO
+        {
+
+            Name = model.City,
+            Country = new CountryDTO { Code3= "BGR" }
+        };
+
+        var addressDto = new AddressDTO
+        {
+            City = cityDto,
+            Street = EcontAddress.Street,
+            Num = EcontAddress.Num,
+        };
+
+        var validateRequest = new ValidateAddressRequest(addressDto);
+
+        var isValid = await _serviceManager.EcontAddressService.ValidateAddressAsync(validateRequest);
+
+        return isValid;
     }
 }

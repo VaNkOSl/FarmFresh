@@ -1,4 +1,5 @@
 ﻿using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Services.Contacts.Econt.APIServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

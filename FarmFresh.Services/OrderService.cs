@@ -1,5 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using AutoMapper;
+using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;

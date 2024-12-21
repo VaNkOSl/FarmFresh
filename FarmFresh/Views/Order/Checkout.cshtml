@@ -48,7 +48,15 @@
                     <option value="">Select an office address</option>
                 </select>
             </div>
+            <div class="col-6">
+                <label asp-for="Street" class="form-label">Street</label>
+                <input asp-for="Street" type="text" class="form-control" id="street" placeholder="Enter your street" required />
+            </div>
 
+            <div class="col-6">
+                <label asp-for="Num" class="form-label">Street Number</label>
+                <input asp-for="Num" type="text" class="form-control" id="num" placeholder="Enter your street number" required />
+            </div>
 
 
 
