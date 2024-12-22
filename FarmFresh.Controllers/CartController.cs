@@ -1,10 +1,7 @@
 ﻿using FarmFresh.Infrastructure.Extensions;
 using FarmFresh.Services.Contacts;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
-using System.Text.Json;
 using static FarmFresh.Commons.MessagesConstants.Cars;
 using static FarmFresh.Commons.NotificationMessagesConstants;
 
@@ -25,6 +22,11 @@ public class CartController : BaseController
     public async Task<IActionResult> Index()
     {
         var userId = User.GetId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            TempData["ErrorMessage"] = "You must log in first.";
+            return RedirectToAction("UnauthorizedError", "Error");
+        }
         var cart = await _serviceManager.CartService.GetAllCartItemsAsync(Guid.Parse(userId), trackChanges: false);
         return View(cart);
     }
@@ -33,6 +35,12 @@ public class CartController : BaseController
     public async Task<IActionResult> AddToCart(Guid Id, int quantity)
     {
         var userId = User.GetId();
+
+        if(userId is null)
+        {
+            return RedirectToAction("Login", nameof(AccountController));
+        }
+
         var success = await _serviceManager.CartService.AddToCartAsync(Guid.Parse(userId), Id, quantity, trackChanges: true);
 
         if (!success)
@@ -75,19 +83,5 @@ public class CartController : BaseController
         }
 
         return RedirectToAction("Index");
-    }
-}
-
-public static class SessionExtension
-{
-    public static void Set<T>(this ISession session, string key, T value)
-    {
-        session.SetString(key, JsonSerializer.Serialize(value));
-    }
-
-    public static T Get<T>(this ISession session, string key)
-    {
-        var value = session.GetString(key);
-        return value == null ? default : JsonSerializer.Deserialize<T>(value);
     }
 }

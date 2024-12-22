@@ -64,6 +64,17 @@ internal class CartService : ICartService
 
         try
         {
+            var productToUpdate = await _repositoryManager.ProductRepository
+                .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
+                .FirstOrDefaultAsync();
+
+            if (productToUpdate != null)
+            {
+                productToUpdate.StockQuantity += orderProductToRemove.Quantity;
+
+                _repositoryManager.ProductRepository.UpdateProduct(productToUpdate);
+                _loggerManager.LogInfo($"[{nameof(RemoveFromCart)}] Successfully updated product quantity for product with ID {productId}");
+            }
             _repositoryManager.CartItemRepository.DeleteItem(cartItem);
             _loggerManager.LogInfo($"[{nameof(RemoveFromCart)}] Successfully remove from cart item with ID {productId}");
             _repositoryManager.OrderProductRepository.DeleteOrderProduct(orderProductToRemove);
