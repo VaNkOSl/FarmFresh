@@ -67,7 +67,7 @@ public static class ServiceCollectionExtension
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie(options =>
                     {
-                        options.LoginPath = "/Account/Login";
+                        options.LoginPath = "/api/account/login";
                         options.LogoutPath = "/Account/Logout";
                         options.ExpireTimeSpan = TimeSpan.FromDays(30);
                         options.SlidingExpiration = true;

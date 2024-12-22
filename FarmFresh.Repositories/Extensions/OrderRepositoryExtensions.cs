@@ -11,10 +11,10 @@ public static class OrderRepositoryExtensions
                 .ThenInclude(op => op.Product)
                 .ThenInclude(ph => ph.ProductPhotos);
 
-    public static IQueryable<OrderProduct> GetOrderProductsByUserId(this IQueryable<Order> orders, Guid userId)
+    public static IQueryable<OrderProduct> GetOrderProductsByUserId(this IQueryable<Order> orders, string userId)
     {
         return orders
-            .Where(o => o.UserId == userId)
+            .Where(o => o.UserId.ToString() == userId)
             .SelectMany(o => o.OrderProducts) 
             .Include(op => op.Product)
             .ThenInclude(ph => ph.ProductPhotos)

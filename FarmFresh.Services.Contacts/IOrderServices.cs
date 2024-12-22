@@ -10,7 +10,7 @@ public interface IOrderService
 
     Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId, bool trackChanges);
 
-    Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId, bool trackChanges);
+    Task<List<OrderListViewModel>> GetOrdersForUserAsync(string userId, bool trackChanges);
 
     Task<OrderDetailsViewModel> GetOrderDetailsAsync(Guid id, bool trackChanges);
 
