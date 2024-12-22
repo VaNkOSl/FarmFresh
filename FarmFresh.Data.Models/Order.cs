@@ -26,6 +26,12 @@ public class Order : Entity_1<Guid>
     [Required]
     [MaxLength(OrderAdressMaxLength)]
     public string Adress { get; set; } = string.Empty;
+    [Required]
+    public string  StreetName { get; set; } = string.Empty;
+    [Required]
+    public string StreetNum { get; set; } = string.Empty;
+    [Required]
+    public string City { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(FarmerPhoneNumberMaxLength)]

@@ -21,8 +21,8 @@ public class CreateOrderDto
     public string EcontOfficeAddress { get; set; }
 
     public string Adress { get; set; } = string.Empty;
-    public string Street { get; set; } = string.Empty;
-    public string Num { get; set; } = string.Empty; 
+    public string StreetName { get; set; } = string.Empty;
+    public string StreetNum { get; set; } = string.Empty; 
     public string PhoneNumber { get; set; } = string.Empty;
 
     [EmailAddress]

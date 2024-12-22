@@ -1,18 +1,29 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 using AutoMapper;
+using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
+using FarmFresh.Data.Models.Econt.DTOs.ShipmentDTOs;
 using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Econt.APIServices;
 using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Order;
 using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
+using LoggerService.Exceptions.InternalError.CartItems;
 using LoggerService.Exceptions.InternalError.Order;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using static FarmFresh.Commons.EntityValidationConstants;
+using static FarmFresh.Commons.MessagesConstants;
 
 namespace FarmFresh.Services;
 
@@ -24,7 +35,8 @@ internal class OrderService : IOrderService
 
     public OrderService(IRepositoryManager repositoryManager,
                         ILoggerManager loggerManager,
-                        IMapper mapper)
+                        IMapper mapper
+                        )
     {
         _repositoryManager = repositoryManager;
         _loggerManager = loggerManager;
@@ -113,11 +125,11 @@ internal class OrderService : IOrderService
             .ThenInclude(ph => ph.ProductPhotos)
             .Include(u => u.User)
             .ToListAsync();
-
+            var shipmentPrice= await CalculatePrice(order,trackChanges);
         var cartItemViewModels = _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
-
         return new OrderConfirmationViewModel(
       Id: order.Id,
+      ShipmentPrice: shipmentPrice,
       Price: order.OrderProducts != null && order.OrderProducts.Any()
           ? order.OrderProducts.Sum(p => p.Price)
           : 0,
@@ -246,5 +258,109 @@ internal class OrderService : IOrderService
      .ToListAsync();
 
         return offices;
+    }
+
+    public async Task<JObject> GetAddressByLatAndLongAsync(double latitude, double longitude)
+    {
+        const string NominatimUrl = "https://nominatim.openstreetmap.org/reverse";
+        var formattedLatitude = latitude.ToString(CultureInfo.InvariantCulture);
+        var formattedLongitude = longitude.ToString(CultureInfo.InvariantCulture);
+        using (var httpClient = new HttpClient())
+        {
+            var requestUrl = $"{NominatimUrl}?lat={formattedLatitude}&lon={formattedLongitude}&format=json";
+
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "YourAppName/1.0");
+
+            var response = await httpClient.GetAsync(requestUrl);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to fetch geocoding data.");
+            }
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            return JObject.Parse(jsonResponse); 
+        }
+    }
+    public async Task<decimal> CalculatePrice(Order order, bool trackChanges)
+    {
+        var cartItems = await _repositoryManager.CartItemRepository
+           .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
+           .Include(p => p.Product)
+           .ThenInclude(ph => ph.ProductPhotos)
+           .Include(u => u.User)
+           .ToListAsync();
+        var cartItemViewModels = _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
+        decimal sum = 0m;
+        try { 
+        foreach (var CartItem in cartItemViewModels)
+        {
+            var currProduct = _repositoryManager.ProductRepository
+                .FindProductByConditionAsync(p => p.Id == CartItem.ProductId, trackChanges)
+                .FirstOrDefault();
+                var senderUserId = _repositoryManager.FarmerRepository
+                    .FindFarmersByConditionAsync(f => f.Id == currProduct.FarmerId, trackChanges: trackChanges)
+                    .FirstOrDefault().UserId;
+                var senderUser = _repositoryManager.UserRepository
+                    .FindUsersByConditionAsync(u=>u.Id == senderUserId, trackChanges: trackChanges) .FirstOrDefault();
+
+                var currUser = _repositoryManager.UserRepository.FindUsersByConditionAsync(u => u.Id == order.UserId, trackChanges: trackChanges).FirstOrDefault();
+            var FarmerLocation = _repositoryManager.FarmerLocationRepository
+                .FindFarmerLocationsByConditionAsync(f => f.Farmer.UserId == senderUser.Id, trackChanges: trackChanges)
+                .FirstOrDefault();
+            var locationLat = FarmerLocation.Latitude;
+            var locationLon = FarmerLocation.Longitude;
+            var address = await GetAddressByLatAndLongAsync(locationLon, locationLat);
+            var cityDtoReveiver = new CityDTO
+            {
+
+                Name = order.City,
+                Country = new CountryDTO { Code3 = "BGR" }
+            };
+            var cityDtoSender = new CityDTO
+            {
+
+                Name = address["address"]?["city"]?.ToString(),
+                Country = new CountryDTO { Code3 = "BGR" }
+            };
+                var shipmentRequest = new CalculateShipmentPriceRequest(
+                    new ShippingLabelDTO(
+                        senderClient: new ClientProfileDTO($"{senderUser.FirstName} {senderUser.LastName}", new List<string> { senderUser.PhoneNumber }),
+                      senderAddress: new AddressDTO(
+                            city: cityDtoSender,
+                            streetName: address["address"]?["road"]?.ToString(),
+                            streetNum: address["address"]?["num"]?.ToString()
+                            ),
+                        receiverClient: new ClientProfileDTO($"{currUser.FirstName} {currUser.LastName}", new List<string> { order.PhoneNumber }),
+                        receiverAddress: new AddressDTO(
+                            city: cityDtoReveiver,
+                            streetName: order.StreetName,
+                            streetNum: order.StreetNum
+                        ),
+                        packCount: CartItem.Quantity,
+                        weigth: 1 * (order.OrderProducts.Count()),
+                        shipmentType: ShipmentType.Pack,
+                        shipmentDescription: "Order shipment",
+                        orderPrice: (double)CartItem.TotalPrice
+                    )
+                );
+                var configuration = new ConfigurationBuilder()
+                   .SetBasePath(Directory.GetCurrentDirectory())
+                   .AddJsonFile("appsettings.json")
+                   .Build();
+                var httpClient = new HttpClient();
+                var _econtLabelService = new EcontLabelService(configuration, httpClient);
+                var TotalPriceTask = _econtLabelService.CalculateShipmentAsync(shipmentRequest);
+
+                double? TotalPriceNullable = await TotalPriceTask;
+                sum += TotalPriceNullable.HasValue ? (decimal)TotalPriceNullable.Value : 0m;
+            }
+}
+        catch (Exception ex)
+        {
+            _loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
+            throw new Exception();
+        }
+        return sum;
     }
 }

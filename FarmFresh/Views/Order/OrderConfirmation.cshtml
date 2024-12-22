@@ -24,7 +24,8 @@
                             <div class="card-body">
                                 <p><strong>Order ID:</strong> @Model.Id</p>
                                 <p><strong>Total Quantity:</strong> @Model.CartItems.Sum(q => q.Quantity)</p>
-                                <p><strong>Total Price:</strong> <span class="text-success">@Model.CartItems.Sum(p => p.Quantity * p.Price) лв.</span></p>
+                                <p><strong>Shipment Price:</strong> @Model.ShipmentPrice</p>
+                                <p><strong>Total Price:</strong> <span class="text-success">@Model.CartItems.Sum(p => p.Quantity * p.Price+ Model.ShipmentPrice) лв.</span></p>
                             </div>
                         </div>
                     </div>

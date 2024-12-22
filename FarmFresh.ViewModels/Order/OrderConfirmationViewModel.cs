@@ -6,6 +6,7 @@ namespace FarmFresh.ViewModels.Order;
 public record OrderConfirmationViewModel(
     Guid Id,
     decimal Price,
+    decimal ShipmentPrice,
     int Quantity,
     decimal TotalPrice,
     string FirstName,

@@ -176,8 +176,8 @@ public class OrderController : BaseController
     {
         var EcontAddress = new Address
         {
-            Street= model.Street,
-            Num=model.Num
+            Street= model.StreetName,
+            Num=model.StreetNum
         };
         var cityDto = new CityDTO
         {
