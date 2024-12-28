@@ -6,11 +6,13 @@ using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.DataValidator;
 using FarmFresh.Services;
 using FarmFresh.Services.Contacts;
+using FarmFresh.ViewModels.Payment;
 using LoggerService;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -60,7 +62,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<ILoggerManager, LoggerManager>();
 
     public static IServiceCollection ConfigureAccountService(this IServiceCollection services) =>
-        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IAccountService, FarmFresh.Services.AccountService>();
 
     public static IServiceCollection ConfigureCookieAuthentication(this IServiceCollection services)
     {
@@ -93,4 +95,12 @@ public static class ServiceCollectionExtension
         return services;
     }
 
+    public static IServiceCollection ConfigureStriple(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<StripeSettings>(configuration.GetSection("Stripe"));
+        var stripeSettings = configuration.GetSection("Stripe").Get<StripeSettings>();
+        StripeConfiguration.ApiKey = stripeSettings.SecretKey;
+
+        return services;
+    }
 }
