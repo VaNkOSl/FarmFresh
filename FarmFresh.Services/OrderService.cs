@@ -90,6 +90,7 @@ internal class OrderService : IOrderService
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{CompleteOrderAsync}] Successfully updated the order with ID {orderId} to status 'Completed'.");
     }
+
     public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId, bool trackChanges)
     {
         var order = await OrderHelper.GetOrderByIdAndCheckIfExists(orderId, trackChanges, _repositoryManager, _loggerManager);
@@ -130,7 +131,7 @@ internal class OrderService : IOrderService
               pp.ProductId
           ))
           .ToList()
-  );
+         );
     }
 
     public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(string userId, bool trackChanges)

@@ -33,11 +33,11 @@ public class OrderValidator : IValidateEntity
 
     private bool ValidateAdress(string adress) =>
         !string.IsNullOrWhiteSpace(adress) &&
-        adress.Length >= OrderAdressMinLength &&
+        adress.Length > OrderAdressMinLength &&
         adress.Length <= OrderAdressMaxLength;
 
     private bool ValidatePhoneNumber(string phoneNumber) =>
         !string.IsNullOrWhiteSpace(phoneNumber)
-        && phoneNumber.Length < FarmerPhoneNumberMaxLength
-        && phoneNumber.Length >= FarmerPhoneNumberMinLength;
+        && phoneNumber.Length >= FarmerPhoneNumberMinLength
+        && phoneNumber.Length <= FarmerPhoneNumberMaxLength;
 }

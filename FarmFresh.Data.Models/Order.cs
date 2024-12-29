@@ -8,12 +8,6 @@ namespace FarmFresh.Data.Models;
 
 public class Order : Entity_1<Guid>
 {
-    public Order()
-    {
-        Id = Guid.NewGuid();
-        OrderProducts = new HashSet<OrderProduct>();
-        ProductPhotos = new HashSet<ProductPhoto>();
-    }
 
     [Required]
     [MaxLength(UserFirstNameMaxLength)]
@@ -45,6 +39,39 @@ public class Order : Entity_1<Guid>
     public bool IsTaken { get; set; }
 
     public Guid UserId { get; set; }
+
+    public Order(
+        Guid id,
+        string firstName,
+        string lastName,
+        string adress,
+        string phoneNumber,
+        string email,
+        DateTime createorderddate,
+        DeliveryOption deliveryOption,
+        OrderStatus orderStatus,
+        bool istaken,
+        Guid userId)
+    {
+        Id = id;
+        FirstName = firstName;
+        LastName = lastName;
+        Adress = adress;
+        PhoneNumber = phoneNumber;
+        Email = email;
+        CreateOrderdDate = createorderddate;
+        DeliveryOption = deliveryOption;
+        OrderStatus = orderStatus;
+        IsTaken = istaken;
+        UserId = userId;
+    }
+
+    public Order()
+    {
+        Id = Guid.NewGuid();
+        OrderProducts = new HashSet<OrderProduct>();
+        ProductPhotos = new HashSet<ProductPhoto>();
+    }
 
     public virtual ApplicationUser User { get; set; } = null!;
 
