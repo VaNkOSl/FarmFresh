@@ -2,7 +2,7 @@
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Enums;
 
-namespace EntityDataGenerator;
+namespace EntityDataGenerator.EntityGenerator;
 
 public class FarmerGenerator : IEntityGenerator
 {
@@ -58,6 +58,7 @@ public class FarmerGenerator : IEntityGenerator
             Status.PendingApproval,
             Guid.NewGuid());
 
+        _farmersCount++;
         return farmer;
     }
 
