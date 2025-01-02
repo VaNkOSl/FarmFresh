@@ -6,7 +6,6 @@ using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.User;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Users;
-using LoggerService.Exceptions.NotFound;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -256,6 +255,49 @@ public sealed class AccountService : IAccountService
         return false;
     }
 
+    public async Task<IEnumerable<AllUserDto>> GetAllUsersAsync(bool trackChanges)
+    {
+        var users = await _repositoryManager.UserRepository
+              .GetAllUsers(trackChanges)
+              .Where(u => u.IsBlocked == false)
+              .ToListAsync();
+
+        var farmerUserIds = await _repositoryManager.FarmerRepository
+            .FindAllFarmers(trackChanges)
+            .Select(f => f.UserId)
+            .ToListAsync();
+
+        var userDtos = new List<AllUserDto>();
+        foreach (var user in users)
+        {
+            var dto = _mapper.Map<AllUserDto>(user);
+
+            if (farmerUserIds.Contains(user.Id))
+            {
+                dto.IsSeller = true;
+
+                var farmer = await _repositoryManager.FarmerRepository
+                    .FindFarmersByConditionAsync(f => f.UserId == user.Id, trackChanges)
+                    .FirstOrDefaultAsync();
+
+                dto.PhoneNumber = farmer?.PhoneNumber ?? string.Empty;
+            }
+            else
+            {
+                dto.IsSeller = false;
+                dto.PhoneNumber = string.Empty;
+            }
+
+            userDtos.Add(dto);
+        }
+
+        return userDtos;
+    }
+    public async Task<bool> IsUserAdmin(string userId, bool trackChanges) =>
+        await _repositoryManager.UserRepository
+        .FindUsersByConditionAsync(u => u.Id.ToString() == userId && u.IsAdmin == true, trackChanges)
+        .AnyAsync();
+
     private async Task SignInUserAsync(ApplicationUser user)
     {
         var roles = await _userManager.GetRolesAsync(user);
@@ -283,4 +325,5 @@ public sealed class AccountService : IAccountService
             authProperties
         );
     }
+
 }
