@@ -45,27 +45,37 @@ public class OrderMappingProfile : Profile
             .ForCtorParam("Seasons", opt => opt.MapFrom(src => src.Product.SuitableSeason))
             .ForCtorParam("HarvestDate", opt => opt.MapFrom(src => src.Product.HarvestDate))
             .ForCtorParam("ExpirationDate", opt => opt.MapFrom(src => src.Product.ExpirationDate))
-            .ForCtorParam("Photos", opt => opt.MapFrom(src =>
-                src.Order.ProductPhotos.Select(photo => new ProductPhotosDto(
-                    photo.Id,
-                    "/uploads/" + Path.GetFileName(photo.FilePath),
-                    photo.Photo,
-                    photo.ProductId
-                )).ToList()));
+		    .ForCtorParam("Photos", opt => opt.MapFrom(src =>
+		        src.Product.ProductPhotos.Select(photo => new ProductPhotosDto(
+		        photo.Id,
+		        "/uploads/" + Path.GetFileName(photo.FilePath),
+		        photo.Photo,
+		        photo.ProductId
+		        )).ToList()));
 
-        CreateMap<OrderProduct, FarmerOrderListViewModel>()
+		CreateMap<OrderProduct, FarmerOrderListViewModel>()
             .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
             .ForCtorParam("ProductName", opt => opt.MapFrom(src => src.Product.Name))
             .ForCtorParam("UserFullName", opt => opt.MapFrom(src => src.Product.Farmer.User.FirstName + " " + src.Product.Farmer.User.LastName))
 			.ForCtorParam("Price", opt => opt.MapFrom(src => src.Price))
 			.ForCtorParam("Quantity", opt => opt.MapFrom(src => src.Quantity))
 			.ForCtorParam("Photos", opt => opt.MapFrom(src =>
+<<<<<<< HEAD
 				src.Order.ProductPhotos.Select(photo => new ProductPhotosDto(
 					photo.Id,
 					"/uploads/" + Path.GetFileName(photo.FilePath),
 					photo.Photo,
 					photo.ProductId
 				)).ToList()));
+=======
+		src.Product.ProductPhotos.FirstOrDefault() == null ? null : new ProductPhotosDto(
+			src.Product.ProductPhotos.FirstOrDefault().Id,
+			"/uploads/" + Path.GetFileName(src.Product.ProductPhotos.FirstOrDefault().FilePath),
+			src.Product.ProductPhotos.FirstOrDefault().Photo,
+			src.Product.Id
+		)
+	));
+>>>>>>> development
 
 
 

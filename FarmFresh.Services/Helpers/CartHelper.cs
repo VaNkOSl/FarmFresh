@@ -84,6 +84,13 @@ public static class CartHelper
             orderItem.Quantity += quantity;
         }
 
+        product.StockQuantity -= orderItem.Quantity;
+        if (product.StockQuantity <= 0)
+        {
+            product.ProductStatus = Status.OutOfStock;
+        }
+
+
         await _repositoryManager.SaveAsync();
         return orderItem;
     }

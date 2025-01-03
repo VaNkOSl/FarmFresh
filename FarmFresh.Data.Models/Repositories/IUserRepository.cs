@@ -13,5 +13,5 @@ public interface IUserRepository
 
     IQueryable<ApplicationUser> FindUsersByConditionAsync(Expression<Func<ApplicationUser, bool>> expression, bool trackChanges);
 
-   // Task<ApplicationUser?> GetUserByIdAsync(Guid id);
+    IQueryable<ApplicationUser> GetAllUsers(bool trackChanges);
 }

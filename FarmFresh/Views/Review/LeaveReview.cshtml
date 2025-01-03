@@ -1,0 +1,54 @@
+﻿@model ProductReviewCreateDto
+
+<div class="container mt-4">
+    <h2 class="mb-4">Leave a Review</h2>
+
+    <form asp-action="LeaveReview" asp-controller="Review" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label asp-for="Content" class="form-label">Review Content</label>
+            <textarea asp-for="Content" class="form-control" rows="4" required></textarea>
+            <div class="invalid-feedback">Please provide your review content.</div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Rating" class="form-label">Rating</label>
+            <select asp-for="Rating" class="form-select" required>
+                <option value="">Select a rating</option>
+                <option value="1">1 - Very Poor</option>
+                <option value="2">2 - Poor</option>
+                <option value="3">3 - Average</option>
+                <option value="4">4 - Good</option>
+                <option value="5">5 - Excellent</option>
+            </select>
+            <div class="invalid-feedback">Please select a rating.</div>
+        </div>
+
+        <input type="hidden" asp-for="ProductId" value="@Model.ProductId" />
+        <input type="hidden" asp-for="FarmerId" />
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+            'use strict';
+
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+}

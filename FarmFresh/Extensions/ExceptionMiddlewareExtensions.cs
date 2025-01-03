@@ -1,8 +1,6 @@
 ﻿using LoggerService.Contacts;
-using LoggerService.ErrorModel;
 using LoggerService.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
 
 namespace FarmFresh.Extensions;
 
@@ -14,13 +12,11 @@ public static class ExceptionMiddlewareExtensions
         {
             appError.Run(async context =>
             {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "application/json";
                 var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
 
                 if (contextFeature != null)
                 {
-                    context.Response.StatusCode = contextFeature.Error switch
+                    var statusCode = contextFeature.Error switch
                     {
                         NotFoundException => StatusCodes.Status404NotFound,
                         BadRequestException => StatusCodes.Status400BadRequest,
@@ -28,13 +24,17 @@ public static class ExceptionMiddlewareExtensions
                         _ => StatusCodes.Status500InternalServerError
                     };
 
-                    logger.LogError($"Something went wrong: {contextFeature.Error}");
+                    logger.LogError($"[{DateTime.UtcNow}] Error occurred: {contextFeature.Error}");
 
-                    await context.Response.WriteAsync(new ErrorDetails()
+                    var errorRoute = statusCode switch
                     {
-                        StatusCode = context.Response.StatusCode,
-                        Message = "Internal Service Error"
-                    }.ToString());
+                        StatusCodes.Status404NotFound => "/api/error/notfound",
+                        StatusCodes.Status400BadRequest => "/api/error/BadRequest",
+                        StatusCodes.Status500InternalServerError => "/api/error/internalserverError",
+                        _ => "/Error/General"
+                    };
+
+                    context.Response.Redirect(errorRoute);
                 }
             });
         });

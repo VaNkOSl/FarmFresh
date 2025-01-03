@@ -24,7 +24,7 @@
         <div class="col-md-8">
             <div class="product-details">
                 <h3>@Model.Name</h3>
-                <p><strong>Price:</strong> @Model.Price $</p>
+                <p><strong>Price:</strong> @Model.Price $ per kg</p>
                 <p><strong>Origin:</strong> @Model.Origin</p>
                 <p><strong>Category:</strong> @Model.CategoryName</p>
                 <p><strong>Suitable Season:</strong> @Model.SuitableSeason</p>
@@ -34,7 +34,7 @@
                     <p><strong>Stock Status:</strong></p>
                     <div class="progress">
                         <div class="progress-bar" role="progressbar" style="width: @(Model.StockQuantity * 100 / 100)%;" aria-valuenow="@Model.StockQuantity" aria-valuemin="0" aria-valuemax="100">
-                            @Model.StockQuantity left
+                            @Model.StockQuantity left 
                         </div>
                     </div>
                 </div>
@@ -99,47 +99,6 @@
                         </p>
                         <p>Date: @review.ReviewDate.ToShortDateString()</p>
                     </div>
-
-                    @if (review.UserId.ToString() == User.GetId())
-                    {
-                        <div id="edit-form-@review.Id" class="d-none">
-                            <form asp-action="EditProductReview" asp-controller="Review" method="post" id="editForm">
-                                <input type="hidden" id="ReviewId" name="ReviewId" value="@review.Id" />
-                                <div class="form-group">
-                                    <label for="editContent-@review.Id">Your Review:</label>
-                                    <textarea class="form-control" id="editContent-@review.Id" name="Content" rows="3">@review.Content</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="editRating-@review.Id">Rating</label>
-                                    <div class="star-rating">
-                                        @for (int i = 5; i >= 1; i--)
-                                        {
-                                            <input type="radio" id="editRating-@i-@review.Id" name="Rating" value="@i" @(i == review.Rating ? "checked" : "") />
-                                            <label for="editRating-@i-@review.Id" class="star">&#9733;</label>
-                                        }
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-sm" onclick="productReviewUpdate()">Save</button>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit('@review.Id')">Cancel</button>
-                            </form>
-                        </div>
-
-                        <div id="review-display-@review.Id">
-                            <p>@review.Content</p>
-                            <p>
-                                Rating:
-                                @for (int i = 0; i < review.Rating; i++)
-                                {
-                                    <span class="star">&#9733;</span>
-                                }
-                            </p>
-                            <button class="btn btn-warning btn-sm" onclick="editReview('@review.Id')">Edit</button>
-                            <form id="deleteForm" class="d-inline">
-                                <input type="hidden" name="id" value="@review.Id" />
-                                <button class="btn btn-danger btn-sm" onclick="deleteReview('@review.Id')">Delete</button>
-                            </form>
-                        </div>
-                    }
                 </div>
             </div>
         }
@@ -147,35 +106,6 @@
     else
     {
         <h4 class="text-center">No reviews yet!</h4>
-    }
-
-    @if (User.Identity.IsAuthenticated)
-    {
-        <div class="mt-4">
-            <h3 class="text-center">Write a Product Review</h3>
-            <form asp-action="CreateProductReview" asp-controller="Review" method="post">
-                <input type="hidden" name="ProductId" value="@Model.Id" />
-                <div class="form-group">
-                    <label for="reviewContent">Your Review:</label>
-                    <textarea class="form-control" id="reviewContent" name="Content" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="rating">Rating</label>
-                    <div class="star-rating">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <input type="radio" id="@i-stars" name="Rating" value="@i" />
-                            <label for="@i-stars" class="star">&#9733;</label>
-                        }
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-custom">Submit Review</button>
-            </form>
-        </div> 
-    }
-    else
-    {
-        <div class="alert alert-warning text-center">You must be logged in to leave a review.</div>
     }
 </div>
 <script src="/js/review/deleteReview.js" ></script>

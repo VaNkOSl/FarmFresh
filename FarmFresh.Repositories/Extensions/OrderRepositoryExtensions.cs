@@ -10,10 +10,10 @@ public static class OrderRepositoryExtensions
            order.Include(o => o.OrderProducts)
                 .ThenInclude(op => op.Product);
 
-    public static IQueryable<OrderProduct> GetOrderProductsByUserId(this IQueryable<Order> orders, Guid userId)
+    public static IQueryable<OrderProduct> GetOrderProductsByUserId(this IQueryable<Order> orders, string userId)
     {
         return orders
-            .Where(o => o.UserId == userId)
+            .Where(o => o.UserId.ToString() == userId)
             .SelectMany(o => o.OrderProducts) 
             .Include(op => op.Product) 
             .Include(op => op.Order) 
@@ -44,5 +44,13 @@ public static class OrderRepositoryExtensions
             .ThenInclude(f => f.Farmer)
             .ThenInclude(u => u.User);
     }
+
+    public static IQueryable<Order> GetAllProductsForReviewByUserAsync(this IQueryable<Order> orders) =>
+        orders.Include(o => o.OrderProducts)
+         .ThenInclude(op => op.Product)
+         .ThenInclude(p => p.ProductPhotos)
+         .Include(o => o.OrderProducts)
+         .ThenInclude(op => op.Product)
+         .ThenInclude(p => p.Reviews);
 }
 

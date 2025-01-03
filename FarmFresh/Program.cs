@@ -1,9 +1,9 @@
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
+using FarmFresh.Mapper;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Identity;
 using NLog;
-
 using static FarmFresh.Commons.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +21,7 @@ builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
+builder.Services.ConfigureStriple(builder.Configuration);
 
 builder.Services.AddSession(options =>
 {

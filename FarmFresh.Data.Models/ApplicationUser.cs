@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FarmFresh.Data.Models.Enums;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using static FarmFresh.Commons.EntityValidationConstants;
 using static FarmFresh.Commons.EntityValidationConstants.User;
 
 namespace FarmFresh.Data.Models;
 
 public class ApplicationUser : IdentityUser<Guid>
 {
-    public ApplicationUser()
-    {
-        Id = Guid.NewGuid();
-
-        Orders = new HashSet<Order>();
-        Reviews = new HashSet<Review>();
-    }
-
     [Required]
     [MaxLength(UserFirstNameMaxLength)]
     public string FirstName { get; set; } = string.Empty;
@@ -31,4 +25,30 @@ public class ApplicationUser : IdentityUser<Guid>
     public virtual ICollection<Order> Orders { get; set; }
 
     public virtual ICollection<Review> Reviews { get; set; }
+
+    public ApplicationUser()
+    {
+        Id = Guid.NewGuid();
+
+        Orders = new HashSet<Order>();
+        Reviews = new HashSet<Review>();
+    }
+
+    public ApplicationUser(Guid id,
+        string userName,
+        string email,
+        string firstName,
+        string lastName,
+        DateTime createdAt)
+    {
+        Id = id; 
+        FirstName = firstName;
+        LastName = lastName;
+        UserName = userName;
+        Email = email;
+        CreatedAt = createdAt;
+    }
+
+    public override bool Equals(object? obj) => (obj as ApplicationUser)?.Id.Equals(Id) ?? false;
+    public override int GetHashCode() => Id.GetHashCode();
 }

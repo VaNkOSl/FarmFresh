@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
 using FarmFresh.ViewModels.User;
+using static FarmFresh.Commons.EntityValidationConstants;
 
 namespace FarmFresh.Mapper;
 
@@ -34,5 +35,10 @@ public class UserMappingProfile : Profile
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
             .ReverseMap();
+
+        CreateMap<ApplicationUser, AllUserDto>()
+           .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName))
+           .ForMember(dest => dest.IsSeller, opt => opt.MapFrom(src => false))
+           .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber));
     }
 }
