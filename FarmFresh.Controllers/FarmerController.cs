@@ -108,7 +108,6 @@ public class FarmerController : BaseController
     }
 
     [HttpDelete("delete/{id}")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromBody] FarmerProfileViewModel model)
     {
         if (model.Id == Guid.Empty)
