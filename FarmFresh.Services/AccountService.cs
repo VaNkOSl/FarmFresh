@@ -293,6 +293,48 @@ public sealed class AccountService : IAccountService
 
         return userDtos;
     }
+
+    public async Task<BlockUserDto> GetUserForBlockAsync(Guid userId, bool trackChanges)
+    {
+        var user = await _repositoryManager.UserRepository
+            .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(user, userId, "GetUserForBlockAsync", _loggerManager);
+
+        var userForBlocking = new BlockUserDto(userId, user.Email, user.FirstName + " " + user.LastName);
+
+        return userForBlocking;
+    }
+
+    public async Task BlockUserAsync(Guid userId, bool trackChanges)
+    {
+        var user = await _repositoryManager.UserRepository
+          .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
+          .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(user, userId, "BlockUserAsync", _loggerManager);
+
+        user.IsBlocked = true;
+        _repositoryManager.UserRepository.UpdateUser(user);
+        await _repositoryManager.SaveAsync();
+        _loggerManager.LogInfo($"[{nameof(BlockUserAsync)}] Successfully blocked user with ID {userId}");
+    }
+
+    public async Task UnblockUserAsync(Guid userId, bool trackChanges)
+    {
+        var user = await _repositoryManager.UserRepository
+         .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
+         .FirstOrDefaultAsync();
+
+        AccountHelper.ChekIfUserIsNull(user, userId, "BlockUserAsync", _loggerManager);
+
+        user.IsBlocked = false;
+        _repositoryManager.UserRepository.UpdateUser(user);
+        await _repositoryManager.SaveAsync();
+        _loggerManager.LogInfo($"[{nameof(BlockUserAsync)}] Successfully blocked user with ID {userId}");
+    }
+
     public async Task<bool> IsUserAdmin(string userId, bool trackChanges) =>
         await _repositoryManager.UserRepository
         .FindUsersByConditionAsync(u => u.Id.ToString() == userId && u.IsAdmin == true, trackChanges)
@@ -325,5 +367,4 @@ public sealed class AccountService : IAccountService
             authProperties
         );
     }
-
 }

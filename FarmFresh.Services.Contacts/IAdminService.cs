@@ -1,5 +1,6 @@
 ﻿using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.ViewModels.Admin;
+using FarmFresh.ViewModels.User;
 
 namespace FarmFresh.Services.Contacts;
 
