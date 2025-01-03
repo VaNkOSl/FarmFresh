@@ -26,5 +26,11 @@ public interface IAccountService
 
     Task<IEnumerable<AllUserDto>> GetAllUsersAsync(bool trackChanges);
 
-    Task<bool> IsUserAdmin(string userId, bool trackChanges);    
+    Task<bool> IsUserAdmin(string userId, bool trackChanges);
+
+    Task<BlockUserDto> GetUserForBlockAsync(Guid userId, bool trackChanges);
+
+    Task BlockUserAsync(Guid userId, bool trackChanges);
+
+    Task UnblockUserAsync(Guid userId, bool trackChanges);
 }

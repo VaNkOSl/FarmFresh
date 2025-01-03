@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FarmFresh.ViewModels.User;
+﻿namespace FarmFresh.ViewModels.User;
 
 public record class AllUserDto
 {
