@@ -25,7 +25,7 @@ public class FarmerManagementService
         _repositoryManager = repositoryManager;
         _loggerManager = loggerManager;
         _mapper = mapper;
-        _farmerValidationService = new FarmerValidationService(_repositoryManager, _loggerManager, _mapper);
+        _farmerValidationService = new FarmerValidationService(_repositoryManager);
     }
 
     public async Task CreateFarmerAsync(FarmerForCreationDto model, string userId, bool trackChanges)
