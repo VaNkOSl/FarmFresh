@@ -46,5 +46,13 @@ public static class OrderRepositoryExtensions
             .ThenInclude(f => f.Farmer)
             .ThenInclude(u => u.User);
     }
+
+    public static IQueryable<Order> GetAllProductsForReviewByUserAsync(this IQueryable<Order> orders) =>
+        orders.Include(o => o.OrderProducts)
+         .ThenInclude(op => op.Product)
+         .ThenInclude(p => p.ProductPhotos)
+         .Include(o => o.OrderProducts)
+         .ThenInclude(op => op.Product)
+         .ThenInclude(p => p.Reviews);
 }
 

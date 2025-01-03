@@ -4,6 +4,7 @@ using FarmFresh.Data.Models;
 using FarmFresh.ViewModels.Admin;
 using FarmFresh.ViewModels.Farmer;
 using FarmFresh.ViewModels.Product;
+using FarmFresh.ViewModels.Review;
 
 namespace FarmFresh.Mapper;
 
@@ -134,6 +135,20 @@ public class ProductMappingProfile : Profile
             .ForCtorParam("ProductStatus", opt => opt.MapFrom(src => src.ProductStatus))
             .ForCtorParam("CategoryName", opt => opt.MapFrom(src => src.Category.Name))
             .ForCtorParam("FarmerId", opt => opt.MapFrom(src => src.FarmerId))
+            .ForCtorParam("Photos", opt => opt.MapFrom(src =>
+             src.ProductPhotos != null && src.ProductPhotos.Any()
+                    ? src.ProductPhotos.Select(photo => new ProductPhotosDto(
+                        photo.Id,
+                        "/uploads/" + Path.GetFileName(photo.FilePath),
+                        photo.Photo,
+                        photo.ProductId
+                    )).ToList()
+                    : new List<ProductPhotosDto>()));
+
+        CreateMap<Product, AllReviewDto>()
+            .ForCtorParam("Id", opt => opt.MapFrom(src => src.Reviews.FirstOrDefault().Id))
+            .ForCtorParam("ProductName", opt => opt.MapFrom(src => src.Name))
+            .ForCtorParam("ProductId", opt => opt.MapFrom(src => src.Id))
             .ForCtorParam("Photos", opt => opt.MapFrom(src =>
              src.ProductPhotos != null && src.ProductPhotos.Any()
                     ? src.ProductPhotos.Select(photo => new ProductPhotosDto(

@@ -7,6 +7,7 @@ using FarmFresh.ViewModels.Review;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Review;
 using Microsoft.EntityFrameworkCore;
+using FarmFresh.Repositories.Extensions;
 
 namespace FarmFresh.Services;
 
@@ -60,50 +61,33 @@ internal sealed class ReviewService : IReviewService
         }
     }
 
-    public async Task DeleteReview(Guid reviewId, bool trackChanges)
+    public async Task<IEnumerable<AllReviewDto>> GetAllReviewsAsync(Guid userId, bool trackChanges)
     {
-        var review = await
-            _repositoryManager
-            .ReviewRepository
-            .FindReviewByConditionAsync(r => r.Id == reviewId, trackChanges)
-            .FirstOrDefaultAsync();
+        var orders = await _repositoryManager.OrderRepository
+         .FindOrderByConditionAsync(r => r.UserId == userId, trackChanges)
+         .GetAllProductsForReviewByUserAsync()
+         .ToListAsync();
 
-        ReviewHelper.CheckIfReviewIsNull(review, reviewId, nameof(DeleteReview), _loggerManager);
+        var productsWithoutReview = orders
+              .SelectMany(o => o.OrderProducts)
+              .Select(op => op.Product)
+              .Where(p => !p.Reviews.Any(r => r.UserId == userId))
+              .ToList();
 
-        try
-        {
-            _repositoryManager.ReviewRepository.DeleteReview(review);
-            await _repositoryManager.SaveAsync();
-            _loggerManager.LogInfo($"[{nameof(DeleteReview)}] Successfully deleted review with ID {reviewId}");
-        }
-        catch (Exception ex)
-        {
-            _loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
-            throw new DeleteReviewException();
-        }
+        var reviewDtos = _mapper.Map<List<AllReviewDto>>(productsWithoutReview);
+        return reviewDtos;
 
     }
 
-    public async Task UpdatereviewAsync(ProductReviewUpdateDto model, Guid reviewId, bool trackChanges)
+    public async Task<IEnumerable<ProductReviewDto>> GetReviewedProductsAsync(Guid userId, bool trackChanges)
     {
-        var review = await
-           _repositoryManager
-           .ReviewRepository
-           .FindReviewByConditionAsync(r => r.Id == reviewId, trackChanges)
-           .FirstOrDefaultAsync();
+        var review = await _repositoryManager.ReviewRepository
+            .FindReviewByConditionAsync(r => r.UserId == userId, trackChanges)
+            .GetProductReviewWithDetailsAsync()
+            .ToListAsync();
 
-        ReviewHelper.CheckIfReviewIsNull(review, reviewId, nameof(DeleteReview), _loggerManager);
+        var reviewDtos = _mapper.Map<List<ProductReviewDto>>(review);
 
-        try
-        {
-            _mapper.Map(model, review);
-            _repositoryManager.ReviewRepository.UpdateReview(review);
-            await _repositoryManager.SaveAsync();
-        }
-        catch (Exception ex)
-        {
-            _loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
-            throw new UpdateReviewException();
-        }
+        return reviewDtos;
     }
 }
