@@ -1,0 +1,31 @@
+﻿@model IEnumerable<AllReviewDto>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-center mb-3">
+        <form id="readyForReviewForm" method="get" asp-action="AllReviews" asp-controller="Review">
+            <input type="hidden" name="reviewStatus" value="ReadyForReview" />
+            <button type="submit" id="readyForReviewBtn" class="btn btn-outline-primary mx-2">Ready for Review</button>
+        </form>
+
+        <form id="reviewedForm" method="get" asp-action="GetReviews" asp-controller="Review">
+            <button type="submit" id="reviewedBtn" class="btn btn-outline-secondary mx-2">Reviewed</button>
+        </form>
+    </div>
+
+    <div id="reviewList" class="row">
+        @foreach (var review in Model)
+        {
+            <div class="col-md-4 mb-3 review-item">
+                <div class="card">
+                    <img src="@review.Photos.FirstOrDefault()?.FilePath" class="card-img-top" alt="@review.ProductName" />
+                    <div class="card-body">
+                        <h5 class="card-title">@review.ProductName</h5>
+                        <form asp-action="LeaveReview" asp-controller="Review" method="get">
+                            <button type="submit" class="btn btn-primary mt-3" formaction="@Url.Action("LeaveReview", "Review", new { productId = review.ProductId })">Leave a Review</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
