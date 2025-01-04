@@ -4,6 +4,7 @@ using LoggerService.Contacts;
 using LoggerService.Exceptions.NotFound;
 using FarmFresh.Repositories.Extensions;
 using Microsoft.EntityFrameworkCore;
+using FarmFresh.Data.Models.Repositories;
 
 namespace FarmFresh.Services.Helpers;
 

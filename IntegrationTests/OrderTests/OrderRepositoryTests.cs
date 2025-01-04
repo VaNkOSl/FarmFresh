@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Repositories;
 
 namespace IntegrationTests.OrderTests;
 
