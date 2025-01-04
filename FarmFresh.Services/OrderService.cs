@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection.Emit;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using AutoMapper;
@@ -71,6 +72,7 @@ internal class OrderService : IOrderService
                     _loggerManager.LogInfo($"[{CheckoutAsync}] Added photo with ID {photo.Id} to order {order.Id}");
                 }
             }
+
             _repositoryManager.OrderRepository.UpdateOrder(order);
             await _repositoryManager.SaveAsync(order);
             _loggerManager.LogInfo($"[{CheckoutAsync}] Successfully updated order with ID {order.Id}");
@@ -96,6 +98,8 @@ internal class OrderService : IOrderService
             .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
             .ToListAsync();
 
+        await CreateLabel(order, true);
+
         _loggerManager.LogInfo($"[{CompleteOrderAsync}] Found {cartItemToRemove.Count} cart items to remove for user {order.UserId}");
 
         foreach (var cart in cartItemToRemove)
@@ -103,8 +107,9 @@ internal class OrderService : IOrderService
             _repositoryManager.CartItemRepository.DeleteItem(cart);
             _loggerManager.LogInfo($"[{CompleteOrderAsync}] Removed cart item with ID {cart.Id} for user {order.UserId}");
         }
-
+        var labelResponse = await CreateLabel(order, true);
         order.OrderStatus = OrderStatus.Completed;
+        order.ShipmentNumber = labelResponse.Label.ShipmentNumber;
         _repositoryManager.OrderRepository.UpdateOrder(order);
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{CompleteOrderAsync}] Successfully updated the order with ID {orderId} to status 'Completed'.");
@@ -166,7 +171,18 @@ internal class OrderService : IOrderService
                 .Include(p => p.Product)
                 .ThenInclude(ph => ph.ProductPhotos)
                 .ToListAsync();
-
+        var configuration = new ConfigurationBuilder()
+                  .SetBasePath(Directory.GetCurrentDirectory())
+                  .AddJsonFile("appsettings.json")
+                  .Build();
+        var httpClient = new HttpClient();
+        var _econtShippmentService = new EcontShipmentService(configuration, httpClient);
+        foreach (var o in order)
+        {
+            var ShippmentRequest = new GetShipmentStatusesRequest(new List<string> { o.Order.ShipmentNumber });
+            var status=_econtShippmentService.GetShipmentStatusesAsync(ShippmentRequest);
+            //o.Order.OrderStatus = status;
+        }
         return _mapper.Map<List<OrderListViewModel>>(order);
     }
 
@@ -247,7 +263,6 @@ internal class OrderService : IOrderService
         if (string.IsNullOrWhiteSpace(cityName))
             return Enumerable.Empty<string>();
 
-        // Fetch the offices based on the HubName prefix (i.e., city name)
         var offices = await _repositoryManager.OfficeRepository
      .FindOfficesByCondition(o =>
          o.Address != null &&
@@ -329,7 +344,7 @@ internal class OrderService : IOrderService
                       senderAddress: new AddressDTO(
                             city: cityDtoSender,
                             streetName: address["address"]?["road"]?.ToString(),
-                            streetNum: address["address"]?["num"]?.ToString()
+                            streetNum: "3" //testing purpose
                             ),
                         receiverClient: new ClientProfileDTO($"{currUser.FirstName} {currUser.LastName}", new List<string> { order.PhoneNumber }),
                         receiverAddress: new AddressDTO(
@@ -362,5 +377,82 @@ internal class OrderService : IOrderService
             throw new Exception();
         }
         return sum;
+    }
+    public async Task<CreateLabelResponse> CreateLabel(Order order, bool trackChanges)
+    {
+        var currUser = _repositoryManager.UserRepository.FindUsersByConditionAsync(u => u.Id == order.UserId, trackChanges: trackChanges).FirstOrDefault();
+        var Address1 =  _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(o => o.UserId == currUser.Id, trackChanges)
+            .FirstOrDefault();
+        var ProductId = _repositoryManager.OrderProductRepository
+            .FindOrderProductByConditionAsync(o => o.OrderId == order.Id, trackChanges)
+            .FirstOrDefault().ProductId;
+        var Product = _repositoryManager.ProductRepository
+            .FindProductByConditionAsync(p => p.Id == ProductId, trackChanges).FirstOrDefault();
+        var Farmer = _repositoryManager.FarmerRepository
+            .FindFarmersByConditionAsync(f => f.Id == Product.FarmerId, trackChanges).FirstOrDefault();
+        var senderUserId = Farmer.UserId;
+        var senderUser = _repositoryManager.UserRepository
+            .FindUsersByConditionAsync(u => u.Id == senderUserId, trackChanges: trackChanges).FirstOrDefault();
+
+      
+        var FarmerLocation = _repositoryManager.FarmerLocationRepository
+            .FindFarmerLocationsByConditionAsync(f => f.Farmer.UserId == senderUser.Id, trackChanges: trackChanges)
+            .FirstOrDefault();
+        var productCount = _repositoryManager.OrderProductRepository
+            .FindOrderProductByConditionAsync(o => o.OrderId == order.Id, trackChanges).Count();
+        var TotalPrice = _repositoryManager.OrderProductRepository
+            .FindOrderProductByConditionAsync(o => o.OrderId == order.Id, trackChanges).Select(o=>o.Price*o.Quantity).Sum();
+        var locationLat = FarmerLocation.Latitude;
+        var locationLon = FarmerLocation.Longitude;
+        var address = await GetAddressByLatAndLongAsync(locationLon, locationLat);
+        var cityDtoReveiver = new CityDTO
+        {
+
+            Name = order.City,
+            Country = new CountryDTO { Code3 = "BGR" }
+        };
+        var cityDtoSender = new CityDTO
+        {
+
+            Name = address["address"]?["city"]?.ToString(),
+            Country = new CountryDTO { Code3 = "BGR" }
+        };
+        var City1= new CityDTO
+        {
+
+            Name = order.City,
+            Country = new CountryDTO { Code3 = "BGR" }
+        };
+        var receiverAddress = new AddressDTO
+        (
+            City1, Address1.StreetName, Address1.StreetNum
+        );
+        var senderAddress = new AddressDTO
+            (
+            cityDtoSender,
+             streetName: address["address"]?["road"]?.ToString(),
+             streetNum: "3" //testing
+            );
+        var ShippingLabel = new ShippingLabelDTO
+            (new ClientProfileDTO(senderUser.FirstName + " " + senderUser.LastName, new List<string> { senderUser.PhoneNumber }),
+            senderAddress,
+            new ClientProfileDTO(currUser.FirstName + " " + currUser.LastName, new List<string> { currUser.PhoneNumber }),
+            receiverAddress,
+            productCount,
+            productCount * 1,
+            shipmentType: ShipmentType.Pack,
+            shipmentDescription: "Order shipment",
+            orderPrice: (double)TotalPrice
+            );
+        var configuration = new ConfigurationBuilder()
+                  .SetBasePath(Directory.GetCurrentDirectory())
+                  .AddJsonFile("appsettings.json")
+                  .Build();
+        var httpClient = new HttpClient();
+        var _econtLabelService = new EcontLabelService(configuration, httpClient);
+        var LabelRequest = new CreateLabelRequest(ShippingLabel);
+        var response = await _econtLabelService.CreateLabelAsync(LabelRequest);
+        return response;
     }
 }
