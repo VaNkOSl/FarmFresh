@@ -1,4 +1,6 @@
-﻿namespace FarmFresh.ViewModels.Review;
+﻿using FarmFresh.ViewModels.Product;
+
+namespace FarmFresh.ViewModels.Review;
 
 public record ProductReviewDto
 {
@@ -17,4 +19,8 @@ public record ProductReviewDto
     public Guid FarmerId { get; set; }
 
     public string UserFullName { get; set; } = string.Empty;
+
+    public string ProductName {  get; set; } = string.Empty;
+
+   public virtual ICollection<ProductPhotosDto> Photos { get; set; } = new List<ProductPhotosDto>();
 }

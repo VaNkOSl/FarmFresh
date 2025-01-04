@@ -1,8 +1,12 @@
 ﻿@using FarmFresh.Commons.RequestFeatures
+@using FarmFresh.Services.Contacts;
+@using FarmFresh.Infrastructure.Extensions;
+@inject IAccountService _accountservice;
 @model FarmersListViewModel 
 
 @{
     ViewBag.Title = "All Farmers";
+    bool isUserAdmin = await _accountservice.IsUserAdmin(User.GetId(), trackChanges: false);
 }
 
 <div class="container mt-4">
@@ -29,11 +33,14 @@
                         <h5 class="card-title">@farmer.FullName</h5>
                         <p class="card-text">Phone: @farmer.PhoneNumber</p>
                         <p class="card-text">Product Count: @farmer.ProductCount</p>
-                        <a href="@Url.Action("Edit", "Farmer", new { id = farmer.Id })" class="btn btn-warning btn-sm">Edit</a>
+                        @if (isUserAdmin is true)
+                        {
+                            <a href="@Url.Action("Edit", "Farmer", new { id = farmer.Id })" class="btn btn-warning btn-sm">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@farmer.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this farmer?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        }
                         <a href="@Url.Action("Details", "Farmer", new { id = farmer.Id })" class="btn btn-info btn-sm">Details</a>
-                        <form asp-action="Delete" asp-route-id="@farmer.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this farmer?');">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
                     </div>
                 </div>
             </div>

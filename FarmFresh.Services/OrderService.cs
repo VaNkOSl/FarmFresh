@@ -114,15 +114,10 @@ internal class OrderService : IOrderService
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{CompleteOrderAsync}] Successfully updated the order with ID {orderId} to status 'Completed'.");
     }
+
     public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId, bool trackChanges)
     {
-        var order = await _repositoryManager.OrderRepository
-                                       .FindOrderByConditionAsync(o => o.Id == orderId, trackChanges)
-                                       .GetOrderWithDetails()
-                                       .FirstOrDefaultAsync();
-
-        OrderHelper.ChekOrderNotFound(order, order.Id, "GetOrderConfirmationViewModelAsync", _loggerManager);
-
+        var order = await OrderHelper.GetOrderByIdAndCheckIfExists(orderId, trackChanges, _repositoryManager, _loggerManager);
 
         var cartItems = await _repositoryManager.CartItemRepository
             .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
@@ -160,10 +155,10 @@ internal class OrderService : IOrderService
               pp.ProductId
           ))
           .ToList()
-  );
+         );
     }
 
-    public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(Guid userId, bool trackChanges)
+    public async Task<List<OrderListViewModel>> GetOrdersForUserAsync(string userId, bool trackChanges)
     {
         var order = await _repositoryManager.OrderRepository
                 .FindAllOrders(trackChanges) 
@@ -188,15 +183,9 @@ internal class OrderService : IOrderService
 
     public async Task<OrderDetailsViewModel> GetOrderDetailsAsync(Guid id, bool trackChanges)
     {
-        var orderProduct = await _repositoryManager.OrderProductRepository
-                  .FindAllOrderProducts(trackChanges)
-                  .GetOrderProductDetailsById(id)
-                  .Include(p => p.Product)
-                  .ThenInclude(ph => ph.ProductPhotos)
-                  .FirstOrDefaultAsync();
+        var orderProduct = await OrderProductHelper.GetOrderProductAndCheckIfItExists(id, trackChanges, _repositoryManager, _loggerManager);
 
-       OrderProductHelper.CheckOrderProductNotFound(orderProduct, orderProduct.Id, "GetOrderDetailsAsync", _loggerManager);
-       return _mapper.Map<OrderDetailsViewModel>(orderProduct);
+        return _mapper.Map<OrderDetailsViewModel>(orderProduct);
     }
 
     public async Task<IEnumerable<FarmerOrderListViewModel>> GetOrderConfirmationForFarmersViewModelAsync(Guid farmerId, bool trackChanges)
@@ -213,11 +202,7 @@ internal class OrderService : IOrderService
 
     public async Task<bool> SendOrderAsync(Guid orderId, bool trackChanges)
     {
-        var order = await _repositoryManager.OrderRepository
-            .FindOrderByConditionAsync(o => o.Id == orderId, trackChanges)
-            .FirstOrDefaultAsync();
-
-        OrderHelper.ChekOrderNotFound(order, order.Id, "SendOrderAsync", _loggerManager);
+        var order = await OrderHelper.GetOrderByIdAndCheckIfExists(orderId, trackChanges, _repositoryManager, _loggerManager);
 
         if (order.OrderStatus == OrderStatus.Shipped)
         {
@@ -233,11 +218,7 @@ internal class OrderService : IOrderService
 
     public async Task<bool> CancelOrder(Guid orderId, bool trackChanges)
     {
-        var order = await _repositoryManager.OrderRepository
-            .FindOrderByConditionAsync(o => o.Id == orderId, trackChanges)
-            .FirstOrDefaultAsync();
-
-        OrderHelper.ChekOrderNotFound(order, order.Id, "CancelOrder", _loggerManager);
+        var order = await OrderHelper.GetOrderByIdAndCheckIfExists(orderId, trackChanges, _repositoryManager, _loggerManager);
 
         order.OrderStatus = OrderStatus.Canceled;
         _repositoryManager.OrderRepository.UpdateOrder(order);

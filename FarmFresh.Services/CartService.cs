@@ -56,6 +56,17 @@ internal class CartService : ICartService
         return _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
     }
 
+    public async Task<decimal> GetTotalSumAsync(Guid userId, bool trackChanges)
+    {
+        var cartItems = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(ci => ci.UserId == userId, trackChanges)
+            .GetCartItemsWithProductDetails()
+            .ToListAsync();
+
+        var totalSum = cartItems.Sum(ci => ci.Quantity * ci.Product.Price);
+
+        return totalSum;
+    }
 
     public async Task RemoveFromCart(Guid productId, bool trackChanges)
     {
@@ -65,6 +76,17 @@ internal class CartService : ICartService
 
         try
         {
+            var productToUpdate = await _repositoryManager.ProductRepository
+                .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
+                .FirstOrDefaultAsync();
+
+            if (productToUpdate != null)
+            {
+                productToUpdate.StockQuantity += orderProductToRemove.Quantity;
+
+                _repositoryManager.ProductRepository.UpdateProduct(productToUpdate);
+                _loggerManager.LogInfo($"[{nameof(RemoveFromCart)}] Successfully updated product quantity for product with ID {productId}");
+            }
             _repositoryManager.CartItemRepository.DeleteItem(cartItem);
             _loggerManager.LogInfo($"[{nameof(RemoveFromCart)}] Successfully remove from cart item with ID {productId}");
             _repositoryManager.OrderProductRepository.DeleteOrderProduct(orderProductToRemove);
@@ -87,7 +109,14 @@ internal class CartService : ICartService
             .Include(p => p.Product)
             .FirstOrDefaultAsync();
 
-        int newQuantity = cart.Quantity + quantityChange;
+        var product = await _repositoryManager.ProductRepository
+            .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        ProductHelper.CheckProductNotFound(product, productId, "UpdateCartQuantityAsync", _loggerManager);
+
+        int currentCartQuantity = cart.Quantity;
+        int newQuantity = currentCartQuantity + quantityChange;
 
         if(newQuantity > cart.Product.StockQuantity || newQuantity < 1)
         {
@@ -96,7 +125,10 @@ internal class CartService : ICartService
 
         try
         {
+            int stockAdjustment = currentCartQuantity - newQuantity;
+            product.StockQuantity += stockAdjustment;
             cart.Quantity = newQuantity;
+            _repositoryManager.ProductRepository.UpdateProduct(product);
             _repositoryManager.CartItemRepository.UpdateItem(cart);
             await _repositoryManager.SaveAsync();
             _loggerManager.LogInfo($"[{nameof(UpdateCartQuantityAsync)}] Quantity in the cart with ID {cart.Id} has been successfully updated.");

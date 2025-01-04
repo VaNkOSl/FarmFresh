@@ -91,6 +91,12 @@ public class AccountController : BaseController
         var updateView = await _accountService
             .GetUserForUpdateAsync(id, trackChanges: false);
 
+        if (updateView is null)
+        {
+            TempData[ErrorMessage] = UserNotFound;
+            return View("Error404");
+        }
+
         return View(updateView);
     }
 
@@ -100,7 +106,8 @@ public class AccountController : BaseController
     {
         if (id != model.Id)
         {
-            return BadRequest("Route ID and model ID do not match.");
+            TempData[ErrorMessage] = UserNotFound;
+            return View("Error404");
         }
 
         await _accountService.UpdateUserAsync(model, trackChanges: true);

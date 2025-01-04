@@ -6,9 +6,9 @@ public interface IReviewRepository
 {
     Task<Review> CreateReviewAsync(Review review);
 
-    void DeleteReview(Review review);
+    public void DeleteReview(Review review);
 
-    void UpdateReview(Review review);
+    public void UpdateReview(Review review);
 
     IQueryable<Review> FindReviewByConditionAsync(Expression<Func<Review, bool>> condition, bool trackChanges);
 

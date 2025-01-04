@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Controllers;
 
-[Authorize]
 [Route("api/order")]
 public class OrderController : BaseController
 {
@@ -27,7 +26,7 @@ public class OrderController : BaseController
     [HttpGet("index")]
     public async Task<IActionResult> Index()
     {
-        var userId = Guid.Parse(User.GetId());
+        var userId = User.GetId();
         var orders = await _serviceManager.OrderService.GetOrdersForUserAsync(userId, trackChanges: false);
         return View(orders);
     }
@@ -36,11 +35,6 @@ public class OrderController : BaseController
     public async Task<IActionResult> Details(Guid Id)
     {
         var orderDetails = await _serviceManager.OrderService.GetOrderDetailsAsync(Id, trackChanges: false);
-
-        if (orderDetails == null)
-        {
-            return NotFound();
-        }
 
         return View(new List<OrderDetailsViewModel> { orderDetails });
     }
@@ -122,13 +116,13 @@ public class OrderController : BaseController
     public IActionResult Checkout()
     {
         var DeliveryList = Enum.GetValues(typeof(DeliveryOption))
-     .Cast<DeliveryOption>()
-     .Select(s => new SelectListItem
-     {
-         Text = s.ToString(),
-         Value = ((int)s).ToString()
-     })
-     .ToList();
+         .Cast<DeliveryOption>()
+         .Select(s => new SelectListItem
+         {
+             Text = s.ToString(),
+             Value = ((int)s).ToString()
+         })
+        .ToList();
         ViewData["DeliveryOption"] = DeliveryList;
         return View();
     }

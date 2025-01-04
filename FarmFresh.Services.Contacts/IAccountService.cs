@@ -23,4 +23,14 @@ public interface IAccountService
     Task ForgotPasswordAsync(string email, bool trackChanges);
 
     Task<bool> ResetPasswordAsync(string email, string token, string newPassword, bool trackChanges);
+
+    Task<IEnumerable<AllUserDto>> GetAllUsersAsync(bool trackChanges);
+
+    Task<bool> IsUserAdmin(string userId, bool trackChanges);
+
+    Task<BlockUserDto> GetUserForBlockAsync(Guid userId, bool trackChanges);
+
+    Task BlockUserAsync(Guid userId, bool trackChanges);
+
+    Task UnblockUserAsync(Guid userId, bool trackChanges);
 }

@@ -24,6 +24,7 @@ builder.Services.ConfigureAccountService();
 builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
+builder.Services.ConfigureStriple(builder.Configuration);
 
 builder.Services.AddSession(options =>
 {

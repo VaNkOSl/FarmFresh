@@ -11,12 +11,12 @@
           <div class="row g-3">
             <div class="col-sm-6">
               <label asp-for="FirstName" class="form-label">First name</label>
-              <input asp-for="FirstName" type="text" class="form-control"  placeholder="" value="" required="">
+                <input asp-for="FirstName" type="text" class="form-control" placeholder="" minlength="2" maxlength="15" value="" required="">
             </div>
 
             <div class="col-sm-6">
                 <label asp-for="LastName" class="form-label">Last name</label>
-                <input asp-for="LastName"  type="text" class="form-control" id="lastName" placeholder="" value="" required="">
+                <input asp-for="LastName" type="text" class="form-control" id="lastName" placeholder="" minlength="3" maxlength="15" value="" required="">
               <div class="invalid-feedback">
                 Valid last name is required.
               </div>
@@ -26,7 +26,7 @@
                 <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
               <div class="input-group has-validation">
                 <span class="input-group-text"></span>
-                    <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="Phone Number">
+                    <input asp-for="PhoneNumber" type="text" class="form-control" minlength="7" maxlength="14" placeholder="Phone Number">
               </div>
             </div>
 
@@ -58,8 +58,6 @@
                 <input asp-for="StreetNum" type="text" class="form-control" id="StreetNum" placeholder="Enter your street number" required />
             </div>
 
-
-
             <div class="col-md-12">
               <label asp-for="DeliveryOption" class="form-label">Delivery Method</label>
                 <select asp-for="DeliveryOption" class="form-control" asp-items="ViewBag.DeliveryOption"></select>
@@ -69,8 +67,6 @@
             </div>
 
           </div>
-
-         
 
           <hr class="my-4">
 
