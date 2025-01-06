@@ -1,5 +1,6 @@
 ﻿using FarmFresh.Data;
 using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Econt.Nomenclatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Data.Models.Repositories.Econt;
