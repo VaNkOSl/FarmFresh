@@ -4,6 +4,7 @@ using FarmFresh.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarmFresh.Data.Migrations
 {
     [DbContext(typeof(FarmFreshDbContext))]
-    partial class FarmFreshDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250104195434_addNewRowToOrdersTable")]
+    partial class addNewRowToOrdersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1041,7 +1044,7 @@ namespace FarmFresh.Data.Migrations
                     b.HasOne("FarmFresh.Data.Models.Order", "Order")
                         .WithMany("OrderProducts")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FarmFresh.Data.Models.Product", "Product")

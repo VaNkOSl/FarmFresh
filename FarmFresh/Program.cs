@@ -8,6 +8,7 @@ using LoggerService.Contacts;
 using Microsoft.AspNetCore.Identity;
 using NLog;
 using static FarmFresh.Commons.GeneralApplicationConstants;
+using FarmFresh.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,35 +92,35 @@ app.MapRazorPages();
 
 //**TESTING PURPOSES**
 //testing econt api calls
-using(var scope = app.Services.CreateScope())
-{
-    var serviceManager = scope.ServiceProvider.GetRequiredService<IServiceManager>();
+//using(var scope = app.Services.CreateScope())
+//{
+//    var serviceManager = scope.ServiceProvider.GetRequiredService<IServiceManager>();
 
-    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    //{
-    //    var countryService = serviceManager.CountryService;
-    //    await countryService.UpdateCountriesAsync();
-    //});
-    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    //{
-    //    var cityService = serviceManager.CityService;
-    //    await cityService.UpdateCitiesAsync();
-    //});
-    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    //{
-    //    var officeService = serviceManager.OfficeService;
-    //    await officeService.UpdateOfficesAsync();
-    //});
-    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    //{
-    //    var streetService = serviceManager.StreetService;
-    //    await streetService.UpdateStreetsAsync();
-    //});
-    //await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
-    //{
-    //    var quarterService = serviceManager.QuarterService;
-    //    await quarterService.UpdateQuartersAsync();
-    //});
-}
+//    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+//    {
+//        var countryService = serviceManager.CountryService;
+//        await countryService.UpdateCountriesAsync();
+//    });
+//    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+//    {
+//        var cityService = serviceManager.CityService;
+//        await cityService.UpdateCitiesAsync();
+//    });
+//    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+//    {
+//        var officeService = serviceManager.OfficeService;
+//        await officeService.UpdateOfficesAsync();
+//    });
+//    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+//    {
+//        var streetService = serviceManager.StreetService;
+//        await streetService.UpdateStreetsAsync();
+//    });
+//    await DBTransactionHelper.ExecuteTransactionAsync(scope.ServiceProvider, async () =>
+//    {
+//        var quarterService = serviceManager.QuarterService;
+//        await quarterService.UpdateQuartersAsync();
+//    });
+//}
 
 app.Run();

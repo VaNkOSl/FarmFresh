@@ -17,6 +17,6 @@ public class OrderProductConfiguration : IEntityTypeConfiguration<OrderProduct>
             .HasOne(o => o.Order)
             .WithMany(p => p.OrderProducts)
             .HasForeignKey(o => o.OrderId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

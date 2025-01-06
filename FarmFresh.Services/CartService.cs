@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
 using FarmFresh.Repositories.Extensions;
@@ -87,6 +88,7 @@ internal class CartService : ICartService
                 _repositoryManager.ProductRepository.UpdateProduct(productToUpdate);
                 _loggerManager.LogInfo($"[{nameof(RemoveFromCart)}] Successfully updated product quantity for product with ID {productId}");
             }
+
             _repositoryManager.CartItemRepository.DeleteItem(cartItem);
             _loggerManager.LogInfo($"[{nameof(RemoveFromCart)}] Successfully remove from cart item with ID {productId}");
             _repositoryManager.OrderProductRepository.DeleteOrderProduct(orderProductToRemove);

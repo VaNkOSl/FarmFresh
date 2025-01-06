@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.ViewModels.Order;
 using FarmFresh.ViewModels.Product;
 
@@ -21,8 +22,7 @@ public class OrderMappingProfile : Profile
             photo.Id,
             "/uploads/" + Path.GetFileName(photo.FilePath),
             photo.Photo,
-            photo.ProductId
-        )).ToList()));
+            photo.ProductId)).ToList()));
 
         CreateMap<OrderProduct, OrderDetailsViewModel>()
             .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
@@ -50,8 +50,7 @@ public class OrderMappingProfile : Profile
 		        photo.Id,
 		        "/uploads/" + Path.GetFileName(photo.FilePath),
 		        photo.Photo,
-		        photo.ProductId
-		        )).ToList()));
+		        photo.ProductId)).ToList()));
 
 		CreateMap<OrderProduct, FarmerOrderListViewModel>()
             .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
@@ -64,9 +63,7 @@ public class OrderMappingProfile : Profile
 			src.Product.ProductPhotos.FirstOrDefault().Id,
 			"/uploads/" + Path.GetFileName(src.Product.ProductPhotos.FirstOrDefault().FilePath),
 			src.Product.ProductPhotos.FirstOrDefault().Photo,
-			src.Product.Id
-		)
-	));
+			src.Product.Id)));
 
 		CreateMap<CreateOrderDto, Order>()
          .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -75,5 +72,13 @@ public class OrderMappingProfile : Profile
          .ForMember(dest => dest.CreateOrderdDate, opt => opt.MapFrom(src => DateTime.Now))
          .ForMember(dest => dest.ProductPhotos, opt => opt.Ignore());
 
+        CreateMap<Order, AddressDTO>()
+                  .ForMember(dest => dest.City, opt => opt.MapFrom(src => new CityDTO
+                  {
+                      Name = src.City,
+                      Country = new CountryDTO { Code3 = "BGR" }
+                  }))
+                  .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.StreetName))
+                  .ForMember(dest => dest.Num, opt => opt.MapFrom(src => src.StreetNum));
     }
 }
