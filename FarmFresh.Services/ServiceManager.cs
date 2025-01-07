@@ -3,12 +3,13 @@ using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
+using FarmFresh.Services.Contacts.FarmersInterfaces;
 using FarmFresh.Services.Contacts.ProductsInterfaces;
 using FarmFresh.Services.Econt;
 using FarmFresh.Services.Econt.APIServices;
+using FarmFresh.Services.Farmers;
 using FarmFresh.Services.Products;
 using LoggerService.Contacts;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace FarmFresh.Services;
@@ -23,31 +24,24 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IReviewService> _reviewService;
     private readonly Lazy<ICartService> _cartService;
     private readonly Lazy<IOrderService> _orderService;
-
     private readonly Lazy<IEcontNumenclaturesService> _econtNumenclaturesService;
-
     private readonly Lazy<IEcontAddressService> _econtAddressService;
-
     private readonly Lazy<IEcontLabelService> _econtLabelService;
-
     private readonly Lazy<IEcontShipmentService> _econtShipmentService;
-
     private readonly Lazy<ICountryService> _countryService;
-
     private readonly Lazy<ICityService> _cityService;
-
     private readonly Lazy<IOfficeService> _officeService;
-
     private readonly Lazy<IAddressService> _addressService;
-
     private readonly Lazy<IStreetService> _streetService;
-
     private readonly Lazy<IQuarterService> _quarterService;
 
-    //
-
+    #region Service Extensions
     private readonly Lazy<IProductManagmentService> _productManagmentService;
     private readonly Lazy<IProductsQueryService> _productsQueryService;
+    private readonly Lazy<IFarmerQueryService> _farmerQueryService;
+    private readonly Lazy<IFarmerValidationService> _farmerValidationService;
+    private readonly Lazy<IFarmerManagementService> _farmerManagementService;
+    #endregion
 
     public ServiceManager(
         IRepositoryManager repositoryManager,
@@ -56,10 +50,15 @@ public sealed class ServiceManager : IServiceManager
         IConfiguration configuration,
         HttpClient httpClient)
     {
+        #region Service Extensions
         _productManagmentService = new Lazy<IProductManagmentService>(() => new ProductManagmentService(repositoryManager, loggerManager, mapper));
         _productsQueryService = new Lazy<IProductsQueryService>(() => new ProductsQueryService(repositoryManager, loggerManager, mapper));
+        _farmerQueryService = new Lazy<IFarmerQueryService>(() => new FarmerQueryService(repositoryManager, loggerManager, mapper));
+        _farmerValidationService = new Lazy<IFarmerValidationService>(() => new FarmerValidationService(repositoryManager));
+        _farmerManagementService = new Lazy<IFarmerManagementService>(() => new FarmerManagementService(repositoryManager, loggerManager, mapper, _farmerValidationService.Value));
+        #endregion
 
-        _farmerService = new Lazy<IFarmerService>(() => new FarmerService(repositoryManager, loggerManager, mapper));
+        _farmerService = new Lazy<IFarmerService>(() => new FarmerService(_farmerQueryService.Value, _farmerValidationService.Value, _farmerManagementService.Value));
         _adminService = new Lazy<IAdminService>(() => new AdminService(repositoryManager, loggerManager, mapper, configuration));
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
         _econtNumenclaturesService = new Lazy<IEcontNumenclaturesService>(() => new EcontNumenclaturesService(configuration, httpClient));
@@ -115,7 +114,15 @@ public sealed class ServiceManager : IServiceManager
 
     public IOrderService OrderService => _orderService.Value;
 
+    #region Service Extensions
     public IProductManagmentService ProductManagmentService => _productManagmentService.Value;
 
     public IProductsQueryService ProductsQueryService => _productsQueryService.Value;
+
+    public IFarmerQueryService FarmerQueryService => _farmerQueryService.Value;
+
+    public IFarmerValidationService FarmerValidationService => _farmerValidationService.Value;
+
+    public IFarmerManagementService FarmerManagementService => _farmerManagementService.Value;
+    #endregion
 }

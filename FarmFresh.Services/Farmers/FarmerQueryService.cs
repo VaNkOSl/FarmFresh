@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Contacts;
+using FarmFresh.Services.Contacts.FarmersInterfaces;
 using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Farmer;
 using LoggerService.Contacts;
@@ -9,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Services.Farmers;
 
-public class FarmerQueryService
+public class FarmerQueryService : IFarmerQueryService
 {
     private readonly IRepositoryManager _repositoryManager;
     private readonly ILoggerManager _loggerManager;
@@ -79,4 +81,18 @@ public class FarmerQueryService
 
         return _mapper.Map<FarmerForUpdatingDto>(farmerForEdit);
     }
+
+    public async Task<(IEnumerable<FarmersViewModel> farmers, MetaData metaData)> GetAllFarmersAsync(FarmerParameters farmerParameters, bool trackChanges)
+    {
+
+        var farmerWithMetaData = await _repositoryManager.FarmerRepository.GetFarmersAsync(farmerParameters, trackChanges);
+
+        var farmerDTO = _mapper.Map<IEnumerable<FarmersViewModel>>(farmerWithMetaData);
+
+        _loggerManager.LogInfo("Successfully retrieved and mapped farmers. Returning data.");
+        return (farmers: farmerDTO, metaData: farmerWithMetaData.MetaData);
+    }
+
+   public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm) =>
+        _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
 }

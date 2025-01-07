@@ -1,44 +1,34 @@
-﻿using AutoMapper;
-using FarmFresh.Commons.RequestFeatures;
-using FarmFresh.Data.Models;
-using FarmFresh.Data.Models.Enums;
-using FarmFresh.Data.Models.Repositories;
-using FarmFresh.Repositories.Contacts;
+﻿using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Services.Contacts;
-using FarmFresh.Services.Farmers;
+using FarmFresh.Services.Contacts.FarmersInterfaces;
 using FarmFresh.ViewModels.Farmer;
-using LoggerService.Contacts;
 
 namespace FarmFresh.Services;
 
 internal sealed class FarmerService : IFarmerService
 {
-    private readonly IRepositoryManager _repositoryManager;
-    private readonly ILoggerManager _loggerManager;
-    private readonly IMapper _mapper;
-    private readonly FarmerValidationService _farmerValidationService;
-    private readonly FarmerManagementService _farmerManagementService;
-    private readonly FarmerQueryService _farmerQueryService;
+    private readonly IFarmerValidationService _farmerValidationService;
+    private readonly IFarmerManagementService _farmerManagementService;
+    private readonly IFarmerQueryService _farmerQueryService;
 
-    public FarmerService(IRepositoryManager repositoryManager, ILoggerManager loggerManager,
-                         IMapper mapper)
+    public FarmerService(
+        IFarmerQueryService farmerQueryService,
+        IFarmerValidationService farmerValidationService,
+        IFarmerManagementService farmerManagementService)
     {
-        _repositoryManager = repositoryManager;
-        _loggerManager = loggerManager;
-        _mapper = mapper;
-        _farmerValidationService = new FarmerValidationService(_repositoryManager);
-        _farmerManagementService = new FarmerManagementService(_repositoryManager, _loggerManager, _mapper);
-        _farmerQueryService = new FarmerQueryService(_repositoryManager, _loggerManager, _mapper);
+        _farmerValidationService = farmerValidationService;
+        _farmerManagementService = farmerManagementService;
+        _farmerQueryService = farmerQueryService;
     }
 
     public async Task CreateFarmerAsync(FarmerForCreationDto model, string userId, bool trackChanges) => await
         _farmerManagementService.CreateFarmerAsync(model, userId, trackChanges);
 
     public async Task<FarmersListViewModel> CreateFarmersListViewModelAsync(IEnumerable<FarmersViewModel> farmers, MetaData metaData, string? searchTerm) => 
-         _mapper.Map<FarmersListViewModel>((farmers, metaData, searchTerm));
+        await _farmerQueryService.CreateFarmersListViewModelAsync(farmers, metaData, searchTerm);
 
     public async Task<(IEnumerable<FarmersViewModel> farmers, MetaData metaData)> GetAllFarmersAsync(FarmerParameters farmerParameters, bool trackChanges) =>
-        await _farmerManagementService.GetAllFarmersAsync(farmerParameters, trackChanges);
+        await _farmerQueryService.GetAllFarmersAsync(farmerParameters, trackChanges);
 
     public async Task DeleteFarmerAsync(Guid farmerId, bool trackChanges) =>
         await _farmerManagementService.DeleteFarmerAsync(farmerId, trackChanges);

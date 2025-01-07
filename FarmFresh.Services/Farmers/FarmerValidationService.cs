@@ -1,9 +1,10 @@
 ﻿using FarmFresh.Data.Models.Repositories;
+using FarmFresh.Services.Contacts.FarmersInterfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Services.Farmers;
 
-public class FarmerValidationService
+public class FarmerValidationService : IFarmerValidationService
 {
     private readonly IRepositoryManager _repositoryManager;
 

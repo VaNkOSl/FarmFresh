@@ -1,5 +1,6 @@
 ﻿using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
+using FarmFresh.Services.Contacts.FarmersInterfaces;
 using FarmFresh.Services.Contacts.ProductsInterfaces;
 
 namespace FarmFresh.Services.Contacts;
@@ -42,7 +43,15 @@ public interface IServiceManager
 
     ICartService CartService { get; }
 
+    #region Service Extensions
     IProductManagmentService ProductManagmentService { get; }
 
     IProductsQueryService ProductsQueryService { get; }
+
+    IFarmerQueryService FarmerQueryService { get; }
+
+    IFarmerValidationService FarmerValidationService { get; }
+
+    IFarmerManagementService FarmerManagementService { get; }
+    #endregion
 }
