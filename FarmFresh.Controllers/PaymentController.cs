@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
+using static FarmFresh.Commons.NotificationMessagesConstants;
+using static FarmFresh.Commons.MessagesConstants.Orders;
 
 namespace FarmFresh.Controllers;
 
@@ -61,6 +63,7 @@ public class PaymentController : BaseController
 
         if (charge.Status == "succeeded")
         {
+            TempData[SuccessMessage] = OrderSuccessfullyPlaced;
             return RedirectToAction("Index", "Home");
         }
         else

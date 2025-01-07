@@ -28,4 +28,9 @@ public static class MessagesConstants
         public static string SuccessfullyAddProductToCart = "The product has been successfully added to your cart!";
         public static string SuccessfullyRemoveProductFromCart = "The product has been successfully removed from your cart.";
     }
+
+    public static class Orders
+    {
+        public static string OrderSuccessfullyPlaced = "Your order has been successfully placed. Thank you for shopping with us!";
+    }
 }
