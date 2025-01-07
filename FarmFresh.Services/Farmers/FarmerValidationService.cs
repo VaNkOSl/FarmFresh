@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using FarmFresh.Data.Models.Repositories;
-using FarmFresh.Repositories.Contacts;
-using LoggerService.Contacts;
+﻿using FarmFresh.Data.Models.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmFresh.Services.Farmers;

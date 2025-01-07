@@ -3,8 +3,10 @@ using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
+using FarmFresh.Services.Contacts.ProductsInterfaces;
 using FarmFresh.Services.Econt;
 using FarmFresh.Services.Econt.APIServices;
+using FarmFresh.Services.Products;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +44,11 @@ public sealed class ServiceManager : IServiceManager
 
     private readonly Lazy<IQuarterService> _quarterService;
 
+    //
+
+    private readonly Lazy<IProductManagmentService> _productManagmentService;
+    private readonly Lazy<IProductsQueryService> _productsQueryService;
+
     public ServiceManager(
         IRepositoryManager repositoryManager,
         IMapper mapper,
@@ -49,6 +56,9 @@ public sealed class ServiceManager : IServiceManager
         IConfiguration configuration,
         HttpClient httpClient)
     {
+        _productManagmentService = new Lazy<IProductManagmentService>(() => new ProductManagmentService(repositoryManager, loggerManager, mapper));
+        _productsQueryService = new Lazy<IProductsQueryService>(() => new ProductsQueryService(repositoryManager, loggerManager, mapper));
+
         _farmerService = new Lazy<IFarmerService>(() => new FarmerService(repositoryManager, loggerManager, mapper));
         _adminService = new Lazy<IAdminService>(() => new AdminService(repositoryManager, loggerManager, mapper, configuration));
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
@@ -62,7 +72,7 @@ public sealed class ServiceManager : IServiceManager
         _addressService = new Lazy<IAddressService>(() => new AddressService(repositoryManager, mapper));
         _streetService = new Lazy<IStreetService>(() => new StreetService(EcontNumenclaturesService, repositoryManager, mapper));
         _quarterService = new Lazy<IQuarterService>(() => new QuarterService(EcontNumenclaturesService, repositoryManager, mapper));
-        _productService = new Lazy<IProductService>(() => new ProductService(repositoryManager, loggerManager, mapper));
+        _productService = new Lazy<IProductService>(() => new ProductService(_productManagmentService.Value, _productsQueryService.Value));
         _productPhotoService = new Lazy<IProductPhotoService>(() => new ProductPhotoService(repositoryManager, loggerManager, mapper));
         _reviewService = new Lazy<IReviewService>(() => new ReviewService(repositoryManager, loggerManager, mapper));
         _cartService = new Lazy<ICartService>(() => new CartService(repositoryManager, loggerManager, mapper));
@@ -104,4 +114,8 @@ public sealed class ServiceManager : IServiceManager
     public ICartService CartService => _cartService.Value;
 
     public IOrderService OrderService => _orderService.Value;
+
+    public IProductManagmentService ProductManagmentService => _productManagmentService.Value;
+
+    public IProductsQueryService ProductsQueryService => _productsQueryService.Value;
 }
