@@ -1,6 +1,6 @@
-﻿using FarmFresh.Data.Models.Repositories.Econt;
-using FarmFresh.Services.Contacts.Econt;
+﻿using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
+using FarmFresh.Services.Contacts.ProductsInterfaces;
 
 namespace FarmFresh.Services.Contacts;
 
@@ -41,4 +41,8 @@ public interface IServiceManager
     IOrderService OrderService { get; }
 
     ICartService CartService { get; }
+
+    IProductManagmentService ProductManagmentService { get; }
+
+    IProductsQueryService ProductsQueryService { get; }
 }
