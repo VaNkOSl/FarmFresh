@@ -9,7 +9,8 @@ using FarmFresh.ViewModels.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using static FarmFresh.Commons.NotificationMessagesConstants;
+using static FarmFresh.Commons.MessagesConstants.Orders;
 
 namespace FarmFresh.Controllers;
 
@@ -89,6 +90,7 @@ public class OrderController : BaseController
         try
         {
             await _serviceManager.OrderService.CompleteOrderAsync(order.Id, trackChanges: true);
+            TempData[SuccessMessage] = OrderSuccessfullyPlaced;
             return RedirectToAction("Index", "Home");
         }
         catch (KeyNotFoundException)
