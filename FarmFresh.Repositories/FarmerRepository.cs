@@ -31,6 +31,7 @@ internal sealed class FarmerRepository(FarmFreshDbContext data, IValidateEntity 
     {
         var farmers = await
             FindAllFarmers(trackChanges)
+            .Where(f => f.FarmerStatus == Status.Approved && f.PhoneNumber != "0000000000")
             .Include(f => f.User)
             .Include(ow => ow.OwnedProducts)
             .Search(farmerParameters.SearchTerm)

@@ -160,8 +160,29 @@ public sealed class AccountService : IAccountService
 
         AccountHelper.ChekIfUserIsNull(farmerForDeleting, userId, nameof(DeleteFarmerAsync), _loggerManager);
 
-        _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
-        await _repositoryManager.SaveAsync();
+        var productsForDeleting = await _repositoryManager.ProductRepository
+            .FindProductByConditionAsync(p => p.FarmerId == farmerForDeleting.Id, trackChanges)
+            .ToListAsync();
+
+
+        try
+        {
+            foreach (var product in productsForDeleting)
+            {
+                await ProductHelper.DeleteProductPhotoAsync(_repositoryManager, _loggerManager, product.Id, trackChanges);
+                await ProductHelper.DeleteProductReviewAsync(_repositoryManager, _loggerManager, product.Id, trackChanges);
+                _repositoryManager.ProductRepository.DeleteProduct(product);
+            }
+
+            _repositoryManager.FarmerRepository.DeleteFarmer(farmerForDeleting);
+            await _repositoryManager.SaveAsync();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
     }
 
     public async Task<UserForUpdateDto> GetUserForUpdateAsync(Guid userId, bool trackChanges)

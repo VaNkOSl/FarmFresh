@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
-using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data.Models.Enums;
-using FarmFresh.Repositories.Contacts;
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.Extensions;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Admin;
-using FarmFresh.ViewModels.User;
 using LoggerService.Contacts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

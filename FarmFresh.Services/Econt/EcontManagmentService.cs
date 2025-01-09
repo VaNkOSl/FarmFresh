@@ -219,6 +219,7 @@ public class EcontManagmentService
            .Include(u => u.User)
            .ToListAsync();
 
+        
         var cartItemViewModels = _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
 
         decimal sum = 0m;

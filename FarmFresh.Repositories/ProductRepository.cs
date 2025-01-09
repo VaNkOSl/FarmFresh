@@ -1,6 +1,7 @@
 ﻿using FarmFresh.Commons.RequestFeatures;
 using FarmFresh.Data;
 using FarmFresh.Data.Models;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Repositories.DataValidator;
 using FarmFresh.Repositories.Extensions;
@@ -33,6 +34,7 @@ internal sealed class ProductRepository(FarmFreshDbContext data, IValidateEntity
         var products = await
             FindAllProducts(trackChanges)
             .FilterProductsByPrice(productParameters.MinPrice, productParameters.MaxPrice)
+            .Where(p => p.ProductStatus == Status.Approved)
             .Search(productParameters.SearchTerm)
             .Include(p => p.ProductPhotos)
             .ToListAsync();

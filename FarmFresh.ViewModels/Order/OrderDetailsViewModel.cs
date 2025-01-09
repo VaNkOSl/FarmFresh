@@ -21,6 +21,7 @@ public record OrderDetailsViewModel(
     string Origin,
     string FarmerName,
     decimal ProductPrice,
+    string ShipmentNumber,
     Seasons Seasons,
     DateTime HarvestDate,
     DateTime ExpirationDate,

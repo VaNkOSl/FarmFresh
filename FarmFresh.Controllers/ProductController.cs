@@ -95,11 +95,16 @@ public class ProductController : BaseController
         return View(model);
     }
 
-    [HttpGet("mine/{id}")]
-    public async Task<IActionResult> Mine(Guid id)
+    [HttpGet("mine")]
+    public async Task<IActionResult> Mine()
     {
         var currentFarmerId = await
-            _serviceManager.FarmerService.GetFarmerByUserIdAsync(id, trackChanges: false);
+            _serviceManager.FarmerService.GetFarmerByUserIdAsync(Guid.Parse(User.GetId()), trackChanges: false);
+
+        if(currentFarmerId == Guid.Empty)
+        {
+            return RedirectToAction("NotFoundError", "Error");
+        }
 
         var model = await _serviceManager.ProductService.GetAllFarmersProductByFarmerIdAsync(currentFarmerId, trackChanges: false);
         return View(model);

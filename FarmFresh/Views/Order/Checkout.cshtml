@@ -76,10 +76,8 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Your custom JavaScript -->
 <script>
     $(document).ready(function () {
-        // Fetch cities based on user input
         $("#city").on("input", function () {
             const city = $(this).val();
             if (city.length >= 2) {
@@ -89,7 +87,7 @@
                     data: { search: city },
                     success: function (data) {
                         const suggestions = $("#citySuggestions");
-                        suggestions.empty().removeClass('d-none'); // Show suggestions list
+                        suggestions.empty().removeClass('d-none'); 
                         if (data.length === 0) {
                             suggestions.append('<li class="list-group-item text-muted">No results found</li>');
                         } else {
@@ -103,18 +101,16 @@
                     }
                 });
             } else {
-                $("#citySuggestions").addClass('d-none'); // Hide suggestions list
+                $("#citySuggestions").addClass('d-none'); 
             }
         });
 
-        // Handle city selection from suggestions
         $(document).on("click", "#citySuggestions li", function () {
             const selectedCity = $(this).text();
-            $("#city").val(selectedCity); // Set the selected city
-            $("#citySuggestions").addClass('d-none'); // Hide suggestions
+            $("#city").val(selectedCity); 
+            $("#citySuggestions").addClass('d-none');
 
             if (selectedCity !== "No results found") {
-                // Enable Econt Office Address field and fetch addresses
                 $("#econtOfficeAddress").prop('disabled', false);
                 $.ajax({
                     url: '/api/order/get-econt-offices',
@@ -138,14 +134,12 @@
             }
         });
 
-        // Hide city suggestions when clicking outside
         $(document).on("click", function (e) {
             if (!$(e.target).closest("#citySuggestions, #city").length) {
                 $("#citySuggestions").addClass('d-none');
             }
         });
 
-        // Prevent form submission if office address is not selected
         $("form").on("submit", function (e) {
             if ($("#econtOfficeAddress").val() === "") {
                 alert("Please select an Econt Office Address.");
