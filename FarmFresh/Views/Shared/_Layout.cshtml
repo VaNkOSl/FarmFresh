@@ -9,7 +9,7 @@
 <div id="wrapper">
     <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
         <div class="container-fluid d-flex flex-column p-0">
-            <a asp-action="List" asp-area="" asp-controller="Course" class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0">
+            <a asp-action="Index" asp-controller="Home" class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-leaf"></i>
                 </div>
@@ -20,13 +20,19 @@
             <ul class="navbar-nav text-light" id="accordionSidebar">
                 <li><hr class="sidebar-divider" /></li>
 
-                <li class="nav-item">
-                    <a asp-action="AllProducts" asp-controller="Product" class="nav-link">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="productDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-seedling"></i>
                         <span>Products</span>
                     </a>
+                    <ul class="dropdown-menu" aria-labelledby="productDropdown">
+                        <li><a class="dropdown-item" asp-action="AllProducts" asp-controller="Product">All Products</a></li>
+                        @if (userIsAFarmer == true)
+                        {
+                            <li><a class="dropdown-item" asp-action="Mine" asp-controller="Product">My Products</a></li>
+                        }
+                    </ul>
                 </li>
-
                 <li class="nav-item">
                     <a asp-action="AllFarmers" asp-area="" asp-controller="Farmer" class="nav-link">
                         <i class="fas fa-tractor"></i>

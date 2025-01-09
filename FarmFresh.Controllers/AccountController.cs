@@ -78,7 +78,6 @@ public class AccountController : BaseController
     }
 
     [HttpDelete("delete/{id}")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromBody] ProfileViewModel model)
     {
         await _accountService.DeleteUserAsync(model.Id, trackChanges: true);

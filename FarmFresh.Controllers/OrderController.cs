@@ -142,6 +142,7 @@ public class OrderController : BaseController
         await _serviceManager.OrderService.CancelOrder(id, trackChanges: true);
         return RedirectToAction("GetOrderBySeller", "Order");
     }
+
     [HttpGet("get-cities")]
     public async Task<IActionResult> GetCities(string search)
     {

@@ -36,30 +36,34 @@
     <div class="row">
         @foreach (var product in Model.Products)
         {
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    @if (product.Photos != null && product.Photos.Any())
-                    {
-                        var firstPhoto = product.Photos.First();
-                        <img src="@firstPhoto.FilePath" class="card-img-top" alt="Farmer Photo" style="max-height: 200px; object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <img src="no_photo.jpg" class="card-img-top" alt="Default Product Photo" style="max-height: 200px; object-fit: cover;" />
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text">Price: @product.Price</p>
-                        <p class="card-text">StockQuantity: @product.StockQuantity</p>
-                        @if (await _serviceManager.FarmerService.DoesFarmerHasProductsAsync(User.GetId(), product.Id, trackChanges: false) == true)
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        @if (product.Photos != null && product.Photos.Any())
                         {
-                            <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-warning btn-sm">Edit</a>
-                            <a asp-area="" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>
+                            var firstPhoto = product.Photos.First();
+                            <img src="@firstPhoto.FilePath" class="card-img-top" alt="Farmer Photo" style="max-height: 200px; object-fit: cover;" />
                         }
-                        <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info btn-sm">Details</a>
+                        else
+                        {
+                            <img src="no_photo.jpg" class="card-img-top" alt="Default Product Photo" style="max-height: 200px; object-fit: cover;" />
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">Price: @product.Price</p>
+                           @if(product.StockQuantity <=0)
+                           {
+                            <h4 class="text-danger">This product is out of stock!</h4>
+                           }
+                        <p class="card-text">StockQuantity: @product.StockQuantity</p>
+@*                             @if (await _serviceManager.FarmerService.DoesFarmerHasProductsAsync(User.GetId(), product.Id, trackChanges: false) == true)
+                            {
+                                <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-warning btn-sm">Edit</a>
+                                <a asp-area="" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>
+                            } *@
+                            <a href="@Url.Action("Details", "Product", new { id = product.Id })" class="btn btn-info btn-sm">Details</a>
+                        </div>
                     </div>
                 </div>
-            </div>
         }
     </div>
 
