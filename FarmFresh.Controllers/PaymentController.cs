@@ -40,7 +40,7 @@ public class PaymentController : BaseController
 
     [HttpPost("processcardpayment/{id}")]
     [AutoValidateAntiforgeryToken]
-    public async Task<IActionResult> ProcessCardPayment(Guid id,PaymentViewModel model)
+    public async Task<IActionResult> ProcessCardPayment(Guid id, PaymentViewModel model)
     {
         if (model == null || string.IsNullOrEmpty(model.StripeToken))
         {

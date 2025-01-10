@@ -64,7 +64,7 @@ public class DataGenerator : IDataGenerator
 
     }
 
-    private async Task<IEnumerable<ApplicationUser>> GenerateUsers(int count)
+    public async Task<IEnumerable<ApplicationUser>> GenerateUsers(int count)
     {
         var users = new List<ApplicationUser>();
 
