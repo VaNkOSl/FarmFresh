@@ -72,7 +72,14 @@ public class OrderMappingProfile : Profile
          .ForMember(dest => dest.UserId, opt => opt.Ignore())
          .ForMember(dest => dest.OrderProducts, opt => opt.Ignore())
          .ForMember(dest => dest.CreateOrderdDate, opt => opt.MapFrom(src => DateTime.Now))
-         .ForMember(dest => dest.ProductPhotos, opt => opt.Ignore());
+         .ForMember(dest => dest.Adress, opt => opt.MapFrom(src => src.EcontOfficeAddress))
+         .ForMember(dest => dest.StreetNum, opt => opt.MapFrom(src => src.StreetNum))
+         .ForMember(dest => dest.StreetNum, opt => opt.MapFrom(src => src.StreetNum))
+         .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City))
+         .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+		 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+		 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+		 .ForMember(dest => dest.ProductPhotos, opt => opt.Ignore());
 
         CreateMap<Order, AddressDTO>()
                   .ForMember(dest => dest.City, opt => opt.MapFrom(src => new CityDTO

@@ -1,13 +1,12 @@
 ﻿using EntityDataGenerator;
 using FarmFresh.Data;
-using FarmFresh.Repositories.Contacts;
-using FarmFresh.Repositories.DataValidator;
-using FarmFresh.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Moq;
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
+using FarmFresh.Repositories;
+using FarmFresh.Repositories.DataValidator;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace IntegrationTests.OrderTests;
 
