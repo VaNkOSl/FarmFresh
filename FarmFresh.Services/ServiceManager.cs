@@ -4,10 +4,12 @@ using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
 using FarmFresh.Services.Contacts.FarmersInterfaces;
+using FarmFresh.Services.Contacts.OrdersInterfaces;
 using FarmFresh.Services.Contacts.ProductsInterfaces;
 using FarmFresh.Services.Econt;
 using FarmFresh.Services.Econt.APIServices;
 using FarmFresh.Services.Farmers;
+using FarmFresh.Services.Orders;
 using FarmFresh.Services.Products;
 using LoggerService.Contacts;
 using Microsoft.Extensions.Configuration;
@@ -41,6 +43,8 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IFarmerQueryService> _farmerQueryService;
     private readonly Lazy<IFarmerValidationService> _farmerValidationService;
     private readonly Lazy<IFarmerManagementService> _farmerManagementService;
+    private readonly Lazy<IOrderManagmentService> _orderManagmentService;
+    private readonly Lazy<IEcontManagmentService> _econtManagmentService;
     #endregion
 
     public ServiceManager(
@@ -56,9 +60,11 @@ public sealed class ServiceManager : IServiceManager
         _farmerQueryService = new Lazy<IFarmerQueryService>(() => new FarmerQueryService(repositoryManager, loggerManager, mapper));
         _farmerValidationService = new Lazy<IFarmerValidationService>(() => new FarmerValidationService(repositoryManager));
         _farmerManagementService = new Lazy<IFarmerManagementService>(() => new FarmerManagementService(repositoryManager, loggerManager, mapper, _farmerValidationService.Value));
-        #endregion
+        _econtManagmentService = new Lazy<IEcontManagmentService> (() => new EcontManagmentService(repositoryManager, loggerManager, mapper));
+        _orderManagmentService = new Lazy<IOrderManagmentService>(() => new OrderManagmentService(repositoryManager, loggerManager, mapper, _econtManagmentService.Value));
+		#endregion
 
-        _farmerService = new Lazy<IFarmerService>(() => new FarmerService(_farmerQueryService.Value, _farmerValidationService.Value, _farmerManagementService.Value));
+		_farmerService = new Lazy<IFarmerService>(() => new FarmerService(_farmerQueryService.Value, _farmerValidationService.Value, _farmerManagementService.Value));
         _adminService = new Lazy<IAdminService>(() => new AdminService(repositoryManager, loggerManager, mapper, configuration));
         _categoryService = new Lazy<ICategoryService>(() => new CategoryService(repositoryManager, loggerManager, mapper));
         _econtNumenclaturesService = new Lazy<IEcontNumenclaturesService>(() => new EcontNumenclaturesService(configuration, httpClient));
@@ -75,7 +81,7 @@ public sealed class ServiceManager : IServiceManager
         _productPhotoService = new Lazy<IProductPhotoService>(() => new ProductPhotoService(repositoryManager, loggerManager, mapper));
         _reviewService = new Lazy<IReviewService>(() => new ReviewService(repositoryManager, loggerManager, mapper));
         _cartService = new Lazy<ICartService>(() => new CartService(repositoryManager, loggerManager, mapper));
-        _orderService = new Lazy<IOrderService>(() => new OrderService(repositoryManager, loggerManager, mapper));
+        _orderService = new Lazy<IOrderService>(() => new OrderService(repositoryManager, loggerManager, mapper, _orderManagmentService.Value, _econtManagmentService.Value));
     }
 
     public IFarmerService FarmerService => _farmerService.Value;
@@ -124,5 +130,9 @@ public sealed class ServiceManager : IServiceManager
     public IFarmerValidationService FarmerValidationService => _farmerValidationService.Value;
 
     public IFarmerManagementService FarmerManagementService => _farmerManagementService.Value;
-    #endregion
+
+	public IOrderManagmentService OrderManagmentService => _orderManagmentService.Value;
+
+	public IEcontManagmentService EcontManagmentService => _econtManagmentService.Value;
+	#endregion
 }

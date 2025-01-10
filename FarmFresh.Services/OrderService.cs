@@ -3,6 +3,8 @@ using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Econt.APIInterraction;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts;
+using FarmFresh.Services.Contacts.Econt;
+using FarmFresh.Services.Contacts.OrdersInterfaces;
 using FarmFresh.Services.Econt;
 using FarmFresh.Services.Helpers;
 using FarmFresh.Services.Orders;
@@ -17,20 +19,20 @@ internal class OrderService : IOrderService
     private readonly IRepositoryManager _repositoryManager;
     private readonly ILoggerManager _loggerManager;
     private readonly IMapper _mapper;
-    private readonly OrderManagmentService _orderManagmentService;
-    private readonly EcontManagmentService _econtManagmentService;
+    private readonly IOrderManagmentService _orderManagmentService;
+    private readonly IEcontManagmentService _econtManagmentService;
 
     public OrderService(IRepositoryManager repositoryManager,
                         ILoggerManager loggerManager,
-                        IMapper mapper
-                        )
+                        IMapper mapper,
+						IOrderManagmentService orderManagmentService,
+						IEcontManagmentService econtManagmentService)
     {
         _repositoryManager = repositoryManager;
         _loggerManager = loggerManager;
         _mapper = mapper;
-
-        _orderManagmentService = new OrderManagmentService(_repositoryManager, _loggerManager, _mapper);
-        _econtManagmentService = new EcontManagmentService(repositoryManager, _loggerManager, _mapper);
+        _orderManagmentService = orderManagmentService;
+        _econtManagmentService = econtManagmentService;
     }
 
     public async Task<Guid> CheckoutAsync(CreateOrderDto model, Guid userId, bool trackChanges)

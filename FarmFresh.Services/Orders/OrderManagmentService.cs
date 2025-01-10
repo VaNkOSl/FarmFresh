@@ -1,35 +1,37 @@
 ﻿using AutoMapper;
+using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
+using FarmFresh.Repositories.Extensions;
+using FarmFresh.Services.Contacts.Econt;
+using FarmFresh.Services.Contacts.OrdersInterfaces;
+using FarmFresh.Services.Econt.APIServices;
 using FarmFresh.Services.Helpers;
 using FarmFresh.ViewModels.Order;
+using FarmFresh.ViewModels.Product;
 using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Order;
-using FarmFresh.Repositories.Extensions;
 using Microsoft.EntityFrameworkCore;
-using FarmFresh.Data.Models.Enums;
-using FarmFresh.Services.Econt;
-using FarmFresh.ViewModels.Product;
-using FarmFresh.Data.Models.Econt.APIInterraction;
-using FarmFresh.Services.Econt.APIServices;
 using Microsoft.Extensions.Configuration;
 
 namespace FarmFresh.Services.Orders;
 
-public class OrderManagmentService
+public sealed class OrderManagmentService : IOrderManagmentService
 {
     private readonly IRepositoryManager _repositoryManager;
     private readonly ILoggerManager _loggerManager;
     private readonly IMapper _mapper;
-    private readonly EcontManagmentService _econtManagmentService;
+    private readonly IEcontManagmentService _econtManagmentService;
 
     public OrderManagmentService(IRepositoryManager repositoryManager,
                         ILoggerManager loggerManager,
-                        IMapper mapper)
+                        IMapper mapper,
+						IEcontManagmentService econtManagmentService)
     {
         _repositoryManager = repositoryManager;
         _loggerManager = loggerManager;
         _mapper = mapper;
-        _econtManagmentService = new EcontManagmentService(repositoryManager, loggerManager, _mapper);
+        _econtManagmentService = econtManagmentService;
     }
 
     public async Task<Guid> CheckoutAsync(CreateOrderDto model, Guid userId, bool trackChanges)

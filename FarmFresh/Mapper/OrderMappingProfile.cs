@@ -42,6 +42,7 @@ public class OrderMappingProfile : Profile
             .ForCtorParam("Origin", opt => opt.MapFrom(src => src.Product.Origin))
             .ForCtorParam("FarmerName", opt => opt.MapFrom(src => src.Product.Farmer.User.FirstName + " " + src.Product.Farmer.User.LastName))
             .ForCtorParam("ProductPrice", opt => opt.MapFrom(src => src.Product.Price))
+            .ForCtorParam("ShipmentNumber", opt => opt.MapFrom(src => src.Order.ShipmentNumber))
             .ForCtorParam("Seasons", opt => opt.MapFrom(src => src.Product.SuitableSeason))
             .ForCtorParam("HarvestDate", opt => opt.MapFrom(src => src.Product.HarvestDate))
             .ForCtorParam("ExpirationDate", opt => opt.MapFrom(src => src.Product.ExpirationDate))
@@ -54,6 +55,7 @@ public class OrderMappingProfile : Profile
 
 		CreateMap<OrderProduct, FarmerOrderListViewModel>()
             .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+            .ForCtorParam("OrderId", opt => opt.MapFrom(src => src.OrderId))
             .ForCtorParam("ProductName", opt => opt.MapFrom(src => src.Product.Name))
             .ForCtorParam("UserFullName", opt => opt.MapFrom(src => src.Product.Farmer.User.FirstName + " " + src.Product.Farmer.User.LastName))
 			.ForCtorParam("Price", opt => opt.MapFrom(src => src.Price))

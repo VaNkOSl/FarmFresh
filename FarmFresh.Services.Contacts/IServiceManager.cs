@@ -1,6 +1,7 @@
 ﻿using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Contacts.Econt.APIServices;
 using FarmFresh.Services.Contacts.FarmersInterfaces;
+using FarmFresh.Services.Contacts.OrdersInterfaces;
 using FarmFresh.Services.Contacts.ProductsInterfaces;
 
 namespace FarmFresh.Services.Contacts;
@@ -53,5 +54,9 @@ public interface IServiceManager
     IFarmerValidationService FarmerValidationService { get; }
 
     IFarmerManagementService FarmerManagementService { get; }
-    #endregion
+
+	IOrderManagmentService OrderManagmentService { get; }
+
+	IEcontManagmentService EcontManagmentService { get; }
+	#endregion
 }

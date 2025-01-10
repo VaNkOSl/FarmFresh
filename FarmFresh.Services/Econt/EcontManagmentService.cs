@@ -5,6 +5,7 @@ using FarmFresh.Data.Models.Econt.DTOs.NumenclatureDTOs;
 using FarmFresh.Data.Models.Econt.DTOs.ShipmentDTOs;
 using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
+using FarmFresh.Services.Contacts.Econt;
 using FarmFresh.Services.Econt.APIServices;
 using FarmFresh.ViewModels.Order;
 using LoggerService.Contacts;
@@ -15,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 namespace FarmFresh.Services.Econt;
 
-public class EcontManagmentService
+public class EcontManagmentService : IEcontManagmentService
 {
     private readonly IRepositoryManager _repositoryManager;
     private readonly ILoggerManager _loggerManager;

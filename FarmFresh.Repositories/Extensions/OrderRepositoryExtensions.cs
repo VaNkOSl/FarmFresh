@@ -39,7 +39,8 @@ public static class OrderRepositoryExtensions
             .SelectMany(o => o.OrderProducts)
             .Where(op => op.Product.FarmerId == farmerId &&
             op.Order.OrderStatus != OrderStatus.Shipped 
-            && op.Order.OrderStatus != OrderStatus.ReadyForPickup)
+            && op.Order.OrderStatus != OrderStatus.ReadyForPickup &&
+            op.Order.OrderStatus != OrderStatus.Canceled)
             .Include(o => o.Order)
             .ThenInclude(ph => ph.ProductPhotos)
             .Include(ph => ph.Product)
