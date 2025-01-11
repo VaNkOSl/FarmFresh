@@ -34,69 +34,38 @@ public class EcontManagmentService : IEcontManagmentService
 
     public async Task<CreateLabelResponse> CreateLabel(Order order, bool trackChanges)
     {
-        var currUser = await GetUserAsync(order.UserId, trackChanges);
-        var currentAdress = await GetOrderAddressAsync(currUser.Id, trackChanges);
-        var orderProduct = await GetOrderProductAsync(order.Id, trackChanges);
-        var product = await GetProductAsync(orderProduct.ProductId, trackChanges);
-        var farmer = await GetFarmerAsync(product.FarmerId, trackChanges);
-        var senderUser = await GetUserAsync(farmer.UserId, trackChanges);
-        var farmerLocation = await GetFarmerLocationAsync(senderUser.Id, trackChanges);
+        var orderDetails = await _repositoryManager.OrderRepository
+            .FindOrderByConditionAsync(o => o.Id == order.Id, trackChanges)
+            .Include(u => u.User)
+            .Include(op => op.OrderProducts)
+            .ThenInclude(op => op.Product)
+            .ThenInclude(p => p.Farmer.User)
+            .FirstOrDefaultAsync();
 
-        var productCount = await GetProductCountAsync(order.Id, trackChanges);
-        var totalPrice = await GetTotalPriceAsync(order.Id, trackChanges);
+        var farmerLocation = await _repositoryManager.FarmerLocationRepository
+           .FindFarmerLocationsByConditionAsync(fl => fl.Farmer.UserId == orderDetails.OrderProducts.First().Product.Farmer.UserId, trackChanges)
+           .FirstOrDefaultAsync();
 
         var address = await GetAddressByLatAndLongAsync(farmerLocation.Longitude, farmerLocation.Latitude);
         var senderCityName = GetCityNameFromAddress(address);
 
         var senderAddress = CreateSenderAddress(senderCityName, address);
-        var receiverAddress = CreateReceiverAddress(order.City, currentAdress);
+        var receiverAddress = CreateReceiverAddress(order.City, orderDetails);
 
-        var shippingLabel = CreateShippingLabel(senderUser, currUser, senderAddress, receiverAddress, productCount, totalPrice);
+        var productCount = orderDetails.OrderProducts.Sum(op => op.Quantity);
+        var totalPrice = orderDetails.OrderProducts.Sum(op => op.Price * op.Quantity);
 
+        var shippingLabel = CreateShippingLabel(
+        senderUser: orderDetails.OrderProducts.First().Product.Farmer.User,
+        currentUser: orderDetails.User,
+        senderAddress: senderAddress,
+        receiverAddress: receiverAddress,
+        productCount: productCount,
+        totalPrice: totalPrice
+    );
 
         return await CreateEcontLabelAsync(shippingLabel);
     }
-
-    private async Task<ApplicationUser?> GetUserAsync(Guid userId, bool trackChanges) =>
-        await _repositoryManager.UserRepository
-        .FindUsersByConditionAsync(u => u.Id == userId, trackChanges)
-        .FirstOrDefaultAsync();
-
-    private async Task<Order?> GetOrderAddressAsync(Guid userId, bool trackChanges) =>
-        await _repositoryManager.OrderRepository
-        .FindOrderByConditionAsync(o => o.UserId == userId, trackChanges)
-        .FirstOrDefaultAsync();
-
-    private async Task<OrderProduct?> GetOrderProductAsync(Guid orderId, bool trackChanges) =>
-        await _repositoryManager.OrderProductRepository
-        .FindOrderProductByConditionAsync(op => op.OrderId == orderId, trackChanges)
-        .FirstOrDefaultAsync();
-
-    private async Task<Product?> GetProductAsync(Guid productId, bool trackChanges) =>
-        await _repositoryManager.ProductRepository
-        .FindProductByConditionAsync(p => p.Id == productId, trackChanges)
-        .FirstOrDefaultAsync();
-
-    private async Task<Farmer?> GetFarmerAsync(Guid farmerId, bool trackChanges) =>
-        await _repositoryManager.FarmerRepository
-        .FindFarmersByConditionAsync(f => f.Id == farmerId, trackChanges)
-        .FirstOrDefaultAsync();
-
-    private async Task<FarmerLocation?> GetFarmerLocationAsync(Guid userId, bool trackChanges) =>
-        await _repositoryManager.FarmerLocationRepository
-        .FindFarmerLocationsByConditionAsync(f => f.Farmer.UserId == userId, trackChanges)
-        .FirstOrDefaultAsync();
-
-    private async Task<int> GetProductCountAsync(Guid orderId, bool trackChanges) =>
-        await _repositoryManager.OrderProductRepository
-        .FindOrderProductByConditionAsync(o => o.OrderId == orderId, trackChanges)
-        .CountAsync();
-
-    private async Task<decimal> GetTotalPriceAsync(Guid orderId, bool trackChanges) =>
-        await _repositoryManager.OrderProductRepository
-        .FindOrderProductByConditionAsync(o => o.OrderId == orderId, trackChanges)
-        .Select(o => o.Price * o.Quantity)
-        .SumAsync();
 
     private string GetCityNameFromAddress(JObject address)
     {
@@ -132,12 +101,12 @@ public class EcontManagmentService : IEcontManagmentService
         return new AddressDTO(cityDtoReceiver, currentAdress.StreetName, currentAdress.StreetNum);
     }
 
-    private ShippingLabelDTO CreateShippingLabel(ApplicationUser senderUser, ApplicationUser currUser, AddressDTO senderAddress, AddressDTO receiverAddress, int productCount, decimal totalPrice)
+    private ShippingLabelDTO CreateShippingLabel(ApplicationUser senderUser, ApplicationUser currentUser, AddressDTO senderAddress, AddressDTO receiverAddress, int productCount, decimal totalPrice)
     {
         return new ShippingLabelDTO(
             new ClientProfileDTO(senderUser.FirstName + " " + senderUser.LastName, new List<string> { "0000000000" }),
             senderAddress,
-            new ClientProfileDTO(currUser.FirstName + " " + currUser.LastName, new List<string> { "1111111111" }),
+            new ClientProfileDTO(currentUser.FirstName + " " + currentUser.LastName, new List<string> { "1111111111" }),
             receiverAddress,
             productCount,
             productCount * 1,
@@ -214,110 +183,114 @@ public class EcontManagmentService : IEcontManagmentService
     public async Task<decimal> CalculatePrice(Order order, bool trackChanges)
     {
         var cartItems = await _repositoryManager.CartItemRepository
-           .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
-           .Include(p => p.Product)
-           .ThenInclude(ph => ph.ProductPhotos)
-           .Include(u => u.User)
-           .ToListAsync();
+            .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
+            .Include(p => p.Product)
+            .ThenInclude(p => p.Farmer.User)
+            .Include(ph => ph.Product.ProductPhotos)
+            .ToListAsync();
 
-        
+        var farmerLocations = await _repositoryManager.FarmerLocationRepository
+            .FindFarmerLocationsByConditionAsync(
+            f => cartItems.Select(ci => ci.Product.Farmer.UserId).Contains(f.Farmer.UserId), trackChanges)
+            .Include(f => f.Farmer)
+            .ToListAsync();
+
         var cartItemViewModels = _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
-
-        decimal sum = 0m;
+        decimal totalSum = 0m;
 
         try
         {
-
-            foreach (var CartItem in cartItemViewModels)
+            foreach(var cartItem in cartItemViewModels)
             {
-                var currProduct = await _repositoryManager.ProductRepository
-                    .FindProductByConditionAsync(p => p.Id == CartItem.ProductId, trackChanges)
-                    .FirstOrDefaultAsync();
+                var product = cartItems.First(ci => ci.ProductId == cartItem.ProductId).Product;
+                var farmer = product.Farmer;
+                var senderUser = farmer.User;
+                var farmerLocation = farmerLocations.FirstOrDefault(fl => fl.Farmer.UserId == senderUser.Id);
 
-                var senderUserId = await _repositoryManager.FarmerRepository
-                    .FindFarmersByConditionAsync(f => f.Id == currProduct.FarmerId, trackChanges: trackChanges)
-                    .FirstOrDefaultAsync();
+                var address = await GetAddressByLatAndLongAsync(farmerLocation.Longitude, farmerLocation.Latitude);
 
-                var senderUser = await _repositoryManager.UserRepository
-                    .FindUsersByConditionAsync(u => u.Id == senderUserId.UserId, trackChanges: trackChanges)
-                    .FirstOrDefaultAsync();
+                var senderCityName = ExtractCityNameFromAddress(address);
+                var streetName = ExtractStreetNameFromAddress(address);
 
-                var currUser = await _repositoryManager.UserRepository
-                    .FindUsersByConditionAsync(u => u.Id == order.UserId, trackChanges: trackChanges)
-                    .FirstOrDefaultAsync();
-
-                var FarmerLocation = await _repositoryManager.FarmerLocationRepository
-                    .FindFarmerLocationsByConditionAsync(f => f.Farmer.UserId == senderUser.Id, trackChanges: trackChanges)
-                    .FirstOrDefaultAsync();
-
-                var locationLat = FarmerLocation.Latitude;
-                var locationLon = FarmerLocation.Longitude;
-                var address = await GetAddressByLatAndLongAsync(locationLon, locationLat);
-
-                var cityDtoReveiver = new CityDTO
-                {
-
-                    Name = order.City,
-                    Country = new CountryDTO { Code3 = "BGR" }
-                };
-
-                var addressComponents = address["results"]?[0]?["address_components"];
-                var senderCityName = addressComponents?
-                    .FirstOrDefault(component => component["types"]?.Any(type => type.ToString() == "locality") ?? false)?
-                    ["long_name"]?.ToString()?.Trim();
-
-                var cityDtoSender = new CityDTO
-                {
-
-                    Name = senderCityName,
-                    Country = new CountryDTO { Code3 = "BGR" }
-                };
-
-                var streetName = addressComponents?
-                .FirstOrDefault(component => component["types"]?.Any(type => type.ToString() == "route") ?? false)?
-                ["long_name"]?.ToString()?.Trim();
-
-                var shipmentRequest = new CalculateShipmentPriceRequest(
-                new ShippingLabelDTO(
-                    senderClient: new ClientProfileDTO($"{senderUser.FirstName} {senderUser.LastName}", new List<string> { senderUser.PhoneNumber }),
-                    senderAddress: new AddressDTO(
-                        city: cityDtoSender,
-                        streetName: streetName,
-                        streetNum: "3"
-                        ),
-                    receiverClient: new ClientProfileDTO($"{currUser.FirstName} {currUser.LastName}", new List<string> { order.PhoneNumber }),
-                    receiverAddress: new AddressDTO(
-                        city: cityDtoReveiver,
-                        streetName: order.StreetName,
-                        streetNum: order.StreetNum
-                    ),
-                    packCount: CartItem.Quantity,
-                    weigth: 1 * (order.OrderProducts.Count()),
-                    shipmentType: ShipmentType.Pack,
-                    shipmentDescription: "Order shipment",
-                    orderPrice: (double)CartItem.TotalPrice
-                )
-            );
-
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json")
-                    .Build();
-
-                var httpClient = new HttpClient();
-                var _econtLabelService = new EcontLabelService(configuration, httpClient);
-                var TotalPriceTask = await _econtLabelService.CalculateShipmentAsync(shipmentRequest);
-
-                double? totalPriceNullable = TotalPriceTask;
-                sum += totalPriceNullable.HasValue ? (decimal)totalPriceNullable.Value : 0m;
+                var shipmentRequest = BuildShipmentRequest(cartItem, order, senderUser, senderCityName, streetName);
+                var shipmentPrice = await CalculateShipmentPrice(shipmentRequest);
+                totalSum += shipmentPrice;
             }
         }
         catch (Exception ex)
         {
             _loggerManager.LogError($"An unexpected error occurred: {ex.Message}");
-            throw new Exception();
+            throw;
         }
 
-        return sum;
+        return totalSum;
+    }
+
+    private string ExtractCityNameFromAddress(JObject address)
+    {
+        var addressComponents = address["results"]?[0]?["address_components"];
+        return addressComponents?
+            .FirstOrDefault(component => component["types"]?.Any(type => type.ToString() == "locality") ?? false)?
+            ["long_name"]?.ToString()?.Trim();
+    }
+
+    private string ExtractStreetNameFromAddress(JObject address)
+    {
+        var addressComponents = address["results"]?[0]?["address_components"];
+        return addressComponents?
+            .FirstOrDefault(component => component["types"]?.Any(type => type.ToString() == "route") ?? false)?
+            ["long_name"]?.ToString()?.Trim();
+    }
+
+    private CalculateShipmentPriceRequest BuildShipmentRequest(CartItemViewModel cartItem, Order order,
+                                                               ApplicationUser senderUser, string senderCityName,
+                                                               string streetName)
+    {
+        var senderCity = new CityDTO
+        {
+            Name = senderCityName,
+            Country = new CountryDTO { Code3 = "BGR" }
+        };
+
+        var receiverCity = new CityDTO
+        {
+            Name = order.City,
+            Country = new CountryDTO { Code3 = "BGR" }
+        };
+
+        return new CalculateShipmentPriceRequest(
+       new ShippingLabelDTO(
+           senderClient: new ClientProfileDTO($"{senderUser.FirstName} {senderUser.LastName}", new List<string> { senderUser.PhoneNumber }),
+           senderAddress: new AddressDTO(
+               city: senderCity,
+               streetName: streetName,
+               streetNum: "3"
+           ),
+           receiverClient: new ClientProfileDTO($"{order.FirstName} {order.LastName}", new List<string> { order.PhoneNumber }),
+           receiverAddress: new AddressDTO(
+               city: receiverCity,
+               streetName: order.StreetName,
+               streetNum: order.StreetNum
+           ),
+           packCount: cartItem.Quantity,
+           weigth: 1 * order.OrderProducts.Count(),
+           shipmentType: ShipmentType.Pack,
+           shipmentDescription: "Order shipment",
+           orderPrice: (double)cartItem.TotalPrice
+       )
+   );
+    }
+
+    private async Task<decimal> CalculateShipmentPrice(CalculateShipmentPriceRequest request)
+    {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+        var httpClient = new HttpClient();
+        var econtLabelService = new EcontLabelService(configuration, httpClient);
+        var shipmentPrice = await econtLabelService.CalculateShipmentAsync(request);
+        return shipmentPrice.HasValue ? (decimal)shipmentPrice.Value : 0m;
     }
 }

@@ -37,7 +37,8 @@ public sealed class OrderManagmentService : IOrderManagmentService
     public async Task<Guid> CheckoutAsync(CreateOrderDto model, Guid userId, bool trackChanges)
     {
         var order = await _repositoryManager.OrderRepository
-            .FindOrderByConditionAsync(u => u.UserId == userId, trackChanges)
+            .FindOrderByConditionAsync(u => u.UserId == userId && 
+            u.OrderStatus != OrderStatus.Completed, trackChanges)
             .GetOrderWithDetails()
             .FirstOrDefaultAsync();
 
