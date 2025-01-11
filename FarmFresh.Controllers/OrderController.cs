@@ -45,29 +45,27 @@ public class OrderController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CreateOrderDto model, Guid productId)
     {
-
         var userId = Guid.Parse(User.GetId());
         model.Adress = $"{model.City}, {model.EcontOfficeAddress}";
         bool isValidAddress = await ValidateAddressAsync(model);
+
         if (!isValidAddress)
         {
-            ModelState.AddModelError("", "Invalid address. Please check the address and try again.");
+            TempData[ErrorMessage] = InvalidOrderAdress;
+            var DeliveryList = Enum.GetValues(typeof(DeliveryOption))
+               .Cast<DeliveryOption>()
+               .Select(s => new SelectListItem
+               {
+                   Text = s.ToString(),
+                   Value = ((int)s).ToString()
+               })
+              .ToList();
+                    ViewData["DeliveryOption"] = DeliveryList;
             return View(model);
         }
 
-        try
-        {
-            var orderId = await _serviceManager.OrderService.CheckoutAsync(model, userId, trackChanges: true);
-            return RedirectToAction("OrderConfirmation", new { id = orderId });
-
-    }
-        catch (Exception ex)
-        {
-            ModelState.AddModelError("", "An error occurred while processing your order. Please try again.");
-        }
-
-
-        return View(model);
+        var orderId = await _serviceManager.OrderService.CheckoutAsync(model, userId, trackChanges: true);
+        return RedirectToAction("OrderConfirmation", new { id = orderId });
     }
 
     [HttpGet("orderconfirmation")]

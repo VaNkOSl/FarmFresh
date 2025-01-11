@@ -32,5 +32,6 @@ public static class MessagesConstants
     public static class Orders
     {
         public static string OrderSuccessfullyPlaced = "Your order has been successfully placed. Thank you for shopping with us!";
+        public static string InvalidOrderAdress = "Invalid address. Please check the address and try again.";
     }
 }
