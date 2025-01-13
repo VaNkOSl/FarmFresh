@@ -24,8 +24,7 @@ public class EcontManagmentService : IEcontManagmentService
 
     public EcontManagmentService(IRepositoryManager repositoryManager,
                       ILoggerManager loggerManager,
-                      IMapper mapper
-                      )
+                      IMapper mapper)
     {
         _repositoryManager = repositoryManager;
         _loggerManager = loggerManager;
@@ -55,14 +54,7 @@ public class EcontManagmentService : IEcontManagmentService
         var productCount = orderDetails.OrderProducts.Sum(op => op.Quantity);
         var totalPrice = orderDetails.OrderProducts.Sum(op => op.Price * op.Quantity);
 
-        var shippingLabel = CreateShippingLabel(
-        senderUser: orderDetails.OrderProducts.First().Product.Farmer.User,
-        currentUser: orderDetails.User,
-        senderAddress: senderAddress,
-        receiverAddress: receiverAddress,
-        productCount: productCount,
-        totalPrice: totalPrice
-    );
+        var shippingLabel = CreateShippingLabel(orderDetails.OrderProducts.First().Product.Farmer.User, orderDetails.User, senderAddress, receiverAddress, productCount, totalPrice);
 
         return await CreateEcontLabelAsync(shippingLabel);
     }
@@ -101,12 +93,12 @@ public class EcontManagmentService : IEcontManagmentService
         return new AddressDTO(cityDtoReceiver, currentAdress.StreetName, currentAdress.StreetNum);
     }
 
-    private ShippingLabelDTO CreateShippingLabel(ApplicationUser senderUser, ApplicationUser currentUser, AddressDTO senderAddress, AddressDTO receiverAddress, int productCount, decimal totalPrice)
+    private ShippingLabelDTO CreateShippingLabel(ApplicationUser senderUser, ApplicationUser currUser, AddressDTO senderAddress, AddressDTO receiverAddress, int productCount, decimal totalPrice)
     {
         return new ShippingLabelDTO(
             new ClientProfileDTO(senderUser.FirstName + " " + senderUser.LastName, new List<string> { "0000000000" }),
             senderAddress,
-            new ClientProfileDTO(currentUser.FirstName + " " + currentUser.LastName, new List<string> { "1111111111" }),
+            new ClientProfileDTO(currUser.FirstName + " " + currUser.LastName, new List<string> { "1111111111" }),
             receiverAddress,
             productCount,
             productCount * 1,

@@ -22,6 +22,7 @@ dropArea.addEventListener('drop', (e) => {
     handleFiles(e.dataTransfer.files);
 });
 
+
 fileInput.addEventListener('change', () => {
     handleFiles(fileInput.files);
 });
@@ -41,14 +42,26 @@ function updateFileInput() {
 }
 
 function displayPreview(files) {
-    files.forEach((file) => {
+    files.forEach((file, index) => {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
 
             reader.onload = function (e) {
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'preview-item';
+
                 const imgElement = document.createElement('img');
                 imgElement.src = e.target.result;
-                preview.appendChild(imgElement);
+                imgElement.alt = file.name;
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'X';
+                removeButton.className = 'remove-button';
+                removeButton.addEventListener('click', () => removeFile(index, previewContainer));
+
+                previewContainer.appendChild(imgElement);
+                previewContainer.appendChild(removeButton);
+                preview.appendChild(previewContainer);
             };
 
             reader.readAsDataURL(file);
@@ -56,4 +69,10 @@ function displayPreview(files) {
             alert('Only image files are allowed!');
         }
     });
+}
+
+function removeFile(index, previewContainer) {
+    droppedFiles.splice(index, 1); 
+    updateFileInput(); 
+    previewContainer.remove(); 
 }

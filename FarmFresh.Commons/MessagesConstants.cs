@@ -21,6 +21,7 @@ public static class MessagesConstants
         public static string SuccessfullyRegister = "Hello {0}, you have successfully registered! Welcome aboard.";
         public static string SendEmailForResetingPassword = "An email with a link to reset your password has been sent to the provided email address {0}. Please check your inbox and follow the instructions to reset your password.";
         public static string SuccessfullyResetThePassword = "Your password has been successfully reset! You can now log in using your new password.";
+        public static string SuccessfullyChangePassword = "Success! Your password has been updated. Please use your new password for future logins.";
     }
 
     public static class Cars

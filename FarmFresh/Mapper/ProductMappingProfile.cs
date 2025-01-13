@@ -113,7 +113,7 @@ public class ProductMappingProfile : Profile
                     : new List<ProductPhotosDto>()))
         .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src =>
             src.Reviews != null && src.Reviews.Any()
-                ? src.Reviews.Select(review => new ViewModels.Review.ProductReviewDto
+                ? src.Reviews.Select(review => new ProductReviewDto
                 {
                     Id = review.Id,
                     Content = review.Content,

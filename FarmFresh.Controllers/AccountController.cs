@@ -158,6 +158,20 @@ public class AccountController : BaseController
         return View(model);
     }
 
+    [HttpGet("changepassword")]
+    public async Task<IActionResult> ChangePassword(Guid id) =>
+        View(await _accountService.GetUserForPasswordChangeAsync(id, trackChanges: false));
+
+    [HttpPost("changepassword")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+
+        var result = await _accountService.ChangePassword(Guid.Parse(User.GetId()),model, trackChanges: true);
+
+        TempData[SuccessMessage] = SuccessfullyChangePassword;
+        return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
     public async Task<IActionResult> Logout()
     {
         await _accountService.Logout();

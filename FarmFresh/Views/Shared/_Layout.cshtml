@@ -30,6 +30,7 @@
                         @if (userIsAFarmer == true)
                         {
                             <li><a class="dropdown-item" asp-action="Mine" asp-controller="Product">My Products</a></li>
+                            <li><a class="dropdown-item" asp-action="Add" asp-controller="Product">Add Product</a></li>
                         }
                     </ul>
                 </li>
@@ -71,21 +72,11 @@
             <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar">
                 <div class="container-fluid" id="contentId">
                     <ul  class="navbar-nav flex-nowrap d-flex align-items-center gap-3">
-                            @if (userIsAFarmer is true)
+                        @if (User.Identity.IsAuthenticated == true && userIsAFarmer == false)
                             {
-                                <a asp-action="Add" asp-controller="Product" class="nav-link">
-                                    <i class="fas fa-seedling"></i>
-                                    <span>Add Product!</span>
+                                <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">
+                                    <i class="fas fa-user-farmer fa-fw"></i> Become a Farmer
                                 </a>
-                            }
-                            else
-                            {
-                                @if (User.Identity.IsAuthenticated == true)
-                                {
-                                    <a asp-action="Become" asp-controller="Farmer" class="btn btn-link text-gray-600 me-2">
-                                        <i class="fas fa-user-farmer fa-fw"></i> Become a Farmer
-                                    </a>
-                                }
                             }
                         <li class="nav-item">
                             <a asp-action="Index" asp-controller="Cart" class="btn btn-link text-gray-600">

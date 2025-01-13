@@ -37,10 +37,16 @@ public class Order : Entity_1<Guid>
 
     public DateTime CreateOrderdDate { get; set; }
 
+    public DateTime? ShippedDate { get; set; }
+
     [Required]
     public DeliveryOption DeliveryOption { get; set; }
 
     public OrderStatus? OrderStatus { get; set; }
+
+    public PaymentOption? PaymentOption { get; set; }
+
+    public decimal TotalPrice { get; set; }
 
     public bool IsTaken { get; set; }
 

@@ -87,20 +87,21 @@ public sealed class OrderManagmentService : IOrderManagmentService
             .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
             .ToListAsync();
 
-        _loggerManager.LogInfo($"[{CompleteOrderAsync}] Found {cartItemToRemove.Count} cart items to remove for user {order.UserId}");
+        _loggerManager.LogInfo($"[{"CompleteOrderAsync"}] Found {cartItemToRemove.Count} cart items to remove for user {order.UserId}");
 
         foreach (var cart in cartItemToRemove)
         {
             _repositoryManager.CartItemRepository.DeleteItem(cart);
-            _loggerManager.LogInfo($"[{CompleteOrderAsync}] Removed cart item with ID {cart.Id} for user {order.UserId}");
+            _loggerManager.LogInfo($"[{"CompleteOrderAsync"}] Removed cart item with ID {cart.Id} for user {order.UserId}");
         }
 
         var labelResponse = await _econtManagmentService.CreateLabel(order, true);
         order.OrderStatus = OrderStatus.Completed;
+        order.PaymentOption = PaymentOption.WhenPickingUp;
         order.ShipmentNumber = labelResponse.Label.ShipmentNumber;
         _repositoryManager.OrderRepository.UpdateOrder(order);
         await _repositoryManager.SaveAsync();
-        _loggerManager.LogInfo($"[{CompleteOrderAsync}] Successfully updated the order with ID {orderId} to status 'Completed'.");
+        _loggerManager.LogInfo($"[{"CompleteOrderAsync"}] Successfully updated the order with ID {orderId} to status 'Completed'.");
     }
 
     public async Task<bool> SendOrderAsync(Guid orderId, bool trackChanges)
@@ -113,6 +114,7 @@ public sealed class OrderManagmentService : IOrderManagmentService
         }
 
         order.OrderStatus = OrderStatus.Shipped;
+        order.ShippedDate = DateTime.UtcNow;
         _repositoryManager.OrderRepository.UpdateOrder(order);
         await _repositoryManager.SaveAsync();
         _loggerManager.LogInfo($"[{SendOrderAsync}] Successfully send order with ID {order.Id}");
@@ -142,6 +144,10 @@ public sealed class OrderManagmentService : IOrderManagmentService
             .ToListAsync();
 
         var shipmentPrice = await _econtManagmentService.CalculatePrice(order, trackChanges);
+
+        order.TotalPrice = cartItems.Sum(p => p.Quantity * p.Product.Price + shipmentPrice);
+        _repositoryManager.OrderRepository.UpdateOrder(order);
+        await _repositoryManager.SaveAsync();
 
         var cartItemViewModels = _mapper.Map<IEnumerable<CartItemViewModel>>(cartItems);
 
@@ -209,5 +215,36 @@ public sealed class OrderManagmentService : IOrderManagmentService
         }
 
         return _mapper.Map<List<OrderListViewModel>>(order);
+    }
+
+    public async Task CompleteOrderAsync(Guid orderId, bool trackChanges, PaymentOption paymentOption)
+    {
+        var order = await _repositoryManager.OrderRepository
+       .FindOrderByConditionAsync(r => r.Id == orderId, trackChanges)
+       .FirstOrDefaultAsync();
+
+        OrderHelper.ChekOrderNotFound(order, order.Id, "CompleteOrderAsync", _loggerManager);
+
+        var cartItemToRemove = await _repositoryManager.CartItemRepository
+            .FindCartItemsByConditionAsync(c => c.UserId == order.UserId, trackChanges)
+            .ToListAsync();
+
+        _loggerManager.LogInfo($"[{nameof(CompleteOrderAsync)}] Found {cartItemToRemove.Count} cart items to remove for user {order.UserId}");
+
+        foreach (var cart in cartItemToRemove)
+        {
+            _repositoryManager.CartItemRepository.DeleteItem(cart);
+            _loggerManager.LogInfo($"[{nameof(CompleteOrderAsync)}] Removed cart item with ID {cart.Id} for user {order.UserId}");
+        }
+
+        var labelResponse = await _econtManagmentService.CreateLabel(order, true);
+
+        order.OrderStatus = OrderStatus.Completed;
+        order.PaymentOption = paymentOption;
+
+        _repositoryManager.OrderRepository.UpdateOrder(order);
+        await _repositoryManager.SaveAsync();
+
+        _loggerManager.LogInfo($"[{nameof(CompleteOrderAsync)}] Order {order.Id} completed with payment option {paymentOption}");
     }
 }

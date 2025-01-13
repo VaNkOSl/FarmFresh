@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FarmFresh.Data.Models;
 using FarmFresh.Data.Models.Econt.APIInterraction;
+using FarmFresh.Data.Models.Enums;
 using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts;
 using FarmFresh.Services.Contacts.Econt;
@@ -43,6 +44,9 @@ internal class OrderService : IOrderService
     public async Task CompleteOrderAsync(Guid orderId, bool trackChanges) =>
         await _orderManagmentService.CompleteOrderAsync(orderId, trackChanges);
 
+    public async Task CompleteOrderAsync(Guid orderId, bool trackChanges, PaymentOption paymentOption) =>
+        await _orderManagmentService.CompleteOrderAsync(orderId, trackChanges, paymentOption);
+
     public async Task<OrderConfirmationViewModel> GetOrderConfirmationViewModelAsync(Guid orderId, bool trackChanges) =>
         await _orderManagmentService.GetOrderConfirmationViewModelAsync(orderId, trackChanges);
 
@@ -79,5 +83,6 @@ internal class OrderService : IOrderService
 
     public async Task<CreateLabelResponse> CreateLabel(Order order, bool trackChanges) =>
         await _econtManagmentService.CreateLabel(order, trackChanges);
-    
+
+
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Stripe;
 using static FarmFresh.Commons.NotificationMessagesConstants;
 using static FarmFresh.Commons.MessagesConstants.Orders;
+using FarmFresh.Data.Models.Enums;
 
 namespace FarmFresh.Controllers;
 
@@ -59,10 +60,10 @@ public class PaymentController : BaseController
         var service = new ChargeService();
         Charge charge = await service.CreateAsync(options);
 
-        await _serviceManager.OrderService.CompleteOrderAsync(id, trackChanges: true);
-
         if (charge.Status == "succeeded")
         {
+            await _serviceManager.OrderService.CompleteOrderAsync(id, true, PaymentOption.Cart);
+
             TempData[SuccessMessage] = OrderSuccessfullyPlaced;
             return RedirectToAction("Index", "Home");
         }

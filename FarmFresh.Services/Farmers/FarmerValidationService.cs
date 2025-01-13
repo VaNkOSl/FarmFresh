@@ -1,4 +1,5 @@
-﻿using FarmFresh.Data.Models.Repositories;
+﻿using FarmFresh.Data.Models.Enums;
+using FarmFresh.Data.Models.Repositories;
 using FarmFresh.Services.Contacts.FarmersInterfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +26,7 @@ public class FarmerValidationService : IFarmerValidationService
     public async Task<bool> DoesFarmerExistsByuserId(string userId, bool trackChanges) =>
         await _repositoryManager
         .FarmerRepository
-        .FindFarmersByConditionAsync(f => f.UserId.ToString() == userId, trackChanges)
+        .FindFarmersByConditionAsync(f => f.UserId.ToString() == userId && f.FarmerStatus == Status.Approved, trackChanges)
         .AnyAsync();
 
     public async Task<bool> DoesFarmerHasProductsAsync(string userId, Guid productId, bool trackChanges)

@@ -1,4 +1,5 @@
-﻿using FarmFresh.ViewModels.Order;
+﻿using FarmFresh.Data.Models.Enums;
+using FarmFresh.ViewModels.Order;
 
 namespace FarmFresh.Services.Contacts.OrdersInterfaces;
 
@@ -17,4 +18,6 @@ public interface IOrderManagmentService
 	Task<IEnumerable<FarmerOrderListViewModel>> GetOrderConfirmationForFarmersViewModelAsync(Guid farmerId, bool trackChanges);
 
 	Task<List<OrderListViewModel>> GetOrdersForUserAsync(string userId, bool trackChanges);
+
+	Task CompleteOrderAsync(Guid orderId, bool trackChanges, PaymentOption paymentOption);
 }

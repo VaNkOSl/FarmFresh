@@ -9,6 +9,7 @@ using LoggerService.Contacts;
 using LoggerService.Exceptions.InternalError.Review;
 using Microsoft.EntityFrameworkCore;
 using FarmFresh.Repositories.Extensions;
+using FarmFresh.Data.Models.Enums;
 
 namespace FarmFresh.Services;
 
@@ -66,6 +67,7 @@ internal sealed class ReviewService : IReviewService
     {
         var orders = await _repositoryManager.OrderRepository
          .FindOrderByConditionAsync(r => r.UserId == userId, trackChanges)
+         .Where(o => o.OrderStatus == OrderStatus.ReadyForPickup)
          .GetAllProductsForReviewByUserAsync()
          .ToListAsync();
 
