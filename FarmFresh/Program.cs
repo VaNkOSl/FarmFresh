@@ -1,14 +1,10 @@
-using FarmFresh.Data;
-using AutoMapper;
-using FarmFresh.Mapper;
 using FarmFresh.Extensions;
 using FarmFresh.Infrastructure.Extensions;
-using FarmFresh.Services.Contacts;
+using FarmFresh.Mapper;
 using LoggerService.Contacts;
 using Microsoft.AspNetCore.Identity;
 using NLog;
 using static FarmFresh.Commons.GeneralApplicationConstants;
-using FarmFresh.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +22,7 @@ builder.Services.ConfigureCookieAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureServicesCORS();
 builder.Services.ConfigureStriple(builder.Configuration);
+builder.Services.AddHostedService<OrderStatusUpdater>();
 
 builder.Services.AddSession(options =>
 {

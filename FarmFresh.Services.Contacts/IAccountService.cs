@@ -33,4 +33,8 @@ public interface IAccountService
     Task BlockUserAsync(Guid userId, bool trackChanges);
 
     Task UnblockUserAsync(Guid userId, bool trackChanges);
+
+    Task<ChangePasswordViewModel> GetUserForPasswordChangeAsync(Guid userId, bool trackChanges);
+
+    Task<bool> ChangePassword(Guid userId,ChangePasswordViewModel changePasswordDto, bool trackChanges);
 }

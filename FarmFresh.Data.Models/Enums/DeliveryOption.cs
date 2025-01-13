@@ -2,6 +2,5 @@
 
 public enum DeliveryOption
 {
-    Econt = 0,
-    HomeAdress = 1,
+    Econt = 0
 }

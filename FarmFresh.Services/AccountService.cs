@@ -388,4 +388,35 @@ public sealed class AccountService : IAccountService
             authProperties
         );
     }
+
+    public async Task<ChangePasswordViewModel> GetUserForPasswordChangeAsync(Guid userId, bool trackChanges)
+    {
+        var user = await _repositoryManager.UserRepository
+            .FindUsersByConditionAsync(f => f.Id == userId, trackChanges)
+            .FirstOrDefaultAsync();
+
+        var model = new ChangePasswordViewModel(userId ,user.FirstName + " " + user.LastName, "", "");
+
+        return model;
+    }
+
+    public async Task<bool> ChangePassword(Guid userId, ChangePasswordViewModel changePasswordDto, bool trackChanges)
+    {
+        var user = await _repositoryManager.UserRepository
+           .FindUsersByConditionAsync(f => f.Id == userId, trackChanges)
+           .FirstOrDefaultAsync();
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, changePasswordDto.NewPassword);
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            _loggerManager.LogError($"Failed to update password for user with ID {changePasswordDto.Id}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        _loggerManager.LogInfo($"Password successfully changed for user with ID {changePasswordDto.Id} at {DateTime.UtcNow}.");
+
+        return true;
+    }
 }

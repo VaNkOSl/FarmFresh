@@ -112,6 +112,7 @@ public class ProductsQueryService : IProductsQueryService
          .Include(f => f.Farmer)
          .ThenInclude(u => u.User)
          .Include(r => r.Reviews)
+         .ThenInclude(u => u.User)
          .Include(c => c.Category)
          .FirstOrDefaultAsync();
 }
